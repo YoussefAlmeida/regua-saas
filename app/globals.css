@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================================
+   RÉGUA — Design Tokens
+   Paleta "Aço & Âmbar" · Direção "Oficina Noturna"
+   ================================================================ */
+@layer base {
+  :root {
+    /* ── shadcn/ui — sistema HSL ──────────────────────────────── */
+    --background:          240 5% 5%;     /* #0B0B0C */
+    --foreground:          45 18% 94%;    /* #F2F1ED */
+    --card:                240 5% 8%;    /* #141416 */
+    --card-foreground:     45 18% 94%;
+    --popover:             240 5% 12%;   /* #1E1E21 */
+    --popover-foreground:  45 18% 94%;
+    --primary:             38 76% 60%;   /* #E8B04B — âmbar */
+    --primary-foreground:  38 33% 6%;    /* #14110A */
+    --secondary:           240 5% 17%;   /* #2A2A2E */
+    --secondary-foreground: 45 18% 94%;
+    --muted:               240 5% 12%;
+    --muted-foreground:    240 4% 65%;   /* #A1A1A8 */
+    --accent:              38 76% 60%;   /* âmbar — mesma do primary */
+    --accent-foreground:   38 33% 6%;
+    --destructive:         3 72% 59%;    /* #E2564D */
+    --destructive-foreground: 45 18% 94%;
+    --border:              240 5% 17%;   /* #2A2A2E */
+    --input:               240 5% 17%;
+    --ring:                38 76% 60%;
+    --radius:              0.75rem;      /* 12px — cards */
+
+    /* ── RÉGUA custom tokens — hex direto ─────────────────────── */
+    --bg:            #0B0B0C;
+    --surface:       #141416;
+    --surface-2:     #1E1E21;
+    --line:          #2A2A2E;
+    --fg:            #F2F1ED;
+    --fg-muted:      #A1A1A8;
+    --regua-accent:  #E8B04B;
+    --accent-press:  #C9963B;
+    --accent-fg:     #14110A;
+
+    /* Semântica financeira — NUNCA usar pra success/error */
+    --entrada:  #4FB477;
+    --saida:    #E2564D;
+    --info:     #6BA3D6;
+
+    /* Tipografia */
+    --font-display: 'Anton', 'Arial Narrow', sans-serif;
+    --font-ui:      'Oswald', sans-serif;
+    --font-body:    'Open Sans', system-ui, sans-serif;
+    --font-mono:    'Space Mono', 'Courier New', monospace;
+  }
+}
+
+/* ================================================================
+   Base
+   ================================================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-ui);
+  }
+
+  /* Números e valores monetários */
+  .valor-monetario {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* ================================================================
+   Utilitários customizados
+   ================================================================ */
+@layer utilities {
+  /* Motion contido — 150–220ms ease-out, conforme spec */
+  .transition-regua {
+    transition-duration: 180ms;
+    transition-timing-function: ease-out;
+  }
+
+  /* Bottom sheet — ações frequentes ficam na metade inferior */
+  .bottom-sheet {
+    @apply fixed bottom-0 left-0 right-0 bg-surface-alt rounded-t-2xl p-4 z-50;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  /* Estado vazio nunca fica vazio */
+  .empty-state {
+    @apply flex flex-col items-center justify-center gap-3 py-12 text-center;
+    color: var(--fg-muted);
+  }
+}
