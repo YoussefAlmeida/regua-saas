@@ -15,7 +15,6 @@ export async function GET(req: NextRequest) {
 }
 
 // Recebimento de eventos (POST)
-export async function POST(_req: NextRequest) {
-  // TODO (Dia 5): processar eventos de status de mensagem
+export async function POST() {
   return NextResponse.json({ received: true })
 }

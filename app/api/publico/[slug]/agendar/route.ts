@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha } from '@/lib/auth'
+import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
 
 const SchemaAgendar = z.object({
   profissional_id: z.string().uuid(),
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, status')
+    .select('id, nome, status')
     .eq('slug', slug)
     .single()
 
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   const { data: servico } = await db
     .from('servicos')
-    .select('id, preco, duracao_min, ativo')
+    .select('id, nome, preco, duracao_min, ativo')
     .eq('id', servico_id)
     .eq('barbearia_id', barbearia.id)
     .single()
@@ -108,6 +109,43 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     const msg = error.message.includes('sem_conflito') ? 'Horário já ocupado. Escolha outro horário.' : 'Erro ao criar agendamento'
     return NextResponse.json({ erro: msg }, { status: 409 })
   }
+
+  // Notificações WhatsApp (fire-and-forget)
+  const dataLocal = inicioDate.toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
+  const horaLocal = inicioDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia' })
+
+  const { data: profDetalhes } = await db
+    .from('profissionais')
+    .select('nome, usuarios!usuario_id(whatsapp)')
+    .eq('id', profissional_id)
+    .single()
+
+  const profNome = profDetalhes?.nome ?? 'Barbeiro'
+  const profWhatsapp = Array.isArray(profDetalhes?.usuarios)
+    ? (profDetalhes.usuarios[0] as { whatsapp?: string })?.whatsapp
+    : (profDetalhes?.usuarios as unknown as { whatsapp?: string } | null)?.whatsapp
+
+  const textoCliente = textoConfirmacaoCliente({
+    clienteNome: cliente_nome,
+    barbeariaNome: barbearia.nome ?? 'Barbearia',
+    servicoNome: servico.nome ?? 'Serviço',
+    barbeiiroNome: profNome,
+    data: dataLocal,
+    hora: horaLocal,
+  })
+
+  const textoBarbeiro = textoNotificacaoBarbeiro({
+    barbeiiroNome: profNome,
+    clienteNome: cliente_nome,
+    servicoNome: servico.nome ?? 'Serviço',
+    data: dataLocal,
+    hora: horaLocal,
+  })
+
+  await Promise.allSettled([
+    enviarTexto(cliente_whatsapp, textoCliente),
+    profWhatsapp ? enviarTexto(profWhatsapp, textoBarbeiro) : Promise.resolve(false),
+  ])
 
   return NextResponse.json({ agendamento, ok: true }, { status: 201 })
 }
