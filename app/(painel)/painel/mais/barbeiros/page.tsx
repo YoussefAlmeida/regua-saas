@@ -1,8 +1,23 @@
-// Dia 2 — Barbeiros: lista + aprovação de cadastros pendentes
-export default function BarbeirosPage() {
-  return (
-    <div className="min-h-screen bg-bg flex items-center justify-center">
-      <p className="font-ui text-fg-muted uppercase tracking-wider">Barbeiros — Dia 2</p>
-    </div>
-  )
+import { headers, cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { criarClienteAutenticado } from '@/lib/supabase/server'
+import { COOKIE_SESSION } from '@/lib/auth'
+import BarbeirosClient from './barbeiros-client'
+
+export default async function BarbeirosPage() {
+  const h = await headers()
+  const papel = h.get('x-papel')
+  if (papel !== 'dono') redirect('/painel/mais')
+
+  const cookieStore = await cookies()
+  const token = cookieStore.get(COOKIE_SESSION)!.value
+  const db = criarClienteAutenticado(token)
+
+  const { data: barbeiros } = await db
+    .from('usuarios')
+    .select('id, nome, whatsapp, status, ativo, criado_em')
+    .eq('papel', 'barbeiro')
+    .order('criado_em', { ascending: false })
+
+  return <BarbeirosClient barbeirosIniciais={barbeiros ?? []} />
 }

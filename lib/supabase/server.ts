@@ -1,45 +1,22 @@
-import { type CookieOptions, createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
+import { createClient } from '@supabase/supabase-js'
 
-/** Supabase client para Server Components e Route Handlers */
-export async function createClient() {
-  const cookieStore = await cookies()
-
-  return createServerClient(
+/** Service role — bypassa RLS; NUNCA expor no cliente */
+export function criarClienteServico() {
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options),
-            )
-          } catch {
-            // Server Component — cookies só podem ser definidos em
-            // Server Actions ou Route Handlers; o erro é esperado aqui.
-          }
-        },
-      },
-    },
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false, autoRefreshToken: false } },
   )
 }
 
-/** Supabase client com service_role — NUNCA usar no cliente */
-export async function createServiceClient() {
-  const cookieStore = await cookies()
-
-  return createServerClient(
+/** Client autenticado com JWT do usuário — respeita RLS */
+export function criarClienteAutenticado(token: string) {
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      cookies: {
-        getAll() { return cookieStore.getAll() },
-        setAll() { /* service role não gerencia cookies de auth */ },
-      },
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
     },
   )
 }

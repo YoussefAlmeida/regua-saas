@@ -1,9 +1,240 @@
-// Dia 2 — Cadastro da barbearia (nome, endereço, Instagram, horário)
-export default function CadastroBarbeariPage() {
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+
+type Etapa = 'barbearia' | 'dono'
+
+export default function CadastroBarbeariaPage() {
+  const router = useRouter()
+  const [etapa, setEtapa] = useState<Etapa>('barbearia')
+  const [carregando, setCarregando] = useState(false)
+  const [erro, setErro] = useState('')
+
+  const [form, setForm] = useState({
+    barbearia_nome: '',
+    barbearia_instagram: '',
+    barbearia_telefone: '',
+    barbearia_endereco: '',
+    dono_nome: '',
+    dono_email: '',
+    dono_senha: '',
+    dono_senha_confirm: '',
+  })
+
+  function update(campo: string, valor: string) {
+    setForm(f => ({ ...f, [campo]: valor }))
+    setErro('')
+  }
+
+  function avancar(e: React.FormEvent) {
+    e.preventDefault()
+    if (!form.barbearia_nome.trim()) { setErro('Nome da barbearia obrigatório'); return }
+    setEtapa('dono')
+  }
+
+  async function cadastrar(e: React.FormEvent) {
+    e.preventDefault()
+    setErro('')
+
+    if (form.dono_senha !== form.dono_senha_confirm) {
+      setErro('As senhas não coincidem')
+      return
+    }
+    if (form.dono_senha.length < 8) {
+      setErro('Senha deve ter pelo menos 8 caracteres')
+      return
+    }
+
+    setCarregando(true)
+    const res = await fetch('/api/auth/cadastro', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        barbearia_nome: form.barbearia_nome,
+        barbearia_instagram: form.barbearia_instagram || undefined,
+        barbearia_telefone: form.barbearia_telefone || undefined,
+        barbearia_endereco: form.barbearia_endereco || undefined,
+        dono_nome: form.dono_nome,
+        dono_email: form.dono_email,
+        dono_senha: form.dono_senha,
+      }),
+    })
+
+    const json = await res.json()
+    setCarregando(false)
+
+    if (!res.ok) { setErro(json.erro || 'Erro ao cadastrar'); return }
+    router.replace('/painel/hoje')
+  }
+
+  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted'
+
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center">
-      <p className="font-ui text-fg-muted uppercase tracking-wider">
-        Cadastro — Dia 2
+    <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-12">
+      <div className="mb-8 text-center">
+        <h1 className="font-display text-5xl text-amber tracking-widest">RÉGUA</h1>
+        <p className="font-ui text-fg-muted text-xs uppercase tracking-[0.2em] mt-1">
+          {etapa === 'barbearia' ? 'sua barbearia' : 'seu acesso'}
+        </p>
+      </div>
+
+      {/* Progress */}
+      <div className="flex gap-2 mb-8">
+        {(['barbearia', 'dono'] as Etapa[]).map((e, i) => (
+          <div
+            key={e}
+            className={`h-1 w-16 rounded-full transition-colors ${
+              etapa === e || (i === 0 && etapa === 'dono') ? 'bg-amber' : 'bg-line'
+            }`}
+          />
+        ))}
+      </div>
+
+      <div className="w-full max-w-sm bg-surface rounded-card border border-line p-6">
+        {etapa === 'barbearia' ? (
+          <form onSubmit={avancar} className="space-y-4">
+            <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-2">Sua barbearia</h2>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Nome da barbearia *</label>
+              <input
+                type="text"
+                value={form.barbearia_nome}
+                onChange={e => update('barbearia_nome', e.target.value)}
+                placeholder="Barbearia do João"
+                required
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Instagram</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-fg-muted font-body text-sm">@</span>
+                <input
+                  type="text"
+                  value={form.barbearia_instagram}
+                  onChange={e => update('barbearia_instagram', e.target.value)}
+                  placeholder="barbeariajoa0"
+                  className={`${inputCls} pl-8`}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Telefone / WhatsApp</label>
+              <input
+                type="tel"
+                value={form.barbearia_telefone}
+                onChange={e => update('barbearia_telefone', e.target.value)}
+                placeholder="(71) 99999-0000"
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Endereço</label>
+              <input
+                type="text"
+                value={form.barbearia_endereco}
+                onChange={e => update('barbearia_endereco', e.target.value)}
+                placeholder="Rua das Flores, 42 — Feira de Santana"
+                className={inputCls}
+              />
+            </div>
+
+            {erro && <p className="font-body text-sm text-saida">{erro}</p>}
+
+            <button
+              type="submit"
+              className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors"
+            >
+              Próximo
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={cadastrar} className="space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <button
+                type="button"
+                onClick={() => { setEtapa('barbearia'); setErro('') }}
+                className="text-fg-muted hover:text-fg transition-colors text-sm font-body"
+              >
+                ← Voltar
+              </button>
+              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">Seu acesso</h2>
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Seu nome *</label>
+              <input
+                type="text"
+                value={form.dono_nome}
+                onChange={e => update('dono_nome', e.target.value)}
+                placeholder="João Silva"
+                required
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>E-mail *</label>
+              <input
+                type="email"
+                value={form.dono_email}
+                onChange={e => update('dono_email', e.target.value)}
+                placeholder="joao@exemplo.com"
+                required
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Senha *</label>
+              <input
+                type="password"
+                value={form.dono_senha}
+                onChange={e => update('dono_senha', e.target.value)}
+                placeholder="mínimo 8 caracteres"
+                required
+                minLength={8}
+                className={inputCls}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className={labelCls}>Confirmar senha *</label>
+              <input
+                type="password"
+                value={form.dono_senha_confirm}
+                onChange={e => update('dono_senha_confirm', e.target.value)}
+                placeholder="••••••••"
+                required
+                className={inputCls}
+              />
+            </div>
+
+            {erro && <p className="font-body text-sm text-saida">{erro}</p>}
+
+            <button
+              type="submit"
+              disabled={carregando}
+              className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors disabled:opacity-50"
+            >
+              {carregando ? 'Criando conta…' : 'Criar barbearia'}
+            </button>
+          </form>
+        )}
+      </div>
+
+      <p className="text-center font-body text-sm text-fg-muted mt-6">
+        Já tem conta?{' '}
+        <Link href="/entrar" className="text-amber hover:underline">
+          Entrar
+        </Link>
       </p>
     </div>
   )

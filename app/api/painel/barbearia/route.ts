@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
+
+const SchemaPatch = z.object({
+  nome: z.string().min(1).max(100).optional(),
+  telefone: z.string().max(20).nullable().optional(),
+  endereco: z.string().max(200).nullable().optional(),
+  instagram: z.string().max(50).nullable().optional(),
+  logo_url: z.string().nullable().optional(),
+  horario_funcionamento: z.record(
+    z.object({
+      ativo: z.boolean(),
+      inicio: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      fim: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      intervalo_inicio: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+      intervalo_fim: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+    }),
+  ).optional(),
+})
+
+export async function GET() {
+  const sessao = await getSessao()
+  if (!sessao) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+
+  const db = criarClienteServico()
+  const { data, error } = await db
+    .from('barbearias')
+    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, plano, status, trial_fim')
+    .eq('id', sessao.barbearia_id)
+    .single()
+
+  if (error) return NextResponse.json({ erro: 'Erro ao buscar dados' }, { status: 500 })
+  return NextResponse.json(data)
+}
+
+export async function PATCH(req: NextRequest) {
+  const sessao = await getSessao()
+  if (!sessao || sessao.papel !== 'dono') {
+    return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  }
+
+  const body = await req.json().catch(() => null)
+  const parse = SchemaPatch.safeParse(body)
+  if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
+
+  const db = criarClienteServico()
+  const { data, error } = await db
+    .from('barbearias')
+    .update({ ...parse.data, atualizado_em: new Date().toISOString() })
+    .eq('id', sessao.barbearia_id)
+    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento')
+    .single()
+
+  if (error) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })
+  return NextResponse.json(data)
+}
