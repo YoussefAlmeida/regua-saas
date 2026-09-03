@@ -47,6 +47,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .eq('id', id)
     .select(`
       id, inicio, fim, status, valor_servico, observacao, cancelado_por,
+      profissional_id,
       profissional:profissionais!profissional_id(id, nome),
       cliente:usuarios!cliente_id(nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
@@ -54,5 +55,29 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .single()
 
   if (error) return NextResponse.json({ erro: 'Erro ao atualizar' }, { status: 500 })
+
+  // Gera entrada financeira automática ao concluir
+  if (parse.data.status === 'concluido' && data) {
+    const { count } = await db
+      .from('movimentacoes')
+      .select('id', { count: 'exact', head: true })
+      .eq('agendamento_id', id)
+    if (!count || count === 0) {
+      const dataLocal = new Date(data.inicio).toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
+      const servicoNome = Array.isArray(data.servico) ? data.servico[0]?.nome : (data.servico as { nome: string } | null)?.nome
+      await db.from('movimentacoes').insert({
+        barbearia_id: sessao.barbearia_id,
+        tipo: 'entrada',
+        descricao: `Serviço — ${servicoNome ?? 'Atendimento'}`,
+        valor: data.valor_servico,
+        data: dataLocal,
+        profissional_id: data.profissional_id,
+        agendamento_id: id,
+        origem: 'automatica',
+        criado_por: sessao.usuario_id,
+      })
+    }
+  }
+
   return NextResponse.json(data)
 }
