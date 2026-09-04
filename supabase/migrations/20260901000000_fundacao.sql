@@ -12,8 +12,7 @@
 
 -- ── Extensões ──────────────────────────────────────────────────
 create extension if not exists "uuid-ossp";
-create extension if not exists pg_cron;
-create extension if not exists btree_gist;  -- necessário para exclusion constraint dos agendamentos
+create extension if not exists btree_gist;
 
 -- ================================================================
 -- TABELAS
