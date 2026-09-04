@@ -319,7 +319,7 @@ export default function LandingPage() {
           <p className="font-body text-xs text-fg-muted text-center mt-6">
             Precisa de algo diferente?{' '}
             <a
-              href="https://wa.me/5571999999999?text=Quero+saber+mais+sobre+o+RÉGUA"
+              href="https://wa.me/5575982727760?text=Quero+saber+mais+sobre+o+RÉGUA"
               target="_blank"
               rel="noreferrer"
               className="text-amber hover:underline"
@@ -388,7 +388,7 @@ export default function LandingPage() {
               Cadastrar
             </Link>
             <a
-              href="https://wa.me/5571999999999"
+              href="https://wa.me/5575982727760"
               target="_blank"
               rel="noreferrer"
               className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg"

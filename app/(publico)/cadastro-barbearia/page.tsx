@@ -48,25 +48,29 @@ export default function CadastroBarbeariaPage() {
     }
 
     setCarregando(true)
-    const res = await fetch('/api/auth/cadastro', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        barbearia_nome: form.barbearia_nome,
-        barbearia_instagram: form.barbearia_instagram || undefined,
-        barbearia_telefone: form.barbearia_telefone || undefined,
-        barbearia_endereco: form.barbearia_endereco || undefined,
-        dono_nome: form.dono_nome,
-        dono_email: form.dono_email,
-        dono_senha: form.dono_senha,
-      }),
-    })
+    try {
+      const res = await fetch('/api/auth/cadastro', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          barbearia_nome: form.barbearia_nome,
+          barbearia_instagram: form.barbearia_instagram || undefined,
+          barbearia_telefone: form.barbearia_telefone || undefined,
+          barbearia_endereco: form.barbearia_endereco || undefined,
+          dono_nome: form.dono_nome,
+          dono_email: form.dono_email,
+          dono_senha: form.dono_senha,
+        }),
+      })
 
-    const json = await res.json()
-    setCarregando(false)
-
-    if (!res.ok) { setErro(json.erro || 'Erro ao cadastrar'); return }
-    router.replace('/painel/hoje')
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) { setErro((json as { erro?: string }).erro || 'Erro ao cadastrar'); return }
+      router.replace('/painel/hoje')
+    } catch {
+      setErro('Erro de conexão. Tente novamente.')
+    } finally {
+      setCarregando(false)
+    }
   }
 
   const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'

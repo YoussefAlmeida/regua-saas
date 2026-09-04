@@ -24,21 +24,25 @@ export default function EntrarPage() {
         ? { tipo: 'dono', email: credencial, senha }
         : { tipo: 'barbeiro', whatsapp: credencial, senha }
 
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
 
-    const json = await res.json()
-    setCarregando(false)
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setErro((json as { erro?: string }).erro || 'Erro ao entrar')
+        return
+      }
 
-    if (!res.ok) {
-      setErro(json.erro || 'Erro ao entrar')
-      return
+      router.replace('/painel/hoje')
+    } catch {
+      setErro('Erro de conexão. Tente novamente.')
+    } finally {
+      setCarregando(false)
     }
-
-    router.replace('/painel/hoje')
   }
 
   return (

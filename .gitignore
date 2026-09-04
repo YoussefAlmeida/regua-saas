@@ -28,8 +28,9 @@ yarn-error.log*
 .env*.local
 !.env.local.example
 
-# vercel
-.vercel
+# vercel — repo.json fica rastreado para deploys sempre irem ao projeto certo
+.vercel/*
+!.vercel/repo.json
 
 # typescript
 *.tsbuildinfo
@@ -39,4 +40,3 @@ next-env.d.ts
 /supabase/.branches
 /supabase/.temp
 
-.vercel

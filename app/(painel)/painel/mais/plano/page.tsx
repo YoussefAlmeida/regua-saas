@@ -167,7 +167,7 @@ export default async function PlanoPage() {
           Para assinar ou alterar seu plano, entre em contato via WhatsApp.
         </p>
         <a
-          href="https://wa.me/5571999999999?text=Olá! Quero assinar o RÉGUA."
+          href="https://wa.me/5575982727760?text=Olá! Quero assinar o RÉGUA."
           target="_blank"
           rel="noreferrer"
           className="mt-3 block w-full bg-amber text-bg font-ui text-sm uppercase tracking-wider rounded-button py-2 text-center hover:opacity-90 transition-opacity"
