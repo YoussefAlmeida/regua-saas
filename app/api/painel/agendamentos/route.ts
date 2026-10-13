@@ -143,6 +143,7 @@ export async function POST(req: NextRequest) {
           senha_hash,
           papel: 'cliente',
           status: 'aprovado',
+          senha_definida: false, // cliente escolhe a senha no primeiro agendamento pelo link
         })
         .select('id')
         .single()

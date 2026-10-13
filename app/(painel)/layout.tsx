@@ -19,9 +19,12 @@ export default async function PainelLayout({ children }: { children: React.React
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('nome')
+    .select('nome, slug')
     .eq('id', barbearia_id)
     .single()
+
+  // Cliente não tem painel — vai pros agendamentos dele
+  if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
 
   const { data: usuario } = await db
     .from('usuarios')

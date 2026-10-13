@@ -1,6 +1,7 @@
 import { hash, verify } from '@node-rs/argon2'
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import type { NextResponse } from 'next/server'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
 export const COOKIE_SESSION = 'regua-session'
@@ -38,6 +39,17 @@ export async function criarToken(sessao: SessaoUsuario): Promise<string> {
     .sign(getSecret())
 }
 
+/** Grava o cookie de sessão na resposta (30 dias, httpOnly) */
+export function gravarCookieSessao(res: NextResponse, token: string): void {
+  res.cookies.set(COOKIE_SESSION, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 60 * 60 * 24 * 30,
+  })
+}
+
 export async function verificarToken(token: string): Promise<SessaoUsuario | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret())
@@ -58,6 +70,13 @@ export async function getSessao(): Promise<SessaoUsuario | null> {
   if (!token) return null
   return verificarToken(token)
 }
+
+/** Endereços do próprio sistema — nenhuma barbearia pode usar como link */
+export const SLUGS_RESERVADOS = new Set([
+  'admin', 'api', 'painel', 'entrar', 'sair', 'cadastro', 'cadastro-barbearia', 'convite',
+  'recuperar-senha', 'planos', 'precos', 'termos', 'privacidade', 'ajuda', 'suporte', 'blog',
+  'regua', 'app', 'www', 'login', 'conta', 'minha-conta', '_next', 'favicon', 'static',
+])
 
 export function slugify(str: string): string {
   return str

@@ -59,12 +59,14 @@ export function textoLembreteCliente(opts: {
   servicoNome: string
   barbeiiroNome: string
   hora: string
+  linkCancelar?: string
 }): string {
   return (
     `⏰ *Lembrete — ${opts.barbeariaNome}*\n\n` +
     `Oi, ${opts.clienteNome}! Seu agendamento é em 2 horas:\n\n` +
     `💈 ${opts.barbeiiroNome} · ${opts.servicoNome}\n` +
     `🕐 ${opts.hora}\n\n` +
+    (opts.linkCancelar ? `Precisa cancelar? Toque aqui (até 1h antes):\n${opts.linkCancelar}\n\n` : '') +
     `Até logo! ✂️`
   )
 }
@@ -94,4 +96,9 @@ export function textoFimTrial(opts: { barbeariaNome: string; dias: number }): st
     `Escolha um plano em Mais → Meu plano pra não perder o acesso. ` +
     `Seus dados ficam guardados de qualquer jeito.`
   )
+}
+
+/** Endereço público do site, sem barra no fim (ex.: https://regua.app) */
+export function urlDoSite(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://regua.app').replace(/\/+$/, '')
 }

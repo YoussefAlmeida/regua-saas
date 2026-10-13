@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { hashSenha, criarToken, slugify, COOKIE_SESSION } from '@/lib/auth'
+import { hashSenha, criarToken, slugify, COOKIE_SESSION, SLUGS_RESERVADOS } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
 
 const Schema = z.object({
@@ -39,7 +39,8 @@ export async function POST(req: NextRequest) {
   }
 
   // Gera slug único
-  let slug = slugify(d.barbearia_nome)
+  let slug = slugify(d.barbearia_nome).replace(/^-+|-+$/g, '').slice(0, 50) || 'barbearia'
+  if (SLUGS_RESERVADOS.has(slug)) slug = `barbearia-${slug}`
   const { count } = await db.from('barbearias').select('id', { count: 'exact', head: true }).eq('slug', slug)
   if (count && count > 0) slug = `${slug}-${Date.now().toString(36)}`
 

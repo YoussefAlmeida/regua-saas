@@ -5,6 +5,8 @@
    ================================================================ */
 
 export const SENHA_MIN = 8
+/** Cliente usa senha curta (seção 10) — compensada pelo bloqueio progressivo */
+export const SENHA_MIN_CLIENTE = 4
 
 const OBVIAS = new Set([
   'senha', 'senha123', 'senha1234', 'password', 'password1', 'qwerty', 'qwerty123',
@@ -24,8 +26,9 @@ function sequencia(s: string): boolean {
 }
 
 /** Retorna a mensagem de erro, ou null se a senha serve */
-export function problemaNaSenha(senha: string, extras: string[] = []): string | null {
-  if (senha.length < SENHA_MIN) return `A senha precisa ter pelo menos ${SENHA_MIN} caracteres`
+export function problemaNaSenha(senha: string, extras: string[] = [], min = SENHA_MIN): string | null {
+  if (senha.length < min) return `A senha precisa ter pelo menos ${min} caracteres`
+  if (senha.length > 128) return 'Senha longa demais'
   const s = senha.toLowerCase()
   if (/^(.)\1+$/.test(s)) return 'Senha fácil demais — não repita o mesmo caractere'
   if (sequencia(s)) return 'Senha fácil demais — evite sequências como 12345678'

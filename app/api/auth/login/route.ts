@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { normalizarWhatsapp } from '@/lib/utils'
-import { verificarSenha, criarToken, COOKIE_SESSION } from '@/lib/auth'
+import { verificarSenha, criarToken, gravarCookieSessao } from '@/lib/auth'
 import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
 
 // Hash de referência pra conta inexistente gastar o mesmo tempo que uma real
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
   let query = db
     .from('usuarios')
-    .select('id, senha_hash, papel, barbearia_id, status, ativo')
+    .select('id, senha_hash, papel, barbearia_id, status, ativo, senha_definida')
 
   if (d.tipo === 'dono') {
     query = query.eq('email', identificador).eq('papel', 'dono')
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
   // Senha confere antes de qualquer outra mensagem — nunca revela se a conta existe
   const senhaOk = await verificarSenha(d.senha, usuario?.senha_hash ?? HASH_FALSO).catch(() => false)
-  if (!usuario || !senhaOk) {
+  if (!usuario || !senhaOk || usuario.senha_definida === false) {
     await registrarFalha(identificador, ip)
     return NextResponse.json({ erro: ERRO_GENERICO }, { status: 401 })
   }
@@ -93,13 +93,14 @@ export async function POST(req: NextRequest) {
     profissional_id,
   })
 
-  const res = NextResponse.json({ ok: true, papel: usuario.papel }, { status: 200 })
-  res.cookies.set(COOKIE_SESSION, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30,
-  })
+  // Cliente não tem painel: vai pra "Meus agendamentos" da barbearia dele
+  let destino = '/painel/hoje'
+  if (usuario.papel === 'cliente') {
+    const { data: b } = await db.from('barbearias').select('slug').eq('id', usuario.barbearia_id).single()
+    destino = b ? `/${b.slug}/meus-agendamentos` : '/'
+  }
+
+  const res = NextResponse.json({ ok: true, papel: usuario.papel, destino }, { status: 200 })
+  gravarCookieSessao(res, token)
   return res
 }
