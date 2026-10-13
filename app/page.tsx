@@ -4,6 +4,7 @@ import {
   CheckCircle2, ArrowRight, Star, Zap, Shield,
 } from 'lucide-react'
 import FaqLanding from './_components/faq-landing'
+import { formatBRL } from '@/lib/utils'
 
 const PLANOS = [
   {
@@ -289,7 +290,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="mb-6">
-                  <span className="font-mono text-4xl text-amber">R$ {plano.preco.toFixed(2)}</span>
+                  <span className="font-mono text-4xl text-amber">{formatBRL(plano.preco)}</span>
                   <span className="font-body text-sm text-fg-muted">/mês</span>
                 </div>
 

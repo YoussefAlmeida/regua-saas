@@ -104,7 +104,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
         </div>
       ) : [...porDia.entries()].map(([dia, lista]) => (
         <section key={dia}>
-          <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted mb-1.5 px-1 capitalize">
+          <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted mb-1.5 px-1">
             {new Date(dia + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
           </p>
           <ul className="bg-surface border border-line rounded-card divide-y divide-line">

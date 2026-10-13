@@ -236,7 +236,7 @@ export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbeari
             {fechados.map(d => (
               <li key={d} className="flex items-center gap-1.5 bg-surface border border-line rounded-full pl-3 pr-1.5 py-1">
                 <CalendarOff size={12} className="text-fg-muted" />
-                <span className="font-body text-xs text-fg capitalize">
+                <span className="font-body text-xs text-fg inline-block first-letter:uppercase">
                   {new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
                 </span>
                 <button

@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { ChevronLeft, ChevronRight, MapPin, Instagram, Clock, Check, MessageCircle, CalendarCheck, LogOut } from 'lucide-react'
 
 type Etapa = 'servico' | 'barbeiro' | 'horario' | 'dados' | 'sucesso'
@@ -103,7 +104,10 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   async function confirmar(e?: React.FormEvent) {
     e?.preventDefault()
     setErro('')
-    if (!logado && aba === 'novo' && senha.length < 4) { setErro('Crie uma senha de pelo menos 4 dígitos'); return }
+    if (!logado && aba === 'novo') {
+      const problema = problemaNaSenha(senha, [whatsapp], SENHA_MIN_CLIENTE)
+      if (problema) { setErro(problema); return }
+    }
     setEnviando(true)
 
     const cliente = logado
@@ -173,7 +177,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
               </button>
             )}
             <div className="flex-1 min-w-0">
-              <h1 className="font-display text-2xl text-amber tracking-wider uppercase truncate">{barbearia.nome}</h1>
+              <h1 className="font-display text-2xl text-amber tracking-wide uppercase leading-tight line-clamp-2 break-words">{barbearia.nome}</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
                 {barbearia.endereco && (
                   <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
@@ -318,7 +322,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                     </div>
                   ) : (
                     <>
-                      <p className="font-body text-xs text-fg-muted mb-2 capitalize">{dataFormatada}</p>
+                      <p className="font-body text-xs text-fg-muted mb-2 first-letter:uppercase">{dataFormatada}</p>
                       <div className="grid grid-cols-4 gap-2">
                         {slots.map(slot => (
                           <button
@@ -345,7 +349,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                   <p className="font-ui text-sm uppercase tracking-wider text-fg">{servico?.nome}</p>
                   <p className="font-body text-sm text-fg-muted">com {profissional?.nome}</p>
                   <div className="flex items-end justify-between mt-3">
-                    <p className="font-body text-sm text-fg capitalize">{dataFormatada}<br /><span className="font-mono text-2xl text-amber">{horario}</span></p>
+                    <p className="font-body text-sm text-fg inline-block first-letter:uppercase">{dataFormatada}<br /><span className="font-mono text-2xl text-amber">{horario}</span></p>
                     <p className="font-mono text-base text-fg">{servico && brl(servico.preco)}</p>
                   </div>
                 </div>
@@ -438,7 +442,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <div className="bg-surface border border-line rounded-card p-4 text-left space-y-1 max-w-xs mx-auto">
                   <p className="font-ui text-sm uppercase tracking-wider text-fg">{servico?.nome}</p>
                   <p className="font-body text-sm text-fg-muted">com {profissional?.nome}</p>
-                  <p className="font-body text-sm text-fg capitalize pt-1">{dataFormatada} · <span className="font-mono text-amber">{horario}</span></p>
+                  <p className="font-body text-sm text-fg inline-block first-letter:uppercase pt-1">{dataFormatada} · <span className="font-mono text-amber">{horario}</span></p>
                 </div>
                 <p className="font-body text-sm text-fg-muted max-w-xs mx-auto">
                   A gente te lembra pelo WhatsApp 2 horas antes. Se precisar cancelar, dá pra fazer até 1 hora antes.

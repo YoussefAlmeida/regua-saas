@@ -6,6 +6,7 @@ import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRig
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { mensagemStatus } from '@/lib/status-agendamento'
+import { formatBRL } from '@/lib/utils'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -100,7 +101,7 @@ export default function HojeClient({
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div>
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Hoje</h1>
-        <p className="font-body text-sm text-fg-muted capitalize">{dataFmt}</p>
+        <p className="font-body text-sm text-fg-muted first-letter:uppercase">{dataFmt}</p>
       </div>
 
       {pendencias.length > 0 && (
@@ -131,7 +132,7 @@ export default function HojeClient({
             return (
               <div key={ag.id} className={`border-t border-line pt-3 ${ocupado ? 'opacity-50' : ''}`}>
                 <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
-                <p className="font-body text-xs text-fg-muted capitalize">
+                <p className="font-body text-xs text-fg-muted first-letter:uppercase">
                   {dia} · {hora(ag.inicio)} · {ag.servico?.nome} · {ag.profissional?.nome}
                 </p>
                 <div className="flex gap-2 mt-2">
@@ -163,7 +164,7 @@ export default function HojeClient({
             <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Meu dia</p>
             <span className="flex items-center gap-0.5 font-ui text-[10px] uppercase tracking-wider text-amber">Meu desempenho <ChevronRight size={12} /></span>
           </div>
-          <p className="font-mono text-4xl text-entrada leading-none">R$ {faturadoReal.toFixed(2)}</p>
+          <p className="font-mono text-4xl text-entrada leading-none">{formatBRL(faturadoReal)}</p>
           <p className="font-body text-xs text-fg-muted mt-2">
             {concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente
           </p>
@@ -172,22 +173,22 @@ export default function HojeClient({
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Faturado hoje</p>
-          <p className="font-mono text-2xl text-entrada">R$ {(faturadoReal + entradasManuais).toFixed(2)}</p>
+          <p className="font-mono text-xl text-entrada whitespace-nowrap">{formatBRL((faturadoReal + entradasManuais))}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} concluído{concluidos.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Previsto</p>
-          <p className="font-mono text-2xl text-amber">R$ {faturadoPrev.toFixed(2)}</p>
+          <p className="font-mono text-xl text-amber whitespace-nowrap">{formatBRL(faturadoPrev)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{pendentes.length} pendente{pendentes.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
-          <p className="font-mono text-2xl text-fg">{ags.length}</p>
+          <p className="font-mono text-xl text-fg">{ags.length}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">no total</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Saídas</p>
-          <p className="font-mono text-2xl text-saida">R$ {saidasDia.toFixed(2)}</p>
+          <p className="font-mono text-xl text-saida whitespace-nowrap">{formatBRL(saidasDia)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">lançadas hoje</p>
         </div>
       </div>
@@ -242,7 +243,7 @@ export default function HojeClient({
                         <span className="font-ui text-[10px] uppercase tracking-wider shrink-0">{STATUS_LABEL[ag.status]}</span>
                       </div>
                       <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)}{!souBarbeiro && ` · ${ag.profissional?.nome}`}</p>
-                      <p className="font-mono text-xs text-amber mt-0.5">R$ {ag.valor_servico.toFixed(2)}</p>
+                      <p className="font-mono text-xs text-amber mt-0.5">{formatBRL(ag.valor_servico)}</p>
                     </div>
                   </div>
 
@@ -312,7 +313,7 @@ export default function HojeClient({
             <span className="font-ui text-sm uppercase tracking-wider text-fg-muted">Saldo do dia</span>
           </div>
           <span className={`font-mono text-lg ${(faturadoReal + entradasManuais - saidasDia) >= 0 ? 'text-entrada' : 'text-saida'}`}>
-            R$ {(faturadoReal + entradasManuais - saidasDia).toFixed(2)}
+            {formatBRL((faturadoReal + entradasManuais - saidasDia))}
           </span>
         </div>
       )}

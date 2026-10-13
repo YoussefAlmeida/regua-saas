@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { formatBRL } from '@/lib/utils'
 
 export default async function AdminPage() {
   const cookieStore = await cookies()
@@ -78,7 +79,7 @@ export default async function AdminPage() {
 
         <div className="bg-surface border border-amber/30 rounded-card p-4 flex items-center justify-between">
           <span className="font-ui text-sm uppercase tracking-wider text-fg-muted">MRR</span>
-          <span className="font-mono text-2xl text-amber">R$ {mrr.toFixed(2)}</span>
+          <span className="font-mono text-2xl text-amber">{formatBRL(mrr)}</span>
         </div>
 
         {/* Tabela de barbearias */}

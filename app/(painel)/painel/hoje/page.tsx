@@ -69,6 +69,15 @@ export default async function HojePage() {
     if (!prof?.foto_url || !prof?.especialidade) pendencias.push({ href: '/painel/mais/perfil', texto: 'Coloca sua foto e especialidade — o cliente escolhe por elas' })
     if (!nHorarios) pendencias.push({ href: '/painel/mais/horarios', texto: 'Confere seus dias e horário de almoço' })
   }
+  if (!souBarbeiro) {
+    const [{ count: nServicos }, { count: nProfs }] = await Promise.all([
+      db.from('servicos').select('id', { count: 'exact', head: true }).eq('barbearia_id', barbearia_id).eq('ativo', true),
+      db.from('profissionais').select('id', { count: 'exact', head: true }).eq('barbearia_id', barbearia_id).eq('ativo', true),
+    ])
+    if (!nServicos || !nProfs) {
+      pendencias.push({ href: '/painel/comecar', texto: 'Termina de configurar: falta ' + (!nProfs ? 'quem corta' : 'cadastrar os serviços') + ' pra liberar o link de agendamento' })
+    }
+  }
 
   return (
     <HojeClient

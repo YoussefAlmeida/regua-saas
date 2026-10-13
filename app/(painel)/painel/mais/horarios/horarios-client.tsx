@@ -372,7 +372,7 @@ export default function HorariosClient({
                   <li key={b.id} className="flex items-center gap-3 px-4 py-3">
                     <Lock size={14} className="text-fg-muted shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <p className="font-body text-sm text-fg capitalize">{fmtBloqueio(b)}</p>
+                      <p className="font-body text-sm text-fg first-letter:uppercase">{fmtBloqueio(b)}</p>
                       {b.motivo && <p className="font-body text-xs text-fg-muted truncate">{b.motivo}</p>}
                     </div>
                     <button onClick={() => desbloquear(b.id)} className="p-2 text-fg-muted hover:text-saida transition-colors" aria-label="Liberar horário">

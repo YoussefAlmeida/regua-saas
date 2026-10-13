@@ -41,6 +41,8 @@ const config: Config = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          press: "rgb(var(--accent-press-rgb) / <alpha-value>)",
+          fg: "rgb(var(--accent-fg-rgb) / <alpha-value>)",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -52,29 +54,30 @@ const config: Config = {
         },
 
         // ── RÉGUA design tokens ────────────────────────────────
+        // Canais RGB em app/globals.css → funciona transparência (bg-entrada/10)
         // Fundos
-        bg: "var(--bg)",
+        bg: "rgb(var(--bg-rgb) / <alpha-value>)",
         surface: {
-          DEFAULT: "var(--surface)",
-          alt: "var(--surface-2)",
+          DEFAULT: "rgb(var(--surface-rgb) / <alpha-value>)",
+          alt: "rgb(var(--surface-2-rgb) / <alpha-value>)",
         },
         // Bordas
-        line: "var(--line)",
+        line: "rgb(var(--line-rgb) / <alpha-value>)",
         // Texto
         fg: {
-          DEFAULT: "var(--fg)",
-          muted: "var(--fg-muted)",
+          DEFAULT: "rgb(var(--fg-rgb) / <alpha-value>)",
+          muted: "rgb(var(--fg-muted-rgb) / <alpha-value>)",
         },
         // Acento
         amber: {
-          DEFAULT: "var(--regua-accent)",
-          press: "var(--accent-press)",
-          fg: "var(--accent-fg)",
+          DEFAULT: "rgb(var(--accent-rgb) / <alpha-value>)",
+          press: "rgb(var(--accent-press-rgb) / <alpha-value>)",
+          fg: "rgb(var(--accent-fg-rgb) / <alpha-value>)",
         },
         // Semântica financeira — NUNCA usar pra success/error
-        entrada: "var(--entrada)",
-        saida: "var(--saida)",
-        info: "var(--info)",
+        entrada: "rgb(var(--entrada-rgb) / <alpha-value>)",
+        saida: "rgb(var(--saida-rgb) / <alpha-value>)",
+        info: "rgb(var(--info-rgb) / <alpha-value>)",
       },
 
       // ── Tipografia ────────────────────────────────────────────

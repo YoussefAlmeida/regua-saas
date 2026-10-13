@@ -64,7 +64,7 @@ export default function CadastroBarbeariaPage() {
 
       const json = await res.json().catch(() => ({}))
       if (!res.ok) { setErro((json as { erro?: string }).erro || 'Erro ao cadastrar'); return }
-      router.replace('/painel/hoje')
+      router.replace('/painel/comecar')
     } catch {
       setErro('Erro de conexão. Tente novamente.')
     } finally {

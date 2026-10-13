@@ -114,7 +114,7 @@ export default function MeusAgendamentos({
             <ChevronLeft size={20} />
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="font-display text-xl text-amber tracking-wider uppercase truncate">{barbearia.nome}</p>
+            <p className="font-display text-xl text-amber tracking-wide uppercase leading-tight line-clamp-2 break-words">{barbearia.nome}</p>
             <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted">Meus horários</p>
           </div>
           {nome && (
@@ -184,7 +184,7 @@ export default function MeusAgendamentos({
                   <article key={a.id} className="bg-surface border border-amber/30 rounded-card p-4 space-y-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="font-body text-sm text-fg capitalize">{q.dia}</p>
+                        <p className="font-body text-sm text-fg first-letter:uppercase">{q.dia}</p>
                         <p className="font-mono text-3xl text-amber leading-tight">{q.hora}</p>
                         <p className="font-body text-sm text-fg-muted mt-1">{a.servico?.nome} · {a.profissional?.nome}</p>
                       </div>

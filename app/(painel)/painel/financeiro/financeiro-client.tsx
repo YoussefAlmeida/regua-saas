@@ -316,7 +316,7 @@ export default function FinanceiroClient({
         {tab !== 'fixas' && (
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => mudarMes(mesVizinho(mes, -1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Mês anterior"><ChevronLeft size={18} /></button>
-            <p className="font-ui text-sm uppercase tracking-wider text-fg capitalize">{mesLabel(mes)}</p>
+            <p className="font-ui text-sm uppercase tracking-wider text-fg">{mesLabel(mes)}</p>
             <button onClick={() => mudarMes(mesVizinho(mes, 1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Próximo mês"><ChevronRight size={18} /></button>
           </div>
         )}
@@ -343,7 +343,7 @@ export default function FinanceiroClient({
                   ].map(c => (
                     <div key={c.rot} className="bg-surface border border-line rounded-card p-4">
                       <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">{c.rot}</p>
-                      <p className={`font-mono text-xl mt-1 ${c.cor}`}>{brl(c.v)}</p>
+                      <p className={`font-mono text-lg mt-1 whitespace-nowrap ${c.cor}`}>{brl(c.v)}</p>
                       {c.vari ? (
                         <p className={`flex items-center gap-1 font-body text-xs mt-1 ${c.vari.sobe === c.bomSubir ? 'text-entrada' : 'text-saida'}`}>
                           {c.vari.sobe ? <TrendingUp size={12} /> : <TrendingDown size={12} />} {c.vari.txt} vs mês passado
@@ -427,7 +427,7 @@ export default function FinanceiroClient({
                   return (
                     <section key={dia}>
                       <div className="flex items-center justify-between mb-1.5 px-1">
-                        <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted capitalize">{diaLabel(dia)}</p>
+                        <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted">{diaLabel(dia)}</p>
                         <p className={`font-mono text-xs ${totalDia >= 0 ? 'text-entrada' : 'text-saida'}`}>{totalDia >= 0 ? '+' : ''}{brl(totalDia)}</p>
                       </div>
                       <ul className="bg-surface border border-line rounded-card divide-y divide-line">

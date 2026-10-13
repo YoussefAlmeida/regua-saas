@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { headers, cookies } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
+import { formatBRL } from '@/lib/utils'
 
 export default async function RelatoriosPage() {
   const h = await headers()
@@ -76,7 +77,7 @@ export default async function RelatoriosPage() {
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Relatórios</h1>
-        <span className="font-body text-xs text-fg-muted capitalize">{nomeMes}</span>
+        <span className="font-body text-xs text-fg-muted inline-block first-letter:uppercase">{nomeMes}</span>
       </div>
 
       {/* Métricas principais */}
@@ -92,11 +93,11 @@ export default async function RelatoriosPage() {
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Receita</p>
-          <p className="font-mono text-2xl text-entrada">R$ {totalReceita.toFixed(2)}</p>
+          <p className="font-mono text-2xl text-entrada">{formatBRL(totalReceita)}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Ticket médio</p>
-          <p className="font-mono text-2xl text-amber">R$ {ticketMedio.toFixed(2)}</p>
+          <p className="font-mono text-2xl text-amber">{formatBRL(ticketMedio)}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Clientes únicos</p>
@@ -146,7 +147,7 @@ export default async function RelatoriosPage() {
                   <p className="font-ui text-sm text-fg truncate">{prof.nome}</p>
                   <p className="font-body text-xs text-fg-muted">{prof.atendimentos} atendimentos</p>
                 </div>
-                <span className="font-mono text-sm text-entrada shrink-0">R$ {prof.receita.toFixed(2)}</span>
+                <span className="font-mono text-sm text-entrada shrink-0">{formatBRL(prof.receita)}</span>
               </Link>
             ))}
           </div>

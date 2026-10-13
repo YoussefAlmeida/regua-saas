@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { mensagemStatus, statusAoDesfazer } from '@/lib/status-agendamento'
+import { formatBRL } from '@/lib/utils'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -298,7 +299,7 @@ export default function AgendaClient({
                       </span>
                       <span className="font-body text-xs text-fg-muted truncate">{ag.servico?.nome}</span>
                     </div>
-                    <p className="font-mono text-xs text-amber mt-0.5">R$ {ag.valor_servico.toFixed(2)}</p>
+                    <p className="font-mono text-xs text-amber mt-0.5">{formatBRL(ag.valor_servico)}</p>
                   </div>
                 </div>
               </button>
@@ -330,7 +331,7 @@ export default function AgendaClient({
               <div className="flex items-center gap-2">
                 <Scissors size={14} className="text-fg-muted" />
                 <p className="font-body text-sm text-fg">{selecionado.servico?.nome ?? '—'}</p>
-                <span className="font-mono text-xs text-amber">R$ {selecionado.valor_servico.toFixed(2)}</span>
+                <span className="font-mono text-xs text-amber">{formatBRL(selecionado.valor_servico)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock size={14} className="text-fg-muted" />
@@ -444,7 +445,7 @@ export default function AgendaClient({
                 >
                   <option value="">Selecione…</option>
                   {servicos.map(s => (
-                    <option key={s.id} value={s.id}>{s.nome} — R$ {s.preco.toFixed(2)}</option>
+                    <option key={s.id} value={s.id}>{s.nome} — {formatBRL(s.preco)}</option>
                   ))}
                 </select>
               </div>
