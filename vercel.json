@@ -5,10 +5,6 @@
   "installCommand": "npm install",
   "crons": [
     {
-      "path": "/api/cron/lembrete-cliente",
-      "schedule": "*/15 * * * *"
-    },
-    {
       "path": "/api/cron/diario",
       "schedule": "0 9 * * *"
     }
