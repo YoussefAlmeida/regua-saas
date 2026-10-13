@@ -66,6 +66,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
     .from('usuarios')
     .select('id, nome, whatsapp, senha_hash, papel, barbearia_id, ativo, senha_definida')
     .eq('whatsapp', whatsapp)
+    .eq('barbearia_id', barbearia_id)   // cada barbearia tem seus clientes
     .maybeSingle()
 
   const tokenDe = (id: string) => criarToken({ usuario_id: id, papel: 'cliente', barbearia_id })
@@ -75,8 +76,8 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
     if (problema) return falha(problema, 400)
 
     if (existente) {
-      if (existente.barbearia_id !== barbearia_id || existente.papel !== 'cliente') {
-        return falha('Esse WhatsApp já está cadastrado em outra barbearia do RÉGUA. Fala com a barbearia.', 409)
+      if (existente.papel !== 'cliente') {
+        return falha('Esse WhatsApp é de alguém da equipe da barbearia. Use outro número pra agendar.', 409)
       }
       if (existente.senha_definida) {
         return falha('Você já tem conta aqui. Toca em "Já tenho conta" e entra com sua senha.', 409, { jaTemConta: true })
@@ -108,7 +109,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
   }
 
   // acesso === 'entrar'
-  const conta = existente && existente.papel === 'cliente' && existente.barbearia_id === barbearia_id && existente.senha_definida
+  const conta = existente && existente.papel === 'cliente' && existente.senha_definida
     ? existente : null
   const senhaOk = conta ? await verificarSenha(acesso.senha, conta.senha_hash).catch(() => false) : false
   if (!conta || !senhaOk) {

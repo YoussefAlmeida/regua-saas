@@ -120,16 +120,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ erro: 'WhatsApp inválido. Use DDD + número.' }, { status: 400 })
     }
 
-    // Busca ou cria cliente
+    // Busca ou cria cliente — o mesmo número pode ser cliente em outras barbearias
     const { data: existente } = await db
       .from('usuarios')
-      .select('id, barbearia_id, papel')
+      .select('id, papel')
       .eq('whatsapp', cliente_whatsapp)
+      .eq('barbearia_id', sessao.barbearia_id)
       .maybeSingle()
 
     if (existente) {
-      if (existente.barbearia_id !== sessao.barbearia_id || existente.papel !== 'cliente') {
-        return NextResponse.json({ erro: 'Esse WhatsApp já está em outra conta do RÉGUA. Use outro número.' }, { status: 409 })
+      if (existente.papel !== 'cliente') {
+        return NextResponse.json({ erro: 'Esse WhatsApp é de alguém da equipe. Use o número do cliente.' }, { status: 409 })
       }
       cliente_id = existente.id
     } else {
