@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
+import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRight } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { mensagemStatus } from '@/lib/status-agendamento'
@@ -42,7 +43,11 @@ export default function HojeClient({
   esquecidosIniciais,
   movimentacoesHoje,
   data,
+  souBarbeiro = false,
+  pendencias = [],
 }: {
+  pendencias?: { href: string; texto: string }[]
+  souBarbeiro?: boolean
   agendamentosIniciais: Agendamento[]
   esquecidosIniciais: Agendamento[]
   movimentacoesHoje: Movimentacao[]
@@ -98,6 +103,18 @@ export default function HojeClient({
         <p className="font-body text-sm text-fg-muted capitalize">{dataFmt}</p>
       </div>
 
+      {pendencias.length > 0 && (
+        <div className="space-y-2">
+          {pendencias.map(p => (
+            <Link key={p.href} href={p.href} className="flex items-center gap-3 bg-surface border border-amber/30 rounded-card px-4 py-3 hover:border-amber/60 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-amber shrink-0" />
+              <span className="flex-1 font-body text-sm text-fg">{p.texto}</span>
+              <ChevronRight size={14} className="text-fg-muted" />
+            </Link>
+          ))}
+        </div>
+      )}
+
       {/* Atendimentos que passaram sem status — não deixa esquecer */}
       {esquecidos.length > 0 && (
         <div className="bg-amber/5 border border-amber/40 rounded-card p-4 space-y-3">
@@ -140,6 +157,18 @@ export default function HojeClient({
       )}
 
       {/* Cards de métricas */}
+      {souBarbeiro ? (
+        <Link href="/painel/mais/desempenho" className="block bg-surface border border-line rounded-card p-4 hover:border-amber/40 transition-colors">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Meu dia</p>
+            <span className="flex items-center gap-0.5 font-ui text-[10px] uppercase tracking-wider text-amber">Meu desempenho <ChevronRight size={12} /></span>
+          </div>
+          <p className="font-mono text-4xl text-entrada leading-none">R$ {faturadoReal.toFixed(2)}</p>
+          <p className="font-body text-xs text-fg-muted mt-2">
+            {concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente
+          </p>
+        </Link>
+      ) : (
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Faturado hoje</p>
@@ -162,6 +191,7 @@ export default function HojeClient({
           <p className="font-body text-xs text-fg-muted mt-0.5">lançadas hoje</p>
         </div>
       </div>
+      )}
 
       {/* Próximo agendamento */}
       {proximo && (
@@ -211,7 +241,7 @@ export default function HojeClient({
                         <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
                         <span className="font-ui text-[10px] uppercase tracking-wider shrink-0">{STATUS_LABEL[ag.status]}</span>
                       </div>
-                      <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)} · {ag.profissional?.nome}</p>
+                      <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)}{!souBarbeiro && ` · ${ag.profissional?.nome}`}</p>
                       <p className="font-mono text-xs text-amber mt-0.5">R$ {ag.valor_servico.toFixed(2)}</p>
                     </div>
                   </div>
@@ -275,7 +305,7 @@ export default function HojeClient({
       </div>
 
       {/* Resumo financeiro do dia */}
-      {(faturadoReal + entradasManuais - saidasDia) !== 0 && (
+      {!souBarbeiro && (faturadoReal + entradasManuais - saidasDia) !== 0 && (
         <div className="bg-surface border border-line rounded-card p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-fg-muted" />

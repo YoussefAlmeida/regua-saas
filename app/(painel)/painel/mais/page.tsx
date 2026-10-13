@@ -18,7 +18,8 @@ export default async function MaisPage() {
 
   const ITENS_BARBEIRO = [
     { href: '/painel/mais/horarios', label: 'Meu horário', desc: 'Dias, almoço e bloqueios', icon: Clock },
-    { href: '/painel/mais/configuracoes', label: 'Meu perfil', desc: 'Foto e especialidade', icon: Settings },
+    { href: '/painel/mais/desempenho', label: 'Meu desempenho', desc: 'Quanto você fez hoje, na semana e no mês', icon: BarChart3 },
+    { href: '/painel/mais/perfil', label: 'Meu perfil', desc: 'Foto e especialidade', icon: Settings },
   ]
 
   const itens = papel === 'dono' ? ITENS_DONO : ITENS_BARBEIRO

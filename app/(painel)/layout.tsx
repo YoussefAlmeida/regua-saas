@@ -1,14 +1,16 @@
 import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { COOKIE_SESSION, getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const h = await headers()
   const usuarioId = h.get('x-usuario-id')
-  if (!usuarioId) redirect('/entrar')
+  // Confere no banco: conta desativada ou barbeiro removido sai na hora
+  const sessao = await getSessao()
+  if (!usuarioId || !sessao || sessao.usuario_id !== usuarioId) redirect('/entrar')
 
   const barbearia_id = h.get('x-barbearia-id')!
   const papel = h.get('x-papel') as 'dono' | 'barbeiro' | 'cliente'

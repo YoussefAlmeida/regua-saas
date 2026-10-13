@@ -1,6 +1,8 @@
 import { hash, verify } from '@node-rs/argon2'
 import { SignJWT, jwtVerify } from 'jose'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
+import { criarClienteServico } from '@/lib/supabase/server'
 import type { NextResponse } from 'next/server'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
@@ -64,12 +66,27 @@ export async function verificarToken(token: string): Promise<SessaoUsuario | nul
   }
 }
 
-export async function getSessao(): Promise<SessaoUsuario | null> {
+/**
+ * Sessão do usuário logado. Além do token, confere no banco se a conta
+ * continua ativa — barbeiro removido perde o acesso na hora, não em 30 dias.
+ * (cache: uma consulta por requisição, mesmo chamando várias vezes)
+ */
+export const getSessao = cache(async (): Promise<SessaoUsuario | null> => {
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_SESSION)?.value
   if (!token) return null
-  return verificarToken(token)
-}
+  const sessao = await verificarToken(token)
+  if (!sessao) return null
+
+  const { data } = await criarClienteServico()
+    .from('usuarios')
+    .select('ativo, status, barbearia_id')
+    .eq('id', sessao.usuario_id)
+    .maybeSingle()
+  if (!data || !data.ativo || data.status !== 'aprovado' || data.barbearia_id !== sessao.barbearia_id) return null
+
+  return sessao
+})
 
 /** Endereços do próprio sistema — nenhuma barbearia pode usar como link */
 export const SLUGS_RESERVADOS = new Set([
