@@ -13,11 +13,12 @@ export async function middleware(req: NextRequest) {
   if (PUBLICAS.some(r => pathname.startsWith(r))) return NextResponse.next()
   if (API_PUBLICAS.some(r => pathname.startsWith(r))) return NextResponse.next()
 
-  if (pathname === '/') return NextResponse.redirect(new URL('/entrar', req.url))
+  // Landing page de venda
+  if (pathname === '/') return NextResponse.next()
 
   // Rotas públicas por slug da barbearia
-  const slugMatch = pathname.match(/^\/[a-z0-9-]+$/)
-  if (slugMatch) return NextResponse.next()
+  // e "Meus agendamentos" do cliente (a página checa a sessão sozinha)
+  if (/^\/[a-z0-9-]+(\/meus-agendamentos)?$/.test(pathname)) return NextResponse.next()
 
   const token = req.cookies.get(COOKIE_SESSION)?.value
   if (!token) return NextResponse.redirect(new URL('/entrar', req.url))

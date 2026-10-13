@@ -22,3 +22,9 @@ export function formatData(date: Date | string, opts?: Intl.DateTimeFormatOption
     ...opts,
   })
 }
+
+/** WhatsApp no formato guardado no banco: só DDD + número, sem +55 e sem máscara */
+export function normalizarWhatsapp(valor: string): string {
+  const d = valor.replace(/\D/g, '')
+  return d.length >= 12 && d.startsWith('55') ? d.slice(2) : d
+}

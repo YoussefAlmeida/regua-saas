@@ -34,13 +34,12 @@ export const metadata: Metadata = {
     default: "RÉGUA — Sua barbearia na régua.",
   },
   description: "Sistema de agendamento e fluxo de caixa para barbearias do interior da Bahia. Sem app pra baixar. Sem planilha.",
-  robots: { index: false, follow: false }, // ativar quando for a landing pública
+  // Landing e páginas de agendamento podem aparecer no Google; painel e admin ficam fora
 }
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: "#0B0B0C",
 }
 

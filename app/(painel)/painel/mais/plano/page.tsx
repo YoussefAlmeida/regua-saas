@@ -2,6 +2,7 @@ import { headers, cookies } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
 import { CheckCircle2, Circle } from 'lucide-react'
+import { formatBRL } from '@/lib/utils'
 
 const PLANOS = [
   {
@@ -93,7 +94,7 @@ export default async function PlanoPage() {
         {status !== 'trial' && (
           <div className="flex items-center justify-between">
             <span className="font-ui text-xs uppercase tracking-wider text-fg-muted">Plano atual</span>
-            <span className="font-ui text-sm uppercase tracking-wider text-fg capitalize">{planoAtual}</span>
+            <span className="font-ui text-sm uppercase tracking-wider text-fg">{planoAtual}</span>
           </div>
         )}
         {status === 'trial' && (
@@ -140,7 +141,7 @@ export default async function PlanoPage() {
                   <p className="font-body text-xs text-fg-muted mt-0.5">{plano.descricao}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-mono text-xl text-amber">R$ {plano.preco.toFixed(2)}</p>
+                  <p className="font-mono text-xl text-amber">{formatBRL(plano.preco)}</p>
                   <p className="font-body text-xs text-fg-muted">/mês</p>
                 </div>
               </div>

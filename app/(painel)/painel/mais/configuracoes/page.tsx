@@ -16,7 +16,7 @@ export default async function ConfiguracoesPage() {
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, nome, slug, telefone, endereco, instagram, horario_funcionamento')
+    .select('id, nome, slug, telefone, endereco, instagram, horario_funcionamento, dias_fechados')
     .eq('id', barbearia_id)
     .single()
 

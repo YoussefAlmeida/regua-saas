@@ -37,7 +37,7 @@ export default function EntrarPage() {
         return
       }
 
-      router.replace('/painel/hoje')
+      router.replace((json as { destino?: string }).destino ?? '/painel/hoje')
     } catch {
       setErro('Erro de conexão. Tente novamente.')
     } finally {
@@ -73,7 +73,7 @@ export default function EntrarPage() {
               tipo === 'barbeiro' ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'
             }`}
           >
-            Sou barbeiro
+            Barbeiro ou cliente
           </button>
         </div>
 

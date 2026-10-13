@@ -1,38 +1,42 @@
-import { headers, cookies } from 'next/headers'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { redirect } from 'next/navigation'
+import { getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
+import { limitesDoMes, mesVizinho } from '@/lib/periodo'
+import { CAMPOS_MOV } from '@/lib/financeiro'
 import FinanceiroClient, { type Movimentacao } from './financeiro-client'
 
+
 export default async function FinanceiroPage() {
-  const h = await headers()
-  const barbearia_id = h.get('x-barbearia-id')!
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const sessao = await getSessao()
+  if (!sessao) redirect('/entrar')
+  if (sessao.papel !== 'dono') redirect('/painel/hoje')
 
-  const mesAtual = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }).slice(0, 7) // 'YYYY-MM'
-  const [y, m] = mesAtual.split('-').map(Number)
+  const db = criarClienteServico()
+  const mesAtual = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }).slice(0, 7)
+  const atual = limitesDoMes(mesAtual)
+  const anterior = limitesDoMes(mesVizinho(mesAtual, -1))
 
-  const [{ data: movimentacoes }, { data: despesasFixas }] = await Promise.all([
-    db
-      .from('movimentacoes')
-      .select('id, tipo, descricao, valor, data, origem, criado_em, categoria:categorias_fin(nome, cor)')
-      .eq('barbearia_id', barbearia_id)
-      .gte('data', `${mesAtual}-01`)
-      .lt('data', `${y}-${String(m + 1).padStart(2, '0')}-01`)
-      .order('data', { ascending: false })
-      .order('criado_em', { ascending: false }),
-    db
-      .from('despesas_fixas')
-      .select('id, descricao, valor, dia_vencimento, ativa')
-      .eq('barbearia_id', barbearia_id)
-      .order('dia_vencimento'),
+  const [{ data: movs }, { data: movsAnt }, { data: fixas }, { data: categorias }, { data: profissionais }] = await Promise.all([
+    db.from('movimentacoes').select(CAMPOS_MOV)
+      .eq('barbearia_id', sessao.barbearia_id).gte('data', atual.de).lt('data', atual.ate)
+      .order('data', { ascending: false }).order('criado_em', { ascending: false }),
+    db.from('movimentacoes').select('tipo, valor')
+      .eq('barbearia_id', sessao.barbearia_id).gte('data', anterior.de).lt('data', anterior.ate),
+    db.from('despesas_fixas').select('id, descricao, valor, dia_vencimento, ativa')
+      .eq('barbearia_id', sessao.barbearia_id).order('dia_vencimento'),
+    db.from('categorias_fin').select('id, nome, tipo, cor, padrao')
+      .eq('barbearia_id', sessao.barbearia_id).order('padrao', { ascending: false }).order('nome'),
+    db.from('profissionais').select('id, nome')
+      .eq('barbearia_id', sessao.barbearia_id).order('nome'),
   ])
 
   return (
     <FinanceiroClient
-      movimentacoesIniciais={(movimentacoes as unknown) as Movimentacao[] ?? []}
-      despesasFixasIniciais={despesasFixas ?? []}
+      movimentacoesIniciais={(movs ?? []) as unknown as Movimentacao[]}
+      anteriorInicial={movsAnt ?? []}
+      despesasFixasIniciais={fixas ?? []}
+      categoriasIniciais={categorias ?? []}
+      profissionais={profissionais ?? []}
       mesInicial={mesAtual}
     />
   )

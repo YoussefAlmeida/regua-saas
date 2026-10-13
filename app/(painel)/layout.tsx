@@ -1,13 +1,20 @@
+import type { Metadata } from 'next'
 import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { COOKIE_SESSION, getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
+import Avisos from '@/components/aviso'
+import ConfirmarSenha from '@/components/confirmar-senha'
+
+export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const h = await headers()
   const usuarioId = h.get('x-usuario-id')
-  if (!usuarioId) redirect('/entrar')
+  // Confere no banco: conta desativada ou barbeiro removido sai na hora
+  const sessao = await getSessao()
+  if (!usuarioId || !sessao || sessao.usuario_id !== usuarioId) redirect('/entrar')
 
   const barbearia_id = h.get('x-barbearia-id')!
   const papel = h.get('x-papel') as 'dono' | 'barbeiro' | 'cliente'
@@ -18,9 +25,12 @@ export default async function PainelLayout({ children }: { children: React.React
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('nome')
+    .select('nome, slug')
     .eq('id', barbearia_id)
     .single()
+
+  // Cliente não tem painel — vai pros agendamentos dele
+  if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
 
   const { data: usuario } = await db
     .from('usuarios')
@@ -46,6 +56,8 @@ export default async function PainelLayout({ children }: { children: React.React
 
       {/* Nav inferior */}
       <NavInferior papel={papel} />
+      <Avisos />
+      <ConfirmarSenha />
     </div>
   )
 }

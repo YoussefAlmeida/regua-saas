@@ -1,6 +1,8 @@
+import Link from 'next/link'
 import { headers, cookies } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
+import { formatBRL } from '@/lib/utils'
 
 export default async function RelatoriosPage() {
   const h = await headers()
@@ -44,12 +46,12 @@ export default async function RelatoriosPage() {
     : null
 
   // Ranking por profissional
-  const rankingMap: Record<string, { nome: string; atendimentos: number; receita: number }> = {}
+  const rankingMap: Record<string, { id: string; nome: string; atendimentos: number; receita: number }> = {}
   for (const ag of concluidos) {
     const prof = Array.isArray(ag.profissional) ? ag.profissional[0] : ag.profissional
     const pid = ag.profissional_id
     if (!pid) continue
-    if (!rankingMap[pid]) rankingMap[pid] = { nome: (prof as { nome?: string } | null)?.nome ?? 'Barbeiro', atendimentos: 0, receita: 0 }
+    if (!rankingMap[pid]) rankingMap[pid] = { id: pid, nome: (prof as { nome?: string } | null)?.nome ?? 'Barbeiro', atendimentos: 0, receita: 0 }
     rankingMap[pid].atendimentos++
     rankingMap[pid].receita += ag.valor_servico ?? 0
   }
@@ -75,7 +77,7 @@ export default async function RelatoriosPage() {
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Relatórios</h1>
-        <span className="font-body text-xs text-fg-muted capitalize">{nomeMes}</span>
+        <span className="font-body text-xs text-fg-muted inline-block first-letter:uppercase">{nomeMes}</span>
       </div>
 
       {/* Métricas principais */}
@@ -91,11 +93,11 @@ export default async function RelatoriosPage() {
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Receita</p>
-          <p className="font-mono text-2xl text-entrada">R$ {totalReceita.toFixed(2)}</p>
+          <p className="font-mono text-2xl text-entrada">{formatBRL(totalReceita)}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Ticket médio</p>
-          <p className="font-mono text-2xl text-amber">R$ {ticketMedio.toFixed(2)}</p>
+          <p className="font-mono text-2xl text-amber">{formatBRL(ticketMedio)}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Clientes únicos</p>
@@ -139,14 +141,14 @@ export default async function RelatoriosPage() {
           </p>
           <div className="divide-y divide-line">
             {ranking.map((prof, i) => (
-              <div key={prof.nome} className="flex items-center gap-3 px-4 py-3">
+              <Link key={prof.id} href={`/painel/mais/desempenho?p=${prof.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-surface-alt transition-colors">
                 <span className="font-mono text-sm text-fg-muted w-4 shrink-0">{i + 1}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-ui text-sm text-fg truncate">{prof.nome}</p>
                   <p className="font-body text-xs text-fg-muted">{prof.atendimentos} atendimentos</p>
                 </div>
-                <span className="font-mono text-sm text-entrada shrink-0">R$ {prof.receita.toFixed(2)}</span>
-              </div>
+                <span className="font-mono text-sm text-entrada shrink-0">{formatBRL(prof.receita)}</span>
+              </Link>
             ))}
           </div>
         </div>

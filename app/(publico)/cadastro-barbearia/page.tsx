@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { problemaNaSenha } from '@/lib/senha'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -42,10 +43,8 @@ export default function CadastroBarbeariaPage() {
       setErro('As senhas não coincidem')
       return
     }
-    if (form.dono_senha.length < 8) {
-      setErro('Senha deve ter pelo menos 8 caracteres')
-      return
-    }
+    const problema = problemaNaSenha(form.dono_senha, [form.dono_email.split('@')[0], form.barbearia_telefone])
+    if (problema) { setErro(problema); return }
 
     setCarregando(true)
     try {
@@ -65,7 +64,7 @@ export default function CadastroBarbeariaPage() {
 
       const json = await res.json().catch(() => ({}))
       if (!res.ok) { setErro((json as { erro?: string }).erro || 'Erro ao cadastrar'); return }
-      router.replace('/painel/hoje')
+      router.replace('/painel/comecar')
     } catch {
       setErro('Erro de conexão. Tente novamente.')
     } finally {

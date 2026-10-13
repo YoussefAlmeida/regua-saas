@@ -15,7 +15,7 @@ export default async function BarbeirosPage() {
 
   const { data: barbeiros } = await db
     .from('usuarios')
-    .select('id, nome, whatsapp, status, ativo, criado_em')
+    .select('id, nome, whatsapp, status, ativo, criado_em, profissionais(id)')
     .eq('papel', 'barbeiro')
     .order('criado_em', { ascending: false })
 

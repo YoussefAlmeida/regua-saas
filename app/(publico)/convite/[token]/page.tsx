@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { problemaNaSenha } from '@/lib/senha'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 
@@ -21,7 +22,8 @@ export default function ConvitePage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (form.senha !== form.senha_confirm) { setErroMsg('As senhas não coincidem'); return }
-    if (form.senha.length < 8) { setErroMsg('Senha deve ter pelo menos 8 caracteres'); return }
+    const problema = problemaNaSenha(form.senha, [form.whatsapp])
+    if (problema) { setErroMsg(problema); return }
 
     setCarregando(true)
     const res = await fetch('/api/auth/convite/aceitar', {

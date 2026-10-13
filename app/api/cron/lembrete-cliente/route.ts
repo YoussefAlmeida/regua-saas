@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { enviarTexto, textoLembreteCliente } from '@/lib/whatsapp'
+import { enviarTexto, textoLembreteCliente, urlDoSite } from '@/lib/whatsapp'
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     .from('agendamentos')
     .select(`
       id, inicio, valor_servico,
-      barbearia:barbearias!barbearia_id(nome),
+      barbearia:barbearias!barbearia_id(nome, slug),
       cliente:usuarios!cliente_id(nome, whatsapp),
       profissional:profissionais!profissional_id(nome),
       servico:servicos!servico_id(nome)
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
       servicoNome:   servico?.nome ?? 'Serviço',
       barbeiiroNome: profissional?.nome ?? 'Barbeiro',
       hora,
+      linkCancelar: barbearia?.slug ? `${urlDoSite()}/${barbearia.slug}/meus-agendamentos` : undefined,
     })
 
     const ok = await enviarTexto(cliente.whatsapp, texto)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { registrarAuditoria } from '@/lib/auditoria'
 
 const SchemaPatch = z.object({
   descricao: z.string().min(1).max(200).optional(),
@@ -34,7 +35,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   return NextResponse.json(data)
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel !== 'dono') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
@@ -42,12 +43,29 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
 
   const { id } = await params
   const db = criarClienteServico()
-  const { error } = await db
+
+  const { data: fixa } = await db
     .from('despesas_fixas')
-    .delete()
+    .select('id, descricao, valor, dia_vencimento')
     .eq('id', id)
     .eq('barbearia_id', sessao.barbearia_id)
+    .maybeSingle()
+  if (!fixa) return NextResponse.json({ erro: 'Despesa fixa não encontrada' }, { status: 404 })
 
-  if (error) return NextResponse.json({ erro: 'Erro ao deletar' }, { status: 500 })
+  // Os meses já lançados continuam no extrato — só soltam o vínculo
+  await db.from('movimentacoes').update({ recorrente_id: null }).eq('recorrente_id', id)
+
+  const { error } = await db.from('despesas_fixas').delete().eq('id', id)
+  if (error) return NextResponse.json({ erro: 'Erro ao apagar' }, { status: 500 })
+
+  await registrarAuditoria({
+    barbearia_id: sessao.barbearia_id,
+    usuario_id: sessao.usuario_id,
+    acao: 'apagar',
+    tabela: 'despesas_fixas',
+    registro_id: id,
+    antes: fixa,
+    req,
+  })
   return NextResponse.json({ ok: true })
 }

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, Pencil, Trash2, Clock, Check, X } from 'lucide-react'
+import { formatBRL } from '@/lib/utils'
 
 interface Servico {
   id: string
@@ -146,7 +147,7 @@ export default function ServicosClient({
               <div className="flex-1 min-w-0">
                 <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{s.nome}</p>
                 <div className="flex items-center gap-3 mt-0.5">
-                  <span className="font-mono text-sm text-amber">R$ {s.preco.toFixed(2)}</span>
+                  <span className="font-mono text-sm text-amber">{formatBRL(s.preco)}</span>
                   <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
                     <Clock size={11} />
                     {s.duracao_min} min

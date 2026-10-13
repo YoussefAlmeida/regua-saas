@@ -1,7 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, TrendingUp, Scissors, Check, X } from 'lucide-react'
+import Link from 'next/link'
+import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRight } from 'lucide-react'
+import { avisar, erroDaResposta } from '@/components/aviso'
+import ContatoCliente from '@/components/contato-cliente'
+import { mensagemStatus } from '@/lib/status-agendamento'
+import { formatBRL } from '@/lib/utils'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -36,14 +41,21 @@ function hora(iso: string) {
 
 export default function HojeClient({
   agendamentosIniciais,
+  esquecidosIniciais,
   movimentacoesHoje,
   data,
+  souBarbeiro = false,
+  pendencias = [],
 }: {
+  pendencias?: { href: string; texto: string }[]
+  souBarbeiro?: boolean
   agendamentosIniciais: Agendamento[]
+  esquecidosIniciais: Agendamento[]
   movimentacoesHoje: Movimentacao[]
   data: string
 }) {
   const [ags, setAgs] = useState<Agendamento[]>(agendamentosIniciais)
+  const [esquecidos, setEsquecidos] = useState<Agendamento[]>(esquecidosIniciais)
   const [atualizando, setAtualizando] = useState<string | null>(null)
 
   const ativos   = ags.filter(a => !['cancelado', 'faltou'].includes(a.status))
@@ -63,17 +75,22 @@ export default function HojeClient({
   })
 
   async function atualizarStatus(id: string, status: Status) {
+    if (status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
     setAtualizando(id)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
-    })
+    }).catch(() => null)
     setAtualizando(null)
-    if (res.ok) {
-      const json = await res.json()
-      setAgs(prev => prev.map(a => a.id === id ? { ...a, ...json } : a))
-    }
+
+    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+
+    const json = await res.json()
+    setAgs(prev => prev.map(a => a.id === id ? { ...a, ...json } : a))
+    setEsquecidos(prev => prev.filter(a => a.id !== id))
+    avisar(mensagemStatus(status, json.entrada, json.valor_servico), 'sucesso')
   }
 
   // Próximo agendamento pendente
@@ -84,32 +101,98 @@ export default function HojeClient({
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div>
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Hoje</h1>
-        <p className="font-body text-sm text-fg-muted capitalize">{dataFmt}</p>
+        <p className="font-body text-sm text-fg-muted first-letter:uppercase">{dataFmt}</p>
       </div>
 
+      {pendencias.length > 0 && (
+        <div className="space-y-2">
+          {pendencias.map(p => (
+            <Link key={p.href} href={p.href} className="flex items-center gap-3 bg-surface border border-amber/30 rounded-card px-4 py-3 hover:border-amber/60 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-amber shrink-0" />
+              <span className="flex-1 font-body text-sm text-fg">{p.texto}</span>
+              <ChevronRight size={14} className="text-fg-muted" />
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Atendimentos que passaram sem status — não deixa esquecer */}
+      {esquecidos.length > 0 && (
+        <div className="bg-amber/5 border border-amber/40 rounded-card p-4 space-y-3">
+          <p className="font-ui text-xs uppercase tracking-wider text-amber flex items-center gap-1.5">
+            <AlertTriangle size={12} />
+            {esquecidos.length} atendimento{esquecidos.length > 1 ? 's' : ''} sem status
+          </p>
+          <p className="font-body text-xs text-fg-muted">
+            Marca o que aconteceu — só entra no caixa e no desempenho depois disso.
+          </p>
+          {esquecidos.map(ag => {
+            const dia = new Date(ag.inicio).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', timeZone: 'America/Bahia' })
+            const ocupado = atualizando === ag.id
+            return (
+              <div key={ag.id} className={`border-t border-line pt-3 ${ocupado ? 'opacity-50' : ''}`}>
+                <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
+                <p className="font-body text-xs text-fg-muted first-letter:uppercase">
+                  {dia} · {hora(ag.inicio)} · {ag.servico?.nome} · {ag.profissional?.nome}
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => atualizarStatus(ag.id, 'concluido')}
+                    disabled={ocupado}
+                    className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors"
+                  >
+                    Cortou
+                  </button>
+                  <button
+                    onClick={() => atualizarStatus(ag.id, 'faltou')}
+                    disabled={ocupado}
+                    className="flex-1 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-1.5 rounded-button"
+                  >
+                    Faltou
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       {/* Cards de métricas */}
+      {souBarbeiro ? (
+        <Link href="/painel/mais/desempenho" className="block bg-surface border border-line rounded-card p-4 hover:border-amber/40 transition-colors">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Meu dia</p>
+            <span className="flex items-center gap-0.5 font-ui text-[10px] uppercase tracking-wider text-amber">Meu desempenho <ChevronRight size={12} /></span>
+          </div>
+          <p className="font-mono text-4xl text-entrada leading-none">{formatBRL(faturadoReal)}</p>
+          <p className="font-body text-xs text-fg-muted mt-2">
+            {concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente
+          </p>
+        </Link>
+      ) : (
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Faturado hoje</p>
-          <p className="font-mono text-2xl text-entrada">R$ {(faturadoReal + entradasManuais).toFixed(2)}</p>
+          <p className="font-mono text-xl text-entrada whitespace-nowrap">{formatBRL((faturadoReal + entradasManuais))}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} concluído{concluidos.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Previsto</p>
-          <p className="font-mono text-2xl text-amber">R$ {faturadoPrev.toFixed(2)}</p>
+          <p className="font-mono text-xl text-amber whitespace-nowrap">{formatBRL(faturadoPrev)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{pendentes.length} pendente{pendentes.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
-          <p className="font-mono text-2xl text-fg">{ags.length}</p>
+          <p className="font-mono text-xl text-fg">{ags.length}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">no total</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Saídas</p>
-          <p className="font-mono text-2xl text-saida">R$ {saidasDia.toFixed(2)}</p>
-          <p className="font-body text-xs text-fg-muted mt-0.5">manual</p>
+          <p className="font-mono text-xl text-saida whitespace-nowrap">{formatBRL(saidasDia)}</p>
+          <p className="font-body text-xs text-fg-muted mt-0.5">lançadas hoje</p>
         </div>
       </div>
+      )}
 
       {/* Próximo agendamento */}
       {proximo && (
@@ -159,8 +242,8 @@ export default function HojeClient({
                         <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
                         <span className="font-ui text-[10px] uppercase tracking-wider shrink-0">{STATUS_LABEL[ag.status]}</span>
                       </div>
-                      <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)} · {ag.profissional?.nome}</p>
-                      <p className="font-mono text-xs text-amber mt-0.5">R$ {ag.valor_servico.toFixed(2)}</p>
+                      <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)}{!souBarbeiro && ` · ${ag.profissional?.nome}`}</p>
+                      <p className="font-mono text-xs text-amber mt-0.5">{formatBRL(ag.valor_servico)}</p>
                     </div>
                   </div>
 
@@ -182,6 +265,20 @@ export default function HojeClient({
                         <X size={11} />
                       </button>
                     </div>
+                  )}
+                  {(ag.status === 'agendado' || ag.status === 'confirmado') && ag.cliente?.whatsapp && (
+                    <div className="mt-3">
+                      <ContatoCliente whatsapp={ag.cliente.whatsapp} compacto />
+                    </div>
+                  )}
+                  {(ag.status === 'concluido' || ag.status === 'faltou') && (
+                    <button
+                      onClick={() => atualizarStatus(ag.id, 'confirmado')}
+                      disabled={isAtivo}
+                      className="mt-2 flex items-center gap-1 font-ui text-[10px] uppercase tracking-wider text-fg-muted hover:text-fg"
+                    >
+                      <Undo2 size={11} /> Desfazer
+                    </button>
                   )}
                   {ag.status === 'confirmado' && (
                     <div className="flex gap-2 mt-3">
@@ -209,14 +306,14 @@ export default function HojeClient({
       </div>
 
       {/* Resumo financeiro do dia */}
-      {(faturadoReal + entradasManuais - saidasDia) !== 0 && (
+      {!souBarbeiro && (faturadoReal + entradasManuais - saidasDia) !== 0 && (
         <div className="bg-surface border border-line rounded-card p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-fg-muted" />
             <span className="font-ui text-sm uppercase tracking-wider text-fg-muted">Saldo do dia</span>
           </div>
           <span className={`font-mono text-lg ${(faturadoReal + entradasManuais - saidasDia) >= 0 ? 'text-entrada' : 'text-saida'}`}>
-            R$ {(faturadoReal + entradasManuais - saidasDia).toFixed(2)}
+            {formatBRL((faturadoReal + entradasManuais - saidasDia))}
           </span>
         </div>
       )}

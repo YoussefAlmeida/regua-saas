@@ -46,11 +46,23 @@
     --saida:    #E2564D;
     --info:     #6BA3D6;
 
-    /* Tipografia */
-    --font-display: 'Anton', 'Arial Narrow', sans-serif;
-    --font-ui:      'Oswald', sans-serif;
-    --font-body:    'Open Sans', system-ui, sans-serif;
-    --font-mono:    'Space Mono', 'Courier New', monospace;
+    /* Mesmas cores em canais RGB — o Tailwind usa pra transparência
+       (bg-entrada/10, border-amber/30…). Mudou a cor acima? Mude aqui. */
+    --bg-rgb:           11 11 12;
+    --surface-rgb:      20 20 22;
+    --surface-2-rgb:    30 30 33;
+    --line-rgb:         42 42 46;
+    --fg-rgb:           242 241 237;
+    --fg-muted-rgb:     161 161 168;
+    --accent-rgb:       232 176 75;
+    --accent-press-rgb: 201 150 59;
+    --accent-fg-rgb:    20 17 10;
+    --entrada-rgb:      79 180 119;
+    --saida-rgb:        226 86 77;
+    --info-rgb:         107 163 214;
+
+    /* Tipografia: --font-display/ui/body/mono vêm do next/font (app/layout.tsx).
+       Não redefinir aqui — o :root sobrescrevia a fonte carregada. */
   }
 }
 

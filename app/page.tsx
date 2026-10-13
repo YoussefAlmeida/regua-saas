@@ -4,6 +4,7 @@ import {
   CheckCircle2, ArrowRight, Star, Zap, Shield,
 } from 'lucide-react'
 import FaqLanding from './_components/faq-landing'
+import { formatBRL } from '@/lib/utils'
 
 const PLANOS = [
   {
@@ -249,7 +250,7 @@ export default function LandingPage() {
           {[...Array(5)].map((_, i) => <Star key={i} size={18} className="text-amber fill-amber" />)}
         </div>
         <blockquote className="font-display text-2xl md:text-3xl text-fg max-w-2xl mx-auto mb-6 uppercase">
-          "Reduzi faltas em 70% no primeiro mês só com o lembrete automático."
+          &ldquo;Reduzi faltas em 70% no primeiro mês só com o lembrete automático.&rdquo;
         </blockquote>
         <p className="font-body text-sm text-fg-muted">— Carlos, Barbearia Estilo · Feira de Santana, BA</p>
       </section>
@@ -289,7 +290,7 @@ export default function LandingPage() {
                 </div>
 
                 <div className="mb-6">
-                  <span className="font-mono text-4xl text-amber">R$ {plano.preco.toFixed(2)}</span>
+                  <span className="font-mono text-4xl text-amber">{formatBRL(plano.preco)}</span>
                   <span className="font-body text-sm text-fg-muted">/mês</span>
                 </div>
 
