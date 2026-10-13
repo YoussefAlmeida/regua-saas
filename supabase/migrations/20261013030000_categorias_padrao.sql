@@ -2,6 +2,7 @@
 -- Categorias financeiras padrão — Módulo 4
 -- Toda barbearia nova já nasce com as categorias; as que já existem
 -- recebem agora. O dono pode criar outras pelo painel.
+-- Pode rodar mais de uma vez sem erro.
 -- ================================================================
 create or replace function criar_categorias_padrao(b uuid) returns void as $$
 begin
@@ -29,10 +30,11 @@ begin
 end;
 $$ language plpgsql security definer set search_path = public;
 
+drop trigger if exists barbearia_categorias_padrao on barbearias;
 create trigger barbearia_categorias_padrao
   after insert on barbearias
   for each row execute function trg_barbearia_categorias();
 
 select criar_categorias_padrao(id) from barbearias;
 
-create unique index categorias_fin_nome_unico on categorias_fin (barbearia_id, tipo, lower(nome));
+create unique index if not exists categorias_fin_nome_unico on categorias_fin (barbearia_id, tipo, lower(nome));
