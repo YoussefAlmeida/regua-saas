@@ -98,7 +98,9 @@ export function textoFimTrial(opts: { barbeariaNome: string; dias: number }): st
   )
 }
 
-/** Endereço público do site, sem barra no fim (ex.: https://regua.app) */
+/** Endereço público do site, sem barra no fim — usado pelos crons, que não têm requisição de navegador */
 export function urlDoSite(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://regua.app').replace(/\/+$/, '')
+  const url = process.env.NEXT_PUBLIC_SITE_URL
+    ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000')
+  return url.replace(/\/+$/, '')
 }

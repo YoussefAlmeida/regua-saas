@@ -2,6 +2,7 @@ import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
+import { urlDoSiteAtual } from '@/lib/site-url'
 import ConfiguracoesClient from './configuracoes-client'
 
 export default async function ConfiguracoesPage() {
@@ -20,5 +21,5 @@ export default async function ConfiguracoesPage() {
     .eq('id', barbearia_id)
     .single()
 
-  return <ConfiguracoesClient barbearia={barbearia ?? null} />
+  return <ConfiguracoesClient barbearia={barbearia ?? null} siteUrl={await urlDoSiteAtual()} />
 }
