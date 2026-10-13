@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { jwtVerify } from 'jose'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, COOKIE_SESSION } from '@/lib/auth'
+import { problemaNaSenha } from '@/lib/senha'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
 
@@ -21,6 +22,9 @@ export async function POST(req: NextRequest) {
   }
 
   const { token, nome, whatsapp, senha } = parse.data
+
+  const problema = problemaNaSenha(senha, [whatsapp])
+  if (problema) return NextResponse.json({ erro: problema }, { status: 400 })
 
   // Valida token de convite
   let barbearia_id: string

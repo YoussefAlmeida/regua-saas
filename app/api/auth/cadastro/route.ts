@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, criarToken, slugify, COOKIE_SESSION } from '@/lib/auth'
+import { problemaNaSenha } from '@/lib/senha'
 
 const Schema = z.object({
   barbearia_nome: z.string().min(2).max(80),
@@ -21,6 +22,10 @@ export async function POST(req: NextRequest) {
   }
 
   const d = parse.data
+  d.dono_email = d.dono_email.trim().toLowerCase()
+
+  const problema = problemaNaSenha(d.dono_senha, [d.dono_email.split('@')[0], d.barbearia_telefone ?? ''])
+  if (problema) return NextResponse.json({ erro: problema }, { status: 400 })
   const db = criarClienteServico()
 
   // Verifica email duplicado
