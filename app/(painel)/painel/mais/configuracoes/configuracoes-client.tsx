@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, X, CalendarOff } from 'lucide-react'
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
@@ -26,6 +26,7 @@ interface Barbearia {
   endereco: string | null
   instagram: string | null
   horario_funcionamento: Record<string, HorarioDia> | null
+  dias_fechados: string[] | null
 }
 
 export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbearia | null }) {
@@ -40,6 +41,9 @@ export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbeari
     instagram: barbearia?.instagram ?? '',
   })
   const [horarios, setHorarios] = useState<Horarios>(horarioInicial)
+  const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
+  const [fechados, setFechados] = useState<string[]>((barbearia?.dias_fechados ?? []).filter(d => d >= hoje))
+  const [novoFechado, setNovoFechado] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
   const [erro, setErro] = useState('')
@@ -63,6 +67,7 @@ export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbeari
         endereco: form.endereco.trim() || null,
         instagram: form.instagram.trim() || null,
         horario_funcionamento: horarios,
+        dias_fechados: fechados,
       }),
     })
 
@@ -200,6 +205,54 @@ export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbeari
             )
           })}
         </div>
+      </section>
+
+      {/* Dias fechados (feriados) — vencem o horário de qualquer barbeiro */}
+      <section className="space-y-3">
+        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Feriados e dias fechados</h2>
+        <p className="font-body text-xs text-fg-muted -mt-1">
+          Nesses dias ninguém agenda pela página, mesmo que o barbeiro tenha horário configurado.
+        </p>
+        <div className="flex gap-2">
+          <input
+            type="date"
+            min={hoje}
+            value={novoFechado}
+            onChange={e => setNovoFechado(e.target.value)}
+            className={`${inputCls} flex-1`}
+            aria-label="Data fechada"
+          />
+          <button
+            type="button"
+            disabled={!novoFechado || fechados.includes(novoFechado)}
+            onClick={() => { setFechados(f => [...f, novoFechado].sort()); setNovoFechado('') }}
+            className="px-4 bg-surface-alt border border-line hover:border-amber/40 text-fg font-ui text-xs uppercase tracking-wider rounded-button transition-colors disabled:opacity-40"
+          >
+            Adicionar
+          </button>
+        </div>
+        {fechados.length > 0 ? (
+          <ul className="flex flex-wrap gap-2">
+            {fechados.map(d => (
+              <li key={d} className="flex items-center gap-1.5 bg-surface border border-line rounded-full pl-3 pr-1.5 py-1">
+                <CalendarOff size={12} className="text-fg-muted" />
+                <span className="font-body text-xs text-fg capitalize">
+                  {new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' })}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setFechados(f => f.filter(x => x !== d))}
+                  className="p-1 text-fg-muted hover:text-saida"
+                  aria-label="Remover dia fechado"
+                >
+                  <X size={12} />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="font-body text-xs text-fg-muted">Nenhum dia fechado marcado. Não esqueça de salvar.</p>
+        )}
       </section>
 
       {erro && <p className="font-body text-sm text-saida">{erro}</p>}

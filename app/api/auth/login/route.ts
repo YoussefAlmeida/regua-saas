@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { normalizarWhatsapp } from '@/lib/utils'
 import { verificarSenha, criarToken, COOKIE_SESSION } from '@/lib/auth'
 import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   const db = criarClienteServico()
   const d = parse.data
-  const identificador = d.tipo === 'dono' ? d.email.trim().toLowerCase() : d.whatsapp.replace(/\D/g, '')
+  const identificador = d.tipo === 'dono' ? d.email.trim().toLowerCase() : normalizarWhatsapp(d.whatsapp)
   const ip = ipDa(req)
 
   const espera = await segundosBloqueado([`id:${identificador}`, `ip:${ip}`])

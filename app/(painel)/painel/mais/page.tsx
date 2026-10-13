@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import Link from 'next/link'
-import { Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut } from 'lucide-react'
+import { Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut, Clock } from 'lucide-react'
 
 export default async function MaisPage() {
   const h = await headers()
@@ -9,6 +9,7 @@ export default async function MaisPage() {
   const ITENS_DONO = [
     { href: '/painel/mais/servicos', label: 'Serviços', desc: 'Preços e duração', icon: Scissors },
     { href: '/painel/mais/barbeiros', label: 'Equipe', desc: 'Barbeiros e aprovações', icon: Users },
+    { href: '/painel/mais/horarios', label: 'Horários e bloqueios', desc: 'Expediente, almoço e folgas da equipe', icon: Clock },
     { href: '/painel/mais/clientes', label: 'Clientes', desc: 'Histórico de clientes', icon: Users2 },
     { href: '/painel/mais/relatorios', label: 'Relatórios', desc: 'Desempenho e métricas', icon: BarChart3 },
     { href: '/painel/mais/configuracoes', label: 'Configurações', desc: 'Horários e dados da barbearia', icon: Settings },
@@ -16,6 +17,7 @@ export default async function MaisPage() {
   ]
 
   const ITENS_BARBEIRO = [
+    { href: '/painel/mais/horarios', label: 'Meu horário', desc: 'Dias, almoço e bloqueios', icon: Clock },
     { href: '/painel/mais/configuracoes', label: 'Meu perfil', desc: 'Foto e especialidade', icon: Settings },
   ]
 

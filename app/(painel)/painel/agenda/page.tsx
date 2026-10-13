@@ -6,6 +6,8 @@ import AgendaClient, { type Agendamento } from './agenda-client'
 export default async function AgendaPage() {
   const h = await headers()
   const barbearia_id = h.get('x-barbearia-id')!
+  const papel = h.get('x-papel')
+  const meuProfissionalId = h.get('x-profissional-id')
   const cookieStore = await cookies()
   const token = cookieStore.get(COOKIE_SESSION)!.value
   const db = criarClienteAutenticado(token)
@@ -41,7 +43,8 @@ export default async function AgendaPage() {
 
   return (
     <AgendaClient
-      profissionaisIniciais={profissionais ?? []}
+      // Barbeiro vê e marca só na própria agenda (seção 6.1.1)
+      profissionaisIniciais={(profissionais ?? []).filter(p => papel !== 'barbeiro' || p.id === meuProfissionalId)}
       servicosIniciais={servicos ?? []}
       agendamentosIniciais={(agendamentosHoje as unknown) as Agendamento[] ?? []}
       dataInicial={hoje}

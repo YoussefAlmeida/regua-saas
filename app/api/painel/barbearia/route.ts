@@ -18,6 +18,7 @@ const SchemaPatch = z.object({
       intervalo_fim: z.string().regex(/^\d{2}:\d{2}$/).optional(),
     }),
   ).optional(),
+  dias_fechados: z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).max(60).optional(),
 })
 
 export async function GET() {
@@ -27,7 +28,7 @@ export async function GET() {
   const db = criarClienteServico()
   const { data, error } = await db
     .from('barbearias')
-    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, plano, status, trial_fim')
+    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, dias_fechados, plano, status, trial_fim')
     .eq('id', sessao.barbearia_id)
     .single()
 
@@ -45,12 +46,16 @@ export async function PATCH(req: NextRequest) {
   const parse = SchemaPatch.safeParse(body)
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
 
+  if (parse.data.dias_fechados) {
+    parse.data.dias_fechados = [...new Set(parse.data.dias_fechados)].sort()
+  }
+
   const db = criarClienteServico()
   const { data, error } = await db
     .from('barbearias')
     .update({ ...parse.data, atualizado_em: new Date().toISOString() })
     .eq('id', sessao.barbearia_id)
-    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento')
+    .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, dias_fechados')
     .single()
 
   if (error) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })

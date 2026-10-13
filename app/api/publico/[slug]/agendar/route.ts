@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { horariosLivres, dataHoraLocal } from '@/lib/disponibilidade'
+import { normalizarWhatsapp } from '@/lib/utils'
 import { hashSenha } from '@/lib/auth'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
 
@@ -18,13 +20,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   const parse = SchemaAgendar.safeParse(body)
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
 
-  const { profissional_id, servico_id, inicio, cliente_nome, cliente_whatsapp } = parse.data
+  const { profissional_id, servico_id, inicio, cliente_nome } = parse.data
+  const cliente_whatsapp = normalizarWhatsapp(parse.data.cliente_whatsapp)
+  if (cliente_whatsapp.length < 10 || cliente_whatsapp.length > 11) {
+    return NextResponse.json({ erro: 'WhatsApp inválido. Use DDD + número.' }, { status: 400 })
+  }
 
   const db = criarClienteServico()
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, nome, status')
+    .select('id, nome, status, horario_funcionamento, dias_fechados')
     .eq('slug', slug)
     .single()
 
@@ -54,17 +60,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   if (!profissional) return NextResponse.json({ erro: 'Profissional não disponível' }, { status: 404 })
 
+  // O horário precisa estar livre de verdade (expediente, feriado, bloqueio, passado)
+  const inicioPedido = new Date(inicio)
+  if (isNaN(inicioPedido.getTime())) return NextResponse.json({ erro: 'Horário inválido' }, { status: 400 })
+  const local = dataHoraLocal(inicioPedido.toISOString())
+  const livres = await horariosLivres(db, barbearia, profissional_id, local.data, servico.duracao_min)
+  if (!livres.includes(local.hora)) {
+    return NextResponse.json({ erro: 'Esse horário não está mais disponível. Escolhe outro.' }, { status: 409 })
+  }
+
   // Cria ou encontra cliente pelo WhatsApp
   const { data: clienteExistente } = await db
     .from('usuarios')
-    .select('id, barbearia_id')
+    .select('id, barbearia_id, papel')
     .eq('whatsapp', cliente_whatsapp)
     .maybeSingle()
 
   let cliente_id: string
 
   if (clienteExistente) {
-    if (clienteExistente.barbearia_id !== barbearia.id) {
+    if (clienteExistente.barbearia_id !== barbearia.id || clienteExistente.papel !== 'cliente') {
       return NextResponse.json({
         erro: 'Este WhatsApp já está cadastrado em outra barbearia. Entre em contato com a barbearia.',
       }, { status: 409 })

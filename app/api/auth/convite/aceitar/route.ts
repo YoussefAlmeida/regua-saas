@@ -4,6 +4,7 @@ import { jwtVerify } from 'jose'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, COOKIE_SESSION } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
+import { normalizarWhatsapp } from '@/lib/utils'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
 
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Link inválido ou expirado' }, { status: 400 })
   }
 
-  const waNorm = whatsapp.replace(/\D/g, '')
+  const waNorm = normalizarWhatsapp(whatsapp)
   const db = criarClienteServico()
 
   // Verifica WhatsApp duplicado

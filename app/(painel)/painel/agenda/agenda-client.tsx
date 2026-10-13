@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2 } from 'lucide-react'
+import { useState, useCallback, useEffect } from 'react'
+import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2, Lock } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { mensagemStatus, statusAoDesfazer } from '@/lib/status-agendamento'
@@ -9,6 +9,7 @@ import { mensagemStatus, statusAoDesfazer } from '@/lib/status-agendamento'
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
 interface Profissional { id: string; nome: string; foto_url: string | null }
+interface Bloqueio { id: string; profissional_id: string; inicio: string; fim: string; motivo: string | null }
 interface Servico { id: string; nome: string; preco: number; duracao_min: number; cor: string }
 export interface Agendamento {
   id: string
@@ -76,13 +77,23 @@ export default function AgendaClient({
   const [novoErro, setNovoErro] = useState('')
   const [novoSalvando, setNovoSalvando] = useState(false)
 
+  const [bloqueios, setBloqueios] = useState<Bloqueio[]>([])
+
+  const buscarBloqueios = useCallback(async (d: string) => {
+    const res = await fetch(`/api/painel/bloqueios?data=${d}`).catch(() => null)
+    if (res?.ok) setBloqueios(await res.json())
+  }, [])
+
+  useEffect(() => { buscarBloqueios(dataInicial) }, [dataInicial, buscarBloqueios])
+
   const buscarAgendamentos = useCallback(async (d: string) => {
     setCarregando(true)
-    const res = await fetch(`/api/painel/agendamentos?data=${d}`)
-    const json = await res.json()
+    buscarBloqueios(d)
+    const res = await fetch(`/api/painel/agendamentos?data=${d}`).catch(() => null)
     setCarregando(false)
-    if (res.ok) setAgendamentos(json)
-  }, [])
+    if (!res?.ok) { avisar('Não deu pra carregar a agenda. Confere a internet.', 'erro'); return }
+    setAgendamentos(await res.json())
+  }, [buscarBloqueios])
 
   function navegar(n: number) {
     const nova = somarDias(data, n)
@@ -149,6 +160,12 @@ export default function AgendaClient({
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
   const profAtual = profissionais[tabProfissional]
   const agsProfAtual = agendamentos.filter(a => a.profissional?.id === profAtual?.id)
+  const bloqsProfAtual = bloqueios.filter(b => b.profissional_id === profAtual?.id)
+  // Linha do tempo do barbeiro: agendamentos e bloqueios na ordem do relógio
+  const linha: ({ tipo: 'ag'; item: Agendamento } | { tipo: 'bloq'; item: Bloqueio })[] = [
+    ...agsProfAtual.map(item => ({ tipo: 'ag' as const, item })),
+    ...bloqsProfAtual.map(item => ({ tipo: 'bloq' as const, item })),
+  ].sort((a, b) => a.item.inicio.localeCompare(b.item.inicio))
 
   const inputCls = 'w-full bg-bg border border-line rounded-button px-3 py-2 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
   const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
@@ -225,7 +242,7 @@ export default function AgendaClient({
           <div className="text-center py-16">
             <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Nenhum barbeiro cadastrado</p>
           </div>
-        ) : agsProfAtual.length === 0 ? (
+        ) : linha.length === 0 ? (
           <div className="text-center py-16">
             <p className="font-ui text-sm text-fg-muted uppercase tracking-wider mb-2">Dia livre</p>
             <button
@@ -236,7 +253,24 @@ export default function AgendaClient({
             </button>
           </div>
         ) : (
-          agsProfAtual.map(ag => {
+          linha.map(entrada => {
+            if (entrada.tipo === 'bloq') {
+              const b = entrada.item
+              const ini = new Date(b.inicio), fim = new Date(b.fim)
+              const diaTodo = fim.getTime() - ini.getTime() >= 20 * 60 * 60 * 1000
+              return (
+                <div key={`b-${b.id}`} className="flex items-center gap-3 border border-dashed border-line rounded-card px-4 py-3 bg-surface-alt/40">
+                  <Lock size={14} className="text-fg-muted shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">
+                      Bloqueado · {diaTodo ? 'dia inteiro' : `${formatarHora(b.inicio)} – ${formatarHora(b.fim)}`}
+                    </p>
+                    {b.motivo && <p className="font-body text-xs text-fg-muted truncate">{b.motivo}</p>}
+                  </div>
+                </div>
+              )
+            }
+            const ag = entrada.item
             const st = STATUS_CONFIG[ag.status]
             return (
               <button

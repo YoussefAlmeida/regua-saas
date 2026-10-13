@@ -4,6 +4,9 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
 import { hashSenha } from '@/lib/auth'
+import { normalizarWhatsapp } from '@/lib/utils'
+import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
+import { registrarAuditoria } from '@/lib/auditoria'
 
 const SchemaPost = z.object({
   profissional_id: z.string().uuid(),
@@ -63,6 +66,11 @@ export async function POST(req: NextRequest) {
   const { profissional_id, servico_id, inicio, observacao } = parse.data
   let { cliente_id } = parse.data
 
+  // Barbeiro só marca na própria agenda; dono em qualquer barbeiro DA barbearia dele
+  if (!(await podeMexerNaAgendaDe(sessao, profissional_id))) {
+    return NextResponse.json({ erro: 'Você só pode marcar na sua própria agenda' }, { status: 403 })
+  }
+
   const db = criarClienteServico()
 
   // Busca serviço para calcular fim e pegar preço snapshot
@@ -76,23 +84,53 @@ export async function POST(req: NextRequest) {
   if (!servico) return NextResponse.json({ erro: 'Serviço não encontrado' }, { status: 404 })
 
   const inicioDate = new Date(inicio)
+  if (isNaN(inicioDate.getTime())) return NextResponse.json({ erro: 'Horário inválido' }, { status: 400 })
   const fimDate = new Date(inicioDate.getTime() + servico.duracao_min * 60 * 1000)
+
+  // Encaixe fora do expediente é liberado pro painel, mas não por cima de um bloqueio
+  const { count: bloqueado } = await db
+    .from('bloqueios_agenda')
+    .select('id', { count: 'exact', head: true })
+    .eq('profissional_id', profissional_id)
+    .lt('inicio', fimDate.toISOString())
+    .gt('fim', inicioDate.toISOString())
+  if (bloqueado) {
+    return NextResponse.json({ erro: 'Esse horário está bloqueado na agenda do barbeiro' }, { status: 409 })
+  }
+
+  if (cliente_id) {
+    const { data: cli } = await db
+      .from('usuarios')
+      .select('id')
+      .eq('id', cliente_id)
+      .eq('barbearia_id', sessao.barbearia_id)
+      .eq('papel', 'cliente')
+      .maybeSingle()
+    if (!cli) return NextResponse.json({ erro: 'Cliente não encontrado' }, { status: 404 })
+  }
 
   // Cria cliente se não veio cliente_id
   if (!cliente_id) {
-    const { cliente_nome, cliente_whatsapp } = parse.data
+    const { cliente_nome } = parse.data
+    const cliente_whatsapp = parse.data.cliente_whatsapp ? normalizarWhatsapp(parse.data.cliente_whatsapp) : ''
     if (!cliente_nome || !cliente_whatsapp) {
-      return NextResponse.json({ erro: 'Informe cliente_id ou cliente_nome + cliente_whatsapp' }, { status: 400 })
+      return NextResponse.json({ erro: 'Informe o nome e o WhatsApp do cliente' }, { status: 400 })
+    }
+    if (cliente_whatsapp.length < 10 || cliente_whatsapp.length > 11) {
+      return NextResponse.json({ erro: 'WhatsApp inválido. Use DDD + número.' }, { status: 400 })
     }
 
     // Busca ou cria cliente
     const { data: existente } = await db
       .from('usuarios')
-      .select('id')
+      .select('id, barbearia_id, papel')
       .eq('whatsapp', cliente_whatsapp)
       .maybeSingle()
 
     if (existente) {
+      if (existente.barbearia_id !== sessao.barbearia_id || existente.papel !== 'cliente') {
+        return NextResponse.json({ erro: 'Esse WhatsApp já está em outra conta do RÉGUA. Use outro número.' }, { status: 409 })
+      }
       cliente_id = existente.id
     } else {
       const senha_hash = await hashSenha(crypto.randomUUID())
@@ -136,9 +174,22 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
-    const msg = error.message.includes('sem_conflito') ? 'Horário já ocupado' : 'Erro ao criar agendamento'
-    return NextResponse.json({ erro: msg }, { status: 409 })
+    const conflito = error.code === '23P01' || error.message.includes('sem_conflito')
+    return NextResponse.json(
+      { erro: conflito ? 'Esse barbeiro já tem cliente nesse horário' : 'Erro ao criar agendamento' },
+      { status: conflito ? 409 : 500 },
+    )
   }
+
+  await registrarAuditoria({
+    barbearia_id: sessao.barbearia_id,
+    usuario_id: sessao.usuario_id,
+    acao: 'criar',
+    tabela: 'agendamentos',
+    registro_id: agendamento.id,
+    depois: { inicio: agendamento.inicio, profissional_id, servico_id, valor: agendamento.valor_servico },
+    req,
+  })
 
   return NextResponse.json(agendamento, { status: 201 })
 }
