@@ -87,3 +87,11 @@ export function textoNotificacaoBarbeiro(opts: {
     `📅 ${dataFmt} às ${opts.hora}`
   )
 }
+
+export function textoFimTrial(opts: { barbeariaNome: string; dias: number }): string {
+  return (
+    `Seu teste do RÉGUA na ${opts.barbeariaNome} acaba em ${opts.dias} dias.\n` +
+    `Escolha um plano em Mais → Meu plano pra não perder o acesso. ` +
+    `Seus dados ficam guardados de qualquer jeito.`
+  )
+}

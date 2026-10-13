@@ -29,7 +29,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .single()
 
   if (!barbearia) return NextResponse.json({ erro: 'Barbearia não encontrada' }, { status: 404 })
-  if (barbearia.status === 'cancelado') return NextResponse.json({ erro: 'Barbearia inativa' }, { status: 410 })
+  if (barbearia.status === 'cancelado' || barbearia.status === 'leitura') {
+    return NextResponse.json({ erro: 'Essa barbearia não está aceitando agendamentos online no momento' }, { status: 410 })
+  }
 
   const { data: servico } = await db
     .from('servicos')

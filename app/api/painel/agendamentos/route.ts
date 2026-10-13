@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { bloqueioSomenteLeitura } from '@/lib/conta'
 import { hashSenha } from '@/lib/auth'
 
 const SchemaPost = z.object({
@@ -51,6 +52,9 @@ export async function POST(req: NextRequest) {
   if (!sessao || sessao.papel === 'cliente') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
+
+  const bloqueio = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (bloqueio) return bloqueio
 
   const body = await req.json().catch(() => null)
   const parse = SchemaPost.safeParse(body)

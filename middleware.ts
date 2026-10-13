@@ -13,7 +13,8 @@ export async function middleware(req: NextRequest) {
   if (PUBLICAS.some(r => pathname.startsWith(r))) return NextResponse.next()
   if (API_PUBLICAS.some(r => pathname.startsWith(r))) return NextResponse.next()
 
-  if (pathname === '/') return NextResponse.redirect(new URL('/entrar', req.url))
+  // Landing page de venda
+  if (pathname === '/') return NextResponse.next()
 
   // Rotas públicas por slug da barbearia
   const slugMatch = pathname.match(/^\/[a-z0-9-]+$/)
