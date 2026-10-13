@@ -1,7 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, TrendingUp, Scissors, Check, X } from 'lucide-react'
+import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle } from 'lucide-react'
+import { avisar, erroDaResposta } from '@/components/aviso'
+import ContatoCliente from '@/components/contato-cliente'
+import { mensagemStatus } from '@/lib/status-agendamento'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -36,14 +39,17 @@ function hora(iso: string) {
 
 export default function HojeClient({
   agendamentosIniciais,
+  esquecidosIniciais,
   movimentacoesHoje,
   data,
 }: {
   agendamentosIniciais: Agendamento[]
+  esquecidosIniciais: Agendamento[]
   movimentacoesHoje: Movimentacao[]
   data: string
 }) {
   const [ags, setAgs] = useState<Agendamento[]>(agendamentosIniciais)
+  const [esquecidos, setEsquecidos] = useState<Agendamento[]>(esquecidosIniciais)
   const [atualizando, setAtualizando] = useState<string | null>(null)
 
   const ativos   = ags.filter(a => !['cancelado', 'faltou'].includes(a.status))
@@ -63,17 +69,22 @@ export default function HojeClient({
   })
 
   async function atualizarStatus(id: string, status: Status) {
+    if (status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
     setAtualizando(id)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
-    })
+    }).catch(() => null)
     setAtualizando(null)
-    if (res.ok) {
-      const json = await res.json()
-      setAgs(prev => prev.map(a => a.id === id ? { ...a, ...json } : a))
-    }
+
+    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+
+    const json = await res.json()
+    setAgs(prev => prev.map(a => a.id === id ? { ...a, ...json } : a))
+    setEsquecidos(prev => prev.filter(a => a.id !== id))
+    avisar(mensagemStatus(status, json.entrada, json.valor_servico), 'sucesso')
   }
 
   // Próximo agendamento pendente
@@ -86,6 +97,47 @@ export default function HojeClient({
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Hoje</h1>
         <p className="font-body text-sm text-fg-muted capitalize">{dataFmt}</p>
       </div>
+
+      {/* Atendimentos que passaram sem status — não deixa esquecer */}
+      {esquecidos.length > 0 && (
+        <div className="bg-amber/5 border border-amber/40 rounded-card p-4 space-y-3">
+          <p className="font-ui text-xs uppercase tracking-wider text-amber flex items-center gap-1.5">
+            <AlertTriangle size={12} />
+            {esquecidos.length} atendimento{esquecidos.length > 1 ? 's' : ''} sem status
+          </p>
+          <p className="font-body text-xs text-fg-muted">
+            Marca o que aconteceu — só entra no caixa e no desempenho depois disso.
+          </p>
+          {esquecidos.map(ag => {
+            const dia = new Date(ag.inicio).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', timeZone: 'America/Bahia' })
+            const ocupado = atualizando === ag.id
+            return (
+              <div key={ag.id} className={`border-t border-line pt-3 ${ocupado ? 'opacity-50' : ''}`}>
+                <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
+                <p className="font-body text-xs text-fg-muted capitalize">
+                  {dia} · {hora(ag.inicio)} · {ag.servico?.nome} · {ag.profissional?.nome}
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => atualizarStatus(ag.id, 'concluido')}
+                    disabled={ocupado}
+                    className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors"
+                  >
+                    Cortou
+                  </button>
+                  <button
+                    onClick={() => atualizarStatus(ag.id, 'faltou')}
+                    disabled={ocupado}
+                    className="flex-1 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-1.5 rounded-button"
+                  >
+                    Faltou
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       {/* Cards de métricas */}
       <div className="grid grid-cols-2 gap-3">
@@ -107,7 +159,7 @@ export default function HojeClient({
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Saídas</p>
           <p className="font-mono text-2xl text-saida">R$ {saidasDia.toFixed(2)}</p>
-          <p className="font-body text-xs text-fg-muted mt-0.5">manual</p>
+          <p className="font-body text-xs text-fg-muted mt-0.5">lançadas hoje</p>
         </div>
       </div>
 
@@ -182,6 +234,20 @@ export default function HojeClient({
                         <X size={11} />
                       </button>
                     </div>
+                  )}
+                  {(ag.status === 'agendado' || ag.status === 'confirmado') && ag.cliente?.whatsapp && (
+                    <div className="mt-3">
+                      <ContatoCliente whatsapp={ag.cliente.whatsapp} compacto />
+                    </div>
+                  )}
+                  {(ag.status === 'concluido' || ag.status === 'faltou') && (
+                    <button
+                      onClick={() => atualizarStatus(ag.id, 'confirmado')}
+                      disabled={isAtivo}
+                      className="mt-2 flex items-center gap-1 font-ui text-[10px] uppercase tracking-wider text-fg-muted hover:text-fg"
+                    >
+                      <Undo2 size={11} /> Desfazer
+                    </button>
                   )}
                   {ag.status === 'confirmado' && (
                     <div className="flex gap-2 mt-3">

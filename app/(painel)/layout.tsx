@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
+import Avisos from '@/components/aviso'
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const h = await headers()
@@ -46,6 +47,7 @@ export default async function PainelLayout({ children }: { children: React.React
 
       {/* Nav inferior */}
       <NavInferior papel={papel} />
+      <Avisos />
     </div>
   )
 }

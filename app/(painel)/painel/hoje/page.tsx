@@ -28,6 +28,22 @@ export default async function HojePage() {
     .lt('inicio', inicio_lt)
     .order('inicio')
 
+  // Atendimentos que já passaram e ninguém marcou (últimos 7 dias, antes de hoje)
+  const seteDiasAtras = new Date(Date.UTC(y, m - 1, d - 7, 3, 0, 0)).toISOString()
+  const { data: esquecidos } = await db
+    .from('agendamentos')
+    .select(`
+      id, inicio, fim, status, valor_servico, observacao,
+      profissional:profissionais!profissional_id(id, nome),
+      cliente:usuarios!cliente_id(nome, whatsapp),
+      servico:servicos!servico_id(nome, duracao_min, cor)
+    `)
+    .eq('barbearia_id', barbearia_id)
+    .in('status', ['agendado', 'confirmado'])
+    .gte('inicio', seteDiasAtras)
+    .lt('inicio', inicio_gte)
+    .order('inicio')
+
   const { data: movHoje } = await db
     .from('movimentacoes')
     .select('id, tipo, descricao, valor, origem')
@@ -37,6 +53,7 @@ export default async function HojePage() {
   return (
     <HojeClient
       agendamentosIniciais={(agendamentos ?? []) as never[]}
+      esquecidosIniciais={(esquecidos ?? []) as never[]}
       movimentacoesHoje={movHoje ?? []}
       data={hoje}
     />

@@ -1,7 +1,10 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2 } from 'lucide-react'
+import { avisar, erroDaResposta } from '@/components/aviso'
+import ContatoCliente from '@/components/contato-cliente'
+import { mensagemStatus, statusAoDesfazer } from '@/lib/status-agendamento'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -87,17 +90,25 @@ export default function AgendaClient({
     buscarAgendamentos(nova)
   }
 
+  const [salvandoStatus, setSalvandoStatus] = useState(false)
+
   async function atualizarStatus(id: string, status: Status) {
+    if (status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
+    setSalvandoStatus(true)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status }),
-    })
-    if (res.ok) {
-      const json = await res.json()
-      setAgendamentos(prev => prev.map(a => a.id === id ? json : a))
-      setSelecionado(null)
-    }
+    }).catch(() => null)
+    setSalvandoStatus(false)
+
+    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+
+    const json = await res.json()
+    setAgendamentos(prev => prev.map(a => a.id === id ? json : a))
+    setSelecionado(null)
+    avisar(mensagemStatus(status, json.entrada, json.valor_servico), 'sucesso')
   }
 
   async function criarAgendamento(e: React.FormEvent) {
@@ -131,6 +142,7 @@ export default function AgendaClient({
     if (!res.ok) { setNovoErro(json.erro || 'Erro ao criar agendamento'); return }
     setAgendamentos(prev => [...prev, json].sort((a, b) => a.inicio.localeCompare(b.inicio)))
     setModalNovo(false)
+    avisar(`Agendado às ${formatarHora(json.inicio)}.`, 'sucesso')
     setNovoForm({ profissional_id: profissionaisIniciais[0]?.id ?? '', servico_id: '', inicio: '', cliente_nome: '', cliente_whatsapp: '', observacao: '' })
   }
 
@@ -297,17 +309,24 @@ export default function AgendaClient({
               )}
             </div>
 
+            <ContatoCliente
+              whatsapp={selecionado.cliente?.whatsapp}
+              mensagem={`Oi, ${selecionado.cliente?.nome?.split(' ')[0] ?? ''}! Sobre seu horário das ${formatarHora(selecionado.inicio)}:`}
+            />
+
             {/* Ações por status */}
             {selecionado.status === 'agendado' && (
               <div className="flex gap-2">
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'confirmado')}
+                  disabled={salvandoStatus}
                   className="flex-1 flex items-center justify-center gap-2 bg-entrada/10 hover:bg-entrada/20 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
                 >
                   <Check size={13} /> Confirmar
                 </button>
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'cancelado')}
+                  disabled={salvandoStatus}
                   className="flex-1 bg-saida/10 hover:bg-saida/20 border border-saida/30 text-saida font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
                 >
                   Cancelar
@@ -318,23 +337,39 @@ export default function AgendaClient({
               <div className="flex gap-2">
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'concluido')}
+                  disabled={salvandoStatus}
                   className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
                 >
                   Concluir atendimento
                 </button>
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'faltou')}
+                  disabled={salvandoStatus}
                   className="px-4 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
                 >
                   Faltou
                 </button>
               </div>
             )}
-            {(selecionado.status === 'concluido' || selecionado.status === 'cancelado' || selecionado.status === 'faltou') && (
-              <p className={`text-center font-ui text-sm uppercase tracking-wider ${STATUS_CONFIG[selecionado.status].cor}`}>
-                {STATUS_CONFIG[selecionado.status].label}
-              </p>
-            )}
+            {(() => {
+              const voltarPara = statusAoDesfazer(selecionado.status)
+              if (!voltarPara) return null
+              return (
+                <div className="space-y-3">
+                  <p className={`text-center font-ui text-sm uppercase tracking-wider ${STATUS_CONFIG[selecionado.status].cor}`}>
+                    {STATUS_CONFIG[selecionado.status].label}
+                  </p>
+                  <button
+                    onClick={() => atualizarStatus(selecionado.id, voltarPara)}
+                    disabled={salvandoStatus}
+                    className="w-full flex items-center justify-center gap-2 border border-line text-fg-muted hover:text-fg font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors disabled:opacity-50"
+                  >
+                    <Undo2 size={13} />
+                    {selecionado.status === 'concluido' ? 'Desfazer — tira a entrada do caixa' : 'Desfazer'}
+                  </button>
+                </div>
+              )
+            })()}
           </div>
         </div>
       )}

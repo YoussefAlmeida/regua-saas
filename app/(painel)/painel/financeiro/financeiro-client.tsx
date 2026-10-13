@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Plus, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { avisar, erroDaResposta } from '@/components/aviso'
 
 export interface Movimentacao {
   id: string
@@ -107,7 +108,9 @@ export default function FinanceiroClient({
   async function deletarMov(id: string) {
     if (!confirm('Deletar esta movimentação?')) return
     const res = await fetch(`/api/painel/movimentacoes/${id}`, { method: 'DELETE' })
-    if (res.ok) setMovs(prev => prev.filter(m => m.id !== id))
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    setMovs(prev => prev.filter(m => m.id !== id))
+    avisar('Lançamento apagado.', 'sucesso')
   }
 
   async function salvarFixa(e: React.FormEvent) {
@@ -147,7 +150,9 @@ export default function FinanceiroClient({
   async function deletarFixa(id: string) {
     if (!confirm('Deletar esta despesa fixa?')) return
     const res = await fetch(`/api/painel/despesas-fixas/${id}`, { method: 'DELETE' })
-    if (res.ok) setDespesas(prev => prev.filter(d => d.id !== id))
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    setDespesas(prev => prev.filter(d => d.id !== id))
+    avisar('Despesa fixa removida. Os meses já lançados continuam no extrato.', 'sucesso')
   }
 
   const inputCls = 'w-full bg-bg border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
