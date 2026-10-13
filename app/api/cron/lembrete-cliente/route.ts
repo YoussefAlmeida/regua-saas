@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoLembreteCliente, urlDoSite } from '@/lib/whatsapp'
 
+/* Roda a cada 15 minutos. O plano Hobby da Vercel só permite cron diário,
+   então quem chama esta rota é um agendador externo (ex.: cron-job.org)
+   com o header  Authorization: Bearer <CRON_SECRET>. */
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get('authorization')
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
