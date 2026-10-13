@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { exigirSenha } from '@/lib/reautenticar'
 
 const SchemaPatch = z.object({
   status: z.enum(['aprovado', 'pendente']).optional(),
@@ -77,6 +78,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!sessao || sessao.papel !== 'dono') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
+
+  const body = await req.json().catch(() => ({}))
+  const negado = await exigirSenha(sessao, body?.senha, req)
+  if (negado) return negado
 
   const { id } = await params
   const db = criarClienteServico()

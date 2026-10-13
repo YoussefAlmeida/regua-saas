@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Copy, Check, UserMinus, UserCheck, Clock, MessageCircle, BarChart3, RotateCcw, X } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
+import { pedirSenha } from '@/components/confirmar-senha'
 import ContatoCliente from '@/components/contato-cliente'
 
 interface Cancelado {
@@ -85,8 +86,13 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
   }
 
   async function remover(id: string, nome: string) {
-    if (!confirm(`Remover ${nome} da equipe?\n\nEle perde o acesso na hora e os horários futuros dele são cancelados. O histórico fica guardado.`)) return
-    const res = await fetch(`/api/painel/equipe/${id}`, { method: 'DELETE' })
+    const senha = await pedirSenha(`Remover ${nome}`, 'Ele perde o acesso na hora e os horários futuros dele são cancelados. O histórico fica guardado.')
+    if (!senha) return
+    const res = await fetch(`/api/painel/equipe/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senha }),
+    })
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
     const json = await res.json()
     setBarbeiros(prev => prev.map(b => b.id === id ? { ...b, ativo: false } : b))

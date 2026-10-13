@@ -4,6 +4,7 @@ import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION, getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
+import ConfirmarSenha from '@/components/confirmar-senha'
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
   const h = await headers()
@@ -53,6 +54,7 @@ export default async function PainelLayout({ children }: { children: React.React
       {/* Nav inferior */}
       <NavInferior papel={papel} />
       <Avisos />
+      <ConfirmarSenha />
     </div>
   )
 }
