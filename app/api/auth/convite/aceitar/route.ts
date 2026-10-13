@@ -40,14 +40,17 @@ export async function POST(req: NextRequest) {
   const waNorm = normalizarWhatsapp(whatsapp)
   const db = criarClienteServico()
 
-  // Verifica WhatsApp duplicado
-  const { data: waExiste } = await db
+  // Barbeiro: um WhatsApp = uma barbearia (limite do MVP).
+  // Ser cliente em outra barbearia não atrapalha.
+  const { data: contas } = await db
     .from('usuarios')
-    .select('id')
+    .select('id, papel, barbearia_id')
     .eq('whatsapp', waNorm)
-    .maybeSingle()
-  if (waExiste) {
-    return NextResponse.json({ erro: 'WhatsApp já cadastrado' }, { status: 409 })
+  if (contas?.some(c => c.papel === 'barbeiro')) {
+    return NextResponse.json({ erro: 'Esse WhatsApp já é de um barbeiro cadastrado no RÉGUA' }, { status: 409 })
+  }
+  if (contas?.some(c => c.barbearia_id === barbearia_id)) {
+    return NextResponse.json({ erro: 'Esse WhatsApp já está cadastrado como cliente nessa barbearia. Use outro número.' }, { status: 409 })
   }
 
   const senhaHash = await hashSenha(senha)

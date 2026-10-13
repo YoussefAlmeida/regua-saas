@@ -74,7 +74,7 @@ export default function MeusAgendamentos({
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tipo: 'cliente', whatsapp, senha }),
+      body: JSON.stringify({ tipo: 'cliente', whatsapp, senha, slug: barbearia.slug }),
     }).catch(() => null)
     setEntrando(false)
     if (!res) { setErroLogin('Sem conexão. Tenta de novo.'); return }

@@ -19,6 +19,8 @@ const SchemaBarbeiro = z.object({
   tipo: z.union([z.literal('barbeiro'), z.literal('cliente')]),
   whatsapp: z.string().min(10),
   senha: z.string().min(1),
+  /** Página de uma barbearia: entra na conta de cliente DESSA barbearia */
+  slug: z.string().max(80).optional(),
 })
 
 const Schema = z.union([SchemaDono, SchemaBarbeiro])
@@ -43,22 +45,43 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  let query = db
-    .from('usuarios')
-    .select('id, senha_hash, papel, barbearia_id, status, ativo, senha_definida')
+  type Conta = {
+    id: string; senha_hash: string; papel: string; barbearia_id: string
+    status: string; ativo: boolean; senha_definida: boolean | null
+    ultimo_acesso: string | null; barbearia: { slug: string } | { slug: string }[] | null
+  }
+  const CAMPOS = 'id, senha_hash, papel, barbearia_id, status, ativo, senha_definida, ultimo_acesso, barbearia:barbearias!barbearia_id(slug)'
 
+  let candidatas: Conta[] = []
   if (d.tipo === 'dono') {
-    query = query.eq('email', identificador).eq('papel', 'dono')
+    const { data } = await db.from('usuarios').select(CAMPOS).eq('email', identificador).eq('papel', 'dono').limit(1)
+    candidatas = (data ?? []) as unknown as Conta[]
   } else {
-    // WhatsApp: normaliza removendo caracteres não numéricos
-    query = query.eq('whatsapp', identificador).in('papel', ['barbeiro', 'cliente'])
+    // O mesmo WhatsApp pode ser barbeiro numa barbearia e cliente em outras
+    const { data } = await db.from('usuarios').select(CAMPOS).eq('whatsapp', identificador).in('papel', ['barbeiro', 'cliente'])
+    candidatas = ((data ?? []) as unknown as Conta[]).filter(c => c.senha_definida !== false)
+    const slugDe = (c: Conta) => (Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia)?.slug
+    if (d.slug) {
+      // Na página de uma barbearia, vale a conta de cliente dela
+      const daqui = candidatas.filter(c => c.papel === 'cliente' && slugDe(c) === d.slug)
+      if (daqui.length) candidatas = daqui
+    }
+    // Barbeiro primeiro; depois a conta de cliente usada por último
+    candidatas.sort((a, b) =>
+      (a.papel === 'barbeiro' ? -1 : 0) - (b.papel === 'barbeiro' ? -1 : 0)
+      || (b.ultimo_acesso ?? '').localeCompare(a.ultimo_acesso ?? ''))
+    candidatas = candidatas.slice(0, 5)
   }
 
-  const { data: usuario } = await query.maybeSingle()
+  // Cada barbearia pode ter senha diferente: entra na primeira em que a senha bater
+  let usuario: Conta | null = null
+  for (const c of candidatas) {
+    if (await verificarSenha(d.senha, c.senha_hash).catch(() => false)) { usuario = c; break }
+  }
+  if (candidatas.length === 0) await verificarSenha(d.senha, HASH_FALSO).catch(() => false)
 
   // Senha confere antes de qualquer outra mensagem — nunca revela se a conta existe
-  const senhaOk = await verificarSenha(d.senha, usuario?.senha_hash ?? HASH_FALSO).catch(() => false)
-  if (!usuario || !senhaOk || usuario.senha_definida === false) {
+  if (!usuario) {
     await registrarFalha(identificador, ip)
     return NextResponse.json({ erro: ERRO_GENERICO }, { status: 401 })
   }
@@ -96,7 +119,7 @@ export async function POST(req: NextRequest) {
   // Cliente não tem painel: vai pra "Meus agendamentos" da barbearia dele
   let destino = '/painel/hoje'
   if (usuario.papel === 'cliente') {
-    const { data: b } = await db.from('barbearias').select('slug').eq('id', usuario.barbearia_id).single()
+    const b = Array.isArray(usuario.barbearia) ? usuario.barbearia[0] : usuario.barbearia
     destino = b ? `/${b.slug}/meus-agendamentos` : '/'
   }
 
