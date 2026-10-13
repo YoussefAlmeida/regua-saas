@@ -249,7 +249,7 @@ export default function LandingPage() {
           {[...Array(5)].map((_, i) => <Star key={i} size={18} className="text-amber fill-amber" />)}
         </div>
         <blockquote className="font-display text-2xl md:text-3xl text-fg max-w-2xl mx-auto mb-6 uppercase">
-          "Reduzi faltas em 70% no primeiro mês só com o lembrete automático."
+          &ldquo;Reduzi faltas em 70% no primeiro mês só com o lembrete automático.&rdquo;
         </blockquote>
         <p className="font-body text-sm text-fg-muted">— Carlos, Barbearia Estilo · Feira de Santana, BA</p>
       </section>
