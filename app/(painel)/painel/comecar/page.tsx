@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { urlDoSiteAtual } from '@/lib/site-url'
 import ComecarClient from './comecar-client'
 
 export const metadata = { title: 'Primeiros passos' }
@@ -25,7 +26,7 @@ export default async function ComecarPage() {
       servicosIniciais={servicos ?? []}
       temEquipe={(profissionais ?? []).length > 0}
       donoCorta={(profissionais ?? []).some(p => p.usuario_id === sessao.usuario_id)}
-      siteUrl={(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://regua.app').replace(/\/+$/, '')}
+      siteUrl={await urlDoSiteAtual()}
     />
   )
 }

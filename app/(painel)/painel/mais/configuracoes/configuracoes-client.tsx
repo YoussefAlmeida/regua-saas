@@ -29,7 +29,7 @@ interface Barbearia {
   dias_fechados: string[] | null
 }
 
-export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbearia | null }) {
+export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia: Barbearia | null; siteUrl: string }) {
   const horarioInicial = (barbearia?.horario_funcionamento && Object.keys(barbearia.horario_funcionamento).length > 0)
     ? barbearia.horario_funcionamento
     : HORARIO_PADRAO
@@ -114,7 +114,7 @@ export default function ConfiguracoesClient({ barbearia }: { barbearia: Barbeari
           <div>
             <label className={labelCls}>Link público de agendamento</label>
             <div className="bg-surface-alt border border-line rounded-button px-4 py-3 font-mono text-sm text-fg-muted break-all">
-              regua.app/{barbearia.slug}
+              {siteUrl.replace(/^https?:\/\//, '')}/{barbearia.slug}
             </div>
           </div>
         )}
