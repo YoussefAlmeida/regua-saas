@@ -175,6 +175,7 @@ export async function POST(req: NextRequest) {
       inicio: inicioDate.toISOString(),
       fim: fimDate.toISOString(),
       valor_servico: servico.preco,
+      status: 'agendado',
       criado_por: sessao.usuario_id,
       observacao: observacao ?? null,
     })

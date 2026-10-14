@@ -24,7 +24,7 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
   const semFuncao = !!error
   const info = (data ?? {}) as {
     tabelas?: string[]; colunas_usuarios?: string[]; colunas_barbearias?: string[]; indices_usuarios?: string[]
-    gatilho_categorias?: boolean; bucket_fotos?: boolean; banco_trancado?: boolean; entrada_unica?: boolean
+    gatilho_categorias?: boolean; bucket_fotos?: boolean; banco_trancado?: boolean; entrada_unica?: boolean; status_agendamento?: boolean
   }
 
   // Sem a função, testa direto o que dá pra testar
@@ -81,6 +81,13 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     ok: await existeColuna('termos_aceitos_em'), grave: false,
     oQueFazer: migration('20261015010000_lgpd_indicacao.sql'),
   })
+  if (!semFuncao) {
+    itens.push({
+      nome: 'Agendamento novo aceito pelo banco',
+      ok: !!info.status_agendamento, grave: true,
+      oQueFazer: migration('20261015020000_status_agendamento.sql'),
+    })
+  }
   itens.push({
     nome: 'Banco trancado pra acesso direto (segurança)',
     ok: !!info.banco_trancado, grave: true,
