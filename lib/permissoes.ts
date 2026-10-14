@@ -2,7 +2,7 @@
    RÉGUA — Função central de checagem de permissão
    Seção 6.1.1 do documento de produto
 
-   ⚠️  Toda ação que modifica dados DEVE passar por aqui.
+   ATENÇÃO: toda ação que modifica dados DEVE passar por aqui.
        Nunca duplicar a lógica tela por tela.
    ================================================================ */
 

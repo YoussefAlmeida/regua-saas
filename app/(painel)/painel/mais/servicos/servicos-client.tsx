@@ -15,8 +15,8 @@ interface Servico {
 
 interface FormData { nome: string; preco: string; duracao_min: string; cor: string }
 
-const CORES = ['#E8B04B', '#4FB477', '#E2564D', '#6BA3D6', '#A1A1A8', '#C27BDB']
-const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#E8B04B' }
+const CORES = ['#9A4A1A', '#2E7A4E', '#8E2C3A', '#2F5F8A', '#6B6A2E', '#6A635B']
+const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#9A4A1A' }
 
 export default function ServicosClient({
   servicosIniciais,
@@ -107,16 +107,16 @@ export default function ServicosClient({
     setServicos(prev => prev.filter(x => x.id !== s.id))
   }
 
-  const inputCls = 'w-full bg-bg border border-line rounded-button px-4 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Serviços</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Serviços</h1>
         <button
           onClick={abrirNovo}
-          className="flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button transition-colors"
+          className="font-semibold flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors"
         >
           <Plus size={14} />
           Adicionar
@@ -126,7 +126,7 @@ export default function ServicosClient({
       {servicos.length === 0 ? (
         <div className="text-center py-16 text-fg-muted">
           <Scissors size={40} className="mx-auto mb-3 opacity-30" strokeWidth={1} />
-          <p className="font-ui text-sm uppercase tracking-wider">Nenhum serviço cadastrado</p>
+          <p className="font-semibold font-ui text-sm">Nenhum serviço cadastrado</p>
           <button onClick={abrirNovo} className="mt-4 text-amber font-body text-sm hover:underline">
             Adicionar primeiro serviço
           </button>
@@ -145,7 +145,7 @@ export default function ServicosClient({
                 style={{ backgroundColor: s.cor }}
               />
               <div className="flex-1 min-w-0">
-                <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{s.nome}</p>
+                <p className="font-semibold font-ui text-sm text-fg truncate">{s.nome}</p>
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className="font-mono text-sm text-amber">{formatBRL(s.preco)}</span>
                   <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
@@ -187,7 +187,7 @@ export default function ServicosClient({
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={fechar} />
           <div className="relative w-full sm:max-w-md bg-surface rounded-t-card sm:rounded-card border border-line p-6 z-10">
-            <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-5">
+            <h2 className="font-semibold font-ui text-lg text-fg mb-5">
               {modal === 'novo' ? 'Novo serviço' : 'Editar serviço'}
             </h2>
 
@@ -256,14 +256,14 @@ export default function ServicosClient({
                 <button
                   type="button"
                   onClick={fechar}
-                  className="flex-1 border border-line text-fg-muted font-ui text-sm uppercase tracking-wider py-2.5 rounded-button hover:border-fg/30 transition-colors"
+                  className="font-semibold flex-1 border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button hover:border-fg/30 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={salvando}
-                  className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-2.5 rounded-button transition-colors disabled:opacity-50"
+                  className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors disabled:opacity-50"
                 >
                   {salvando ? 'Salvando…' : 'Salvar'}
                 </button>

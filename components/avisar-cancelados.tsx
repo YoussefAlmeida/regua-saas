@@ -23,7 +23,7 @@ export default function AvisarCancelados({ lista, titulo = 'Avise os clientes', 
       <div className="absolute inset-0 bg-black/60" onClick={onFechar} />
       <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 max-h-[85dvh] overflow-y-auto space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="font-ui text-lg uppercase tracking-wider text-fg">{titulo}</h2>
+          <h2 className="font-semibold font-ui text-lg text-fg">{titulo}</h2>
           <button onClick={onFechar} aria-label="Fechar"><X size={18} className="text-fg-muted" /></button>
         </div>
         <p className="font-body text-sm text-fg-muted">
@@ -41,7 +41,7 @@ export default function AvisarCancelados({ lista, titulo = 'Avise os clientes', 
             )
           })}
         </ul>
-        <button onClick={onFechar} className="w-full border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button">
+        <button onClick={onFechar} className="font-semibold w-full border border-line text-fg font-ui text-sm py-3 rounded-button">
           Pronto
         </button>
       </div>

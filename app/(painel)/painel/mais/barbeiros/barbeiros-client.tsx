@@ -111,11 +111,11 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Equipe</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Equipe</h1>
         <button
           onClick={gerarLink}
           disabled={gerandoLink}
-          className="flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button transition-colors disabled:opacity-50"
+          className="font-semibold flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors disabled:opacity-50"
         >
           {gerandoLink ? 'Gerando…' : 'Convidar barbeiro'}
         </button>
@@ -142,7 +142,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
             href={`https://wa.me/?text=${encodeURIComponent(textoConvite)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-2.5 rounded-button hover:bg-entrada/20 transition-colors"
+            className="font-semibold flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-2.5 rounded-button hover:bg-entrada/20 transition-colors"
           >
             <MessageCircle size={14} /> Enviar por WhatsApp
           </a>
@@ -171,18 +171,18 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
         <section>
           <div className="flex items-center gap-2 mb-3">
             <Clock size={14} className="text-amber" />
-            <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">
+            <h2 className="font-semibold font-ui text-sm text-fg-muted">
               Aguardando aprovação ({pendentes.length})
             </h2>
           </div>
           <div className="space-y-2">
             {pendentes.map(b => (
               <div key={b.id} className="bg-surface border border-amber/20 rounded-card px-4 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-ui text-sm text-fg-muted uppercase shrink-0">
+                <div className="font-semibold w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-ui text-sm text-fg-muted shrink-0">
                   {b.nome.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{b.nome}</p>
+                  <p className="font-semibold font-ui text-sm text-fg truncate">{b.nome}</p>
                   {b.whatsapp && (
                     <p className="font-body text-xs text-fg-muted">{b.whatsapp}</p>
                   )}
@@ -212,17 +212,17 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
       {/* Ativos */}
       {ativos.length > 0 && (
         <section>
-          <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted mb-3">
+          <h2 className="font-semibold font-ui text-sm text-fg-muted mb-3">
             Na equipe ({ativos.length})
           </h2>
           <div className="space-y-2">
             {ativos.map(b => (
               <div key={b.id} className="bg-surface border border-line rounded-card px-4 py-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-ui text-sm text-fg-muted uppercase shrink-0">
+                <div className="font-semibold w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-ui text-sm text-fg-muted shrink-0">
                   {b.nome.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{b.nome}</p>
+                  <p className="font-semibold font-ui text-sm text-fg truncate">{b.nome}</p>
                   {b.whatsapp && <p className="font-body text-xs text-fg-muted">{b.whatsapp}</p>}
                 </div>
                 {(() => {
@@ -251,16 +251,16 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
       {/* Inativos */}
       {inativos.length > 0 && (
         <section>
-          <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted mb-3 opacity-50">
+          <h2 className="font-semibold font-ui text-sm text-fg-muted mb-3 opacity-50">
             Inativos ({inativos.length})
           </h2>
           <div className="space-y-2">
             {inativos.map(b => (
               <div key={b.id} className="bg-surface border border-line rounded-card px-4 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-surface-alt flex items-center justify-center font-ui text-xs text-fg-muted uppercase shrink-0 opacity-50">
+                <div className="font-semibold w-8 h-8 rounded-full bg-surface-alt flex items-center justify-center font-ui text-xs text-fg-muted shrink-0 opacity-50">
                   {b.nome.charAt(0)}
                 </div>
-                <p className="flex-1 font-ui text-sm uppercase tracking-wider text-fg-muted truncate opacity-60">{b.nome}</p>
+                <p className="font-semibold flex-1 font-ui text-sm text-fg-muted truncate opacity-60">{b.nome}</p>
                 <button onClick={() => reativar(b.id)} className="flex items-center gap-1 font-ui text-[11px] uppercase tracking-wider text-fg-muted hover:text-amber">
                   <RotateCcw size={12} /> Reativar
                 </button>
@@ -281,7 +281,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
 
       {barbeiros.length === 0 && !linkConvite && (
         <div className="text-center py-16 text-fg-muted">
-          <p className="font-ui text-sm uppercase tracking-wider mb-4">Nenhum barbeiro na equipe</p>
+          <p className="font-semibold font-ui text-sm mb-4">Nenhum barbeiro na equipe</p>
           <button onClick={gerarLink} className="text-amber font-body text-sm hover:underline">
             Gerar link de convite
           </button>

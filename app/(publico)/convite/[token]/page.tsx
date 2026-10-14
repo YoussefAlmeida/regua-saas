@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { problemaNaSenha } from '@/lib/senha'
 import { useParams } from 'next/navigation'
+import { Marca } from '@/components/marca'
 import Link from 'next/link'
+import { Check, X } from 'lucide-react'
 
 type Estado = 'form' | 'sucesso' | 'erro'
 
@@ -49,18 +51,18 @@ export default function ConvitePage() {
     setEstado('sucesso')
   }
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg'
 
   if (estado === 'sucesso') {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 text-center">
-        <div className="text-5xl mb-4">✓</div>
+        <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-entrada/10 text-entrada flex items-center justify-center"><Check size={26} /></div>
         <h2 className="font-display text-3xl text-amber mb-2">Cadastro feito!</h2>
         <p className="font-body text-fg-muted max-w-xs">
           Aguarde o dono da barbearia aprovar seu acesso. Você será avisado pelo WhatsApp.
         </p>
-        <Link href="/entrar" className="mt-8 font-ui text-sm uppercase tracking-wider text-amber hover:underline">
+        <Link href="/entrar" className="font-semibold mt-8 font-ui text-sm text-amber hover:underline">
           Ir para o login
         </Link>
       </div>
@@ -70,10 +72,10 @@ export default function ConvitePage() {
   if (estado === 'erro') {
     return (
       <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 text-center">
-        <div className="text-5xl mb-4">✗</div>
+        <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-saida/10 text-saida flex items-center justify-center"><X size={26} /></div>
         <h2 className="font-display text-3xl text-saida mb-2">Link inválido</h2>
         <p className="font-body text-fg-muted">Este link de convite expirou ou é inválido.</p>
-        <Link href="/entrar" className="mt-8 font-ui text-sm uppercase tracking-wider text-amber hover:underline">
+        <Link href="/entrar" className="font-semibold mt-8 font-ui text-sm text-amber hover:underline">
           Ir para o login
         </Link>
       </div>
@@ -83,12 +85,12 @@ export default function ConvitePage() {
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-12">
       <div className="mb-8 text-center">
-        <h1 className="font-display text-5xl text-amber tracking-widest">RÉGUA</h1>
+        <h1 aria-label="RÉGUA"><Marca className="text-fg scale-150 origin-center" /></h1>
         <p className="font-ui text-fg-muted text-xs uppercase tracking-[0.2em] mt-1">convite de barbeiro</p>
       </div>
 
       <div className="w-full max-w-sm bg-surface rounded-card border border-line p-6">
-        <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-4">Criar seu acesso</h2>
+        <h2 className="font-semibold font-ui text-lg text-fg mb-4">Criar seu acesso</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
@@ -113,7 +115,7 @@ export default function ConvitePage() {
           <button
             type="submit"
             disabled={carregando}
-            className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors disabled:opacity-50"
+            className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50"
           >
             {carregando ? 'Cadastrando…' : 'Criar conta'}
           </button>

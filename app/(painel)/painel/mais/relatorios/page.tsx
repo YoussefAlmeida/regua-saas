@@ -75,7 +75,7 @@ export default async function RelatoriosPage() {
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div className="flex items-baseline justify-between">
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Relatórios</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Relatórios</h1>
         <span className="font-body text-xs text-fg-muted inline-block first-letter:uppercase">{nomeMes}</span>
       </div>
 

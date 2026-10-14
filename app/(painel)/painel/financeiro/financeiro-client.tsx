@@ -115,7 +115,7 @@ export default function FinanceiroClient({
     for (const m of movs) {
       if (m.tipo !== 'saida') continue
       const nome = m.categoria?.nome ?? 'Sem categoria'
-      const atual = mapa.get(nome) ?? { v: 0, cor: m.categoria?.cor ?? '#A1A1A8' }
+      const atual = mapa.get(nome) ?? { v: 0, cor: m.categoria?.cor ?? '#6A635B' }
       atual.v += Number(m.valor)
       mapa.set(nome, atual)
     }
@@ -292,9 +292,9 @@ export default function FinanceiroClient({
   }
 
   // ── Estilos ─────────────────────────────────────────────────
-  const inputCls = 'w-full bg-bg border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
-  const chip = (ativo: boolean) => `shrink-0 px-3 py-1.5 rounded-full border font-ui text-[11px] uppercase tracking-wider transition-colors ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const chip = (ativo: boolean) => `font-semibold shrink-0 px-3 py-1.5 rounded-full border font-ui text-[11px] transition-colors ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
   const totalFixo = despesas.filter(d => d.ativa).reduce((s, d) => s + Number(d.valor), 0)
   const catsDoTipo = categorias.filter(c => c.tipo === novo.tipo)
 
@@ -319,7 +319,7 @@ export default function FinanceiroClient({
         {tab !== 'fixas' && (
           <div className="flex items-center justify-between mb-4">
             <button onClick={() => mudarMes(mesVizinho(mes, -1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Mês anterior"><ChevronLeft size={18} /></button>
-            <p className="font-ui text-sm uppercase tracking-wider text-fg">{mesLabel(mes)}</p>
+            <p className="font-semibold font-ui text-sm text-fg">{mesLabel(mes)}</p>
             <button onClick={() => mudarMes(mesVizinho(mes, 1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Próximo mês"><ChevronRight size={18} /></button>
           </div>
         )}
@@ -412,13 +412,13 @@ export default function FinanceiroClient({
                       value={filtroProf}
                       onChange={e => setFiltroProf(e.target.value)}
                       aria-label="Filtrar por barbeiro"
-                      className="shrink-0 bg-surface border border-line rounded-full px-3 py-1.5 font-ui text-[11px] uppercase tracking-wider text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="font-semibold shrink-0 bg-surface border border-line rounded-full px-3 py-1.5 font-ui text-[11px] text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
                     >
                       <option value="">Todos barbeiros</option>
                       {profissionais.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
                     </select>
                   )}
-                  <button onClick={exportar} className="shrink-0 ml-auto flex items-center gap-1 px-3 py-1.5 rounded-full border border-line font-ui text-[11px] uppercase tracking-wider text-fg-muted hover:text-amber">
+                  <button onClick={exportar} className="font-semibold shrink-0 ml-auto flex items-center gap-1 px-3 py-1.5 rounded-full border border-line font-ui text-[11px] text-fg-muted hover:text-amber">
                     <Download size={12} /> CSV
                   </button>
                 </div>
@@ -520,10 +520,10 @@ export default function FinanceiroClient({
       {tab !== 'fixas' && (
         <div className="fixed bottom-20 inset-x-0 z-20 pointer-events-none">
           <div className="max-w-lg mx-auto px-4 flex gap-2 justify-end">
-            <button onClick={() => abrirNovo('entrada')} className="pointer-events-auto flex items-center gap-1.5 bg-surface-alt border border-entrada/40 text-entrada font-ui text-xs uppercase tracking-wider px-4 py-3 rounded-full shadow-lg shadow-black/40">
+            <button onClick={() => abrirNovo('entrada')} className="font-semibold pointer-events-auto flex items-center gap-1.5 bg-surface-alt border border-entrada/40 text-entrada font-ui text-sm px-4 py-3 rounded-full shadow-lg shadow-black/40">
               <Plus size={14} /> Entrada
             </button>
-            <button onClick={() => abrirNovo('saida')} className="pointer-events-auto flex items-center gap-1.5 bg-amber text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-3 rounded-full shadow-lg shadow-black/40">
+            <button onClick={() => abrirNovo('saida')} className="font-semibold pointer-events-auto flex items-center gap-1.5 bg-amber text-accent-fg font-ui text-sm px-4 py-3 rounded-full shadow-lg shadow-black/40">
               <Plus size={14} /> Saída
             </button>
           </div>
@@ -577,7 +577,7 @@ export default function FinanceiroClient({
                   </button>
                 ))}
                 {novaCat === null ? (
-                  <button type="button" onClick={() => setNovaCat('')} className="shrink-0 px-3 py-1.5 rounded-full border border-dashed border-line font-ui text-[11px] uppercase tracking-wider text-fg-muted hover:text-amber">
+                  <button type="button" onClick={() => setNovaCat('')} className="font-semibold shrink-0 px-3 py-1.5 rounded-full border border-dashed border-line font-ui text-[11px] text-fg-muted hover:text-amber">
                     + Nova
                   </button>
                 ) : (
@@ -589,7 +589,7 @@ export default function FinanceiroClient({
                       onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); criarCategoria() } }}
                       placeholder="Nome"
                       maxLength={40}
-                      className="w-28 bg-bg border border-line rounded-full px-3 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="w-28 bg-surface border border-line rounded-full px-3 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
                     />
                     <button type="button" onClick={criarCategoria} className="font-ui text-[11px] uppercase text-amber px-1">Ok</button>
                   </span>
@@ -617,7 +617,7 @@ export default function FinanceiroClient({
               )}
             </div>
 
-            <button type="submit" disabled={salvandoNovo} className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3.5 rounded-button transition-colors disabled:opacity-50">
+            <button type="submit" disabled={salvandoNovo} className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-50">
               {salvandoNovo ? 'Lançando…' : 'Lançar'}
             </button>
           </form>
@@ -656,8 +656,8 @@ export default function FinanceiroClient({
                   </div>
                 )}
                 <div className="flex gap-2">
-                  <button onClick={() => setEdit(null)} className="flex-1 border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-3 rounded-button">Voltar</button>
-                  <button onClick={salvarEdicao} className="flex-1 bg-amber text-accent-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button">Salvar</button>
+                  <button onClick={() => setEdit(null)} className="font-semibold flex-1 border border-line text-fg-muted font-ui text-sm py-3 rounded-button">Voltar</button>
+                  <button onClick={salvarEdicao} className="font-semibold flex-1 bg-amber text-accent-fg font-ui text-sm py-3 rounded-button">Salvar</button>
                 </div>
               </div>
             ) : (
@@ -676,12 +676,12 @@ export default function FinanceiroClient({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setEdit({ descricao: aberto.descricao, valor: String(aberto.valor).replace('.', ','), data: aberto.data })}
-                    className="flex-1 flex items-center justify-center gap-1.5 border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:border-amber/50"
+                    className="font-semibold flex-1 flex items-center justify-center gap-1.5 border border-line text-fg font-ui text-sm py-3 rounded-button hover:border-amber/50"
                   >
                     <Pencil size={13} /> Editar
                   </button>
                   {!aberto.agendamento_id && (
-                    <button onClick={() => apagar(aberto)} className="flex-1 flex items-center justify-center gap-1.5 border border-saida/30 text-saida font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:bg-saida/5">
+                    <button onClick={() => apagar(aberto)} className="font-semibold flex-1 flex items-center justify-center gap-1.5 border border-saida/30 text-saida font-ui text-sm py-3 rounded-button hover:bg-saida/5">
                       <Trash2 size={13} /> Apagar
                     </button>
                   )}
@@ -698,7 +698,7 @@ export default function FinanceiroClient({
           <div className="absolute inset-0 bg-black/60" onClick={() => setModalFixa(null)} />
           <form onSubmit={salvarFixa} className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">{modalFixa === 'nova' ? 'Nova despesa fixa' : 'Despesa fixa'}</h2>
+              <h2 className="font-semibold font-ui text-lg text-fg">{modalFixa === 'nova' ? 'Nova despesa fixa' : 'Despesa fixa'}</h2>
               <button type="button" onClick={() => setModalFixa(null)} aria-label="Fechar"><X size={18} className="text-fg-muted" /></button>
             </div>
             <div>
@@ -721,7 +721,7 @@ export default function FinanceiroClient({
                   <Trash2 size={14} />
                 </button>
               )}
-              <button type="submit" className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-colors">
+              <button type="submit" className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors">
                 Salvar
               </button>
             </div>

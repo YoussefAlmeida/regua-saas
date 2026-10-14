@@ -70,17 +70,17 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
     setTimeout(() => setSalvo(false), 3000)
   }
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <form onSubmit={salvar} className="px-4 py-6 max-w-lg mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Configurações</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Configurações</h1>
         <button
           type="submit"
           disabled={salvando}
-          className="flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button transition-colors disabled:opacity-50"
+          className="font-semibold flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors disabled:opacity-50"
         >
           {salvo ? <><Check size={13} /> Salvo</> : salvando ? 'Salvando…' : 'Salvar'}
         </button>
@@ -88,7 +88,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
 
       {/* Dados da barbearia */}
       <section className="space-y-4">
-        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Dados da barbearia</h2>
+        <h2 className="font-semibold font-ui text-sm text-fg-muted">Dados da barbearia</h2>
 
         <div>
           <label className={labelCls}>Nome *</label>
@@ -149,7 +149,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
 
       {/* Horários de funcionamento */}
       <section className="space-y-3">
-        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Horários de funcionamento</h2>
+        <h2 className="font-semibold font-ui text-sm text-fg-muted">Horários de funcionamento</h2>
 
         <div className="bg-surface rounded-card border border-line overflow-hidden">
           {DIAS.map((dia, idx) => {
@@ -179,14 +179,14 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
                       type="time"
                       value={h.inicio ?? '08:00'}
                       onChange={e => updateHorario(key, 'inicio', e.target.value)}
-                      className="bg-surface-alt border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="bg-surface border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
                     />
                     <span className="text-fg-muted text-xs">–</span>
                     <input
                       type="time"
                       value={h.fim ?? '19:00'}
                       onChange={e => updateHorario(key, 'fim', e.target.value)}
-                      className="bg-surface-alt border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="bg-surface border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
                     />
                   </div>
                 ) : (
@@ -200,7 +200,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
 
       {/* Dias fechados (feriados) — vencem o horário de qualquer barbeiro */}
       <section className="space-y-3">
-        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Feriados e dias fechados</h2>
+        <h2 className="font-semibold font-ui text-sm text-fg-muted">Feriados e dias fechados</h2>
         <p className="font-body text-xs text-fg-muted -mt-1">
           Nesses dias ninguém agenda pela página, mesmo que o barbeiro tenha horário configurado.
         </p>
@@ -217,7 +217,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
             type="button"
             disabled={!novoFechado || fechados.includes(novoFechado)}
             onClick={() => { setFechados(f => [...f, novoFechado].sort()); setNovoFechado('') }}
-            className="px-4 bg-surface-alt border border-line hover:border-amber/40 text-fg font-ui text-xs uppercase tracking-wider rounded-button transition-colors disabled:opacity-40"
+            className="font-semibold px-4 bg-surface-alt border border-line hover:border-amber/40 text-fg font-ui text-xs rounded-button transition-colors disabled:opacity-40"
           >
             Adicionar
           </button>

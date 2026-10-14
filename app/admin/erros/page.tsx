@@ -21,7 +21,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
   const nomes = new Map((barbearias ?? []).map(b => [b.id, b.nome]))
   const lista: ErroSistema[] = (erros ?? []).map(e => ({ ...e, barbearia_nome: e.barbearia_id ? nomes.get(e.barbearia_id) ?? 'Barbearia apagada' : null }))
 
-  const chip = (ativo: boolean) => `px-3 py-1.5 rounded-full border font-ui text-[11px] uppercase tracking-wider ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
+  const chip = (ativo: boolean) => `font-semibold px-3 py-1.5 rounded-full border font-ui text-[11px] ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
 
   return (
     <div className="min-h-screen bg-bg px-4 py-6">
@@ -30,7 +30,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
           <ChevronLeft size={15} /> Todas as barbearias
         </Link>
         <div>
-          <h1 className="font-display text-3xl uppercase tracking-wide text-fg">Erros do sistema</h1>
+          <h1 className="font-display text-3xl text-fg">Erros do sistema</h1>
           <p className="font-body text-sm text-fg-muted">Tudo que deu errado, em todas as barbearias. Toca num erro pra ver o motivo.</p>
         </div>
         <div className="flex gap-2">

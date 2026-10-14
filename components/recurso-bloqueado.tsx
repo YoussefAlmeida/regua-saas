@@ -8,9 +8,9 @@ export default function RecursoBloqueado({ titulo, texto, plano = 'Barbearia' }:
       <div className="w-10 h-10 rounded-full bg-amber/10 text-amber flex items-center justify-center mx-auto">
         <Lock size={16} />
       </div>
-      <p className="font-ui text-sm uppercase tracking-wider text-fg">{titulo}</p>
+      <p className="font-semibold font-ui text-sm text-fg">{titulo}</p>
       <p className="font-body text-sm text-fg-muted">{texto}</p>
-      <Link href="/painel/mais/plano" className="inline-block bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-5 py-2.5 rounded-button transition-colors">
+      <Link href="/painel/mais/plano" className="font-semibold inline-block bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm px-5 py-2.5 rounded-button transition-colors">
         Ver plano {plano}
       </Link>
     </div>

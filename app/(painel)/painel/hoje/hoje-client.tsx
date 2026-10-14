@@ -27,12 +27,13 @@ const STATUS_LABEL: Record<Status, string> = {
   agendado: 'Agendado', confirmado: 'Confirmado', concluido: 'Concluído',
   cancelado: 'Cancelado', faltou: 'Faltou',
 }
+// Etiqueta discreta de situação (o cartão fica branco)
 const STATUS_COR: Record<Status, string> = {
-  agendado: 'text-amber border-amber/30 bg-amber/5',
-  confirmado: 'text-entrada border-entrada/30 bg-entrada/5',
-  concluido: 'text-entrada border-entrada/40 bg-entrada/10',
-  cancelado: 'text-saida border-saida/30 bg-saida/5',
-  faltou: 'text-fg-muted border-line bg-surface-alt',
+  agendado: 'text-fg-muted bg-surface-alt',
+  confirmado: 'text-info bg-info/10',
+  concluido: 'text-entrada bg-entrada/10',
+  cancelado: 'text-saida bg-saida/10',
+  faltou: 'text-fg-muted bg-surface-alt',
 }
 
 function hora(iso: string) {
@@ -100,7 +101,7 @@ export default function HojeClient({
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div>
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Hoje</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Hoje</h1>
         <p className="font-body text-sm text-fg-muted first-letter:uppercase">{dataFmt}</p>
       </div>
 
@@ -131,7 +132,7 @@ export default function HojeClient({
             const ocupado = atualizando === ag.id
             return (
               <div key={ag.id} className={`border-t border-line pt-3 ${ocupado ? 'opacity-50' : ''}`}>
-                <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
+                <p className="font-semibold font-ui text-sm text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
                 <p className="font-body text-xs text-fg-muted first-letter:uppercase">
                   {dia} · {hora(ag.inicio)} · {ag.servico?.nome} · {ag.profissional?.nome}
                 </p>
@@ -139,14 +140,14 @@ export default function HojeClient({
                   <button
                     onClick={() => atualizarStatus(ag.id, 'concluido')}
                     disabled={ocupado}
-                    className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors"
+                    className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
                   >
                     Cortou
                   </button>
                   <button
                     onClick={() => atualizarStatus(ag.id, 'faltou')}
                     disabled={ocupado}
-                    className="flex-1 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-1.5 rounded-button"
+                    className="font-semibold flex-1 bg-surface-alt border border-line text-fg-muted font-ui text-xs py-1.5 rounded-button"
                   >
                     Faltou
                   </button>
@@ -201,16 +202,16 @@ export default function HojeClient({
             <Clock size={11} /> Próximo
           </p>
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: proximo.servico?.cor ?? '#E8B04B' }} />
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: proximo.servico?.cor ?? '#9A4A1A' }} />
             <div className="flex-1">
-              <p className="font-ui text-sm uppercase tracking-wider text-fg">{proximo.cliente?.nome ?? '—'}</p>
+              <p className="font-semibold font-ui text-sm text-fg">{proximo.cliente?.nome ?? '—'}</p>
               <p className="font-body text-xs text-fg-muted">{proximo.servico?.nome} · {hora(proximo.inicio)} · {proximo.profissional?.nome}</p>
             </div>
             {proximo.status === 'agendado' && (
               <button
                 onClick={() => atualizarStatus(proximo.id, 'confirmado')}
                 disabled={atualizando === proximo.id}
-                className="flex items-center gap-1 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider px-3 py-1.5 rounded-button transition-colors hover:bg-entrada/20"
+                className="font-semibold flex items-center gap-1 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs px-3 py-1.5 rounded-button transition-colors hover:bg-entrada/20"
               >
                 <Check size={12} /> Confirmar
               </button>
@@ -221,12 +222,12 @@ export default function HojeClient({
 
       {/* Lista completa do dia */}
       <div>
-        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted mb-3">Agenda do dia</h2>
+        <h2 className="font-semibold font-ui text-sm text-fg-muted mb-3">Agenda do dia</h2>
 
         {ags.length === 0 ? (
           <div className="text-center py-12">
             <Scissors size={32} className="mx-auto mb-3 text-fg-muted opacity-30" strokeWidth={1} />
-            <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Dia sem agendamentos</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted">Dia sem agendamentos</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -234,40 +235,45 @@ export default function HojeClient({
               const st = STATUS_COR[ag.status]
               const isAtivo = atualizando === ag.id
               return (
-                <div key={ag.id} className={`border rounded-card px-4 py-3 ${st} transition-opacity ${isAtivo ? 'opacity-50' : ''}`}>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full shrink-0 mt-1.5" style={{ backgroundColor: ag.servico?.cor ?? '#E8B04B' }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
-                        <span className="font-ui text-[10px] uppercase tracking-wider shrink-0">{STATUS_LABEL[ag.status]}</span>
+                <div key={ag.id} className={`bg-surface border border-line rounded-card px-4 py-3.5 transition-opacity ${ag.status === 'concluido' || ag.status === 'faltou' ? 'opacity-70' : ''} ${isAtivo ? 'opacity-50' : ''}`}>
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 shrink-0 text-right">
+                      <p className="font-mono text-[17px] font-semibold text-fg leading-tight">{hora(ag.inicio)}</p>
+                      <p className="font-mono text-[11px] text-fg-muted">{hora(ag.fim)}</p>
+                    </div>
+                    <div className="flex-1 min-w-0 border-l border-line pl-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-semibold font-ui text-[15px] text-fg truncate">{ag.cliente?.nome ?? '—'}</p>
+                        <span className={`shrink-0 px-2 py-0.5 rounded-full font-body text-[11px] font-semibold ${st}`}>{STATUS_LABEL[ag.status]}</span>
                       </div>
-                      <p className="font-body text-xs text-fg-muted">{ag.servico?.nome} · {hora(ag.inicio)}{!souBarbeiro && ` · ${ag.profissional?.nome}`}</p>
-                      <p className="font-mono text-xs text-amber mt-0.5">{formatBRL(ag.valor_servico)}</p>
+                      <p className="font-body text-[13px] text-fg-muted mt-0.5">
+                        {ag.servico?.nome}{!souBarbeiro && ` · ${ag.profissional?.nome}`} · <span className="font-mono text-fg">{formatBRL(ag.valor_servico)}</span>
+                      </p>
                     </div>
                   </div>
 
                   {/* Ações rápidas */}
                   {ag.status === 'agendado' && (
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 ml-16">
                       <button
                         onClick={() => atualizarStatus(ag.id, 'confirmado')}
                         disabled={isAtivo}
-                        className="flex-1 flex items-center justify-center gap-1.5 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors hover:bg-entrada/20"
+                        className="font-semibold flex-1 flex items-center justify-center gap-1.5 bg-fg text-bg font-ui text-sm py-2.5 rounded-button transition-colors hover:bg-fg/85"
                       >
-                        <Check size={11} /> Confirmar
+                        <Check size={14} /> Confirmar
                       </button>
                       <button
                         onClick={() => atualizarStatus(ag.id, 'cancelado')}
                         disabled={isAtivo}
-                        className="px-3 bg-saida/10 border border-saida/30 text-saida font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors"
+                        aria-label="Cancelar horário"
+                        className="font-semibold px-3.5 border border-line text-saida font-ui text-sm py-2.5 rounded-button transition-colors hover:border-saida/40"
                       >
-                        <X size={11} />
+                        <X size={15} />
                       </button>
                     </div>
                   )}
                   {(ag.status === 'agendado' || ag.status === 'confirmado') && ag.cliente?.whatsapp && (
-                    <div className="mt-3">
+                    <div className="mt-3 ml-16">
                       <ContatoCliente whatsapp={ag.cliente.whatsapp} compacto />
                     </div>
                   )}
@@ -275,24 +281,24 @@ export default function HojeClient({
                     <button
                       onClick={() => atualizarStatus(ag.id, 'confirmado')}
                       disabled={isAtivo}
-                      className="mt-2 flex items-center gap-1 font-ui text-[10px] uppercase tracking-wider text-fg-muted hover:text-fg"
+                      className="mt-2 ml-16 flex items-center gap-1 font-body text-xs font-semibold text-fg-muted hover:text-fg py-1"
                     >
-                      <Undo2 size={11} /> Desfazer
+                      <Undo2 size={13} /> Desfazer
                     </button>
                   )}
                   {ag.status === 'confirmado' && (
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 ml-16">
                       <button
                         onClick={() => atualizarStatus(ag.id, 'concluido')}
                         disabled={isAtivo}
-                        className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-1.5 rounded-button transition-colors"
+                        className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
                       >
                         Concluir
                       </button>
                       <button
                         onClick={() => atualizarStatus(ag.id, 'faltou')}
                         disabled={isAtivo}
-                        className="px-3 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-1.5 rounded-button"
+                        className="font-semibold px-4 border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button hover:text-fg"
                       >
                         Faltou
                       </button>
@@ -310,7 +316,7 @@ export default function HojeClient({
         <div className="bg-surface border border-line rounded-card p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-fg-muted" />
-            <span className="font-ui text-sm uppercase tracking-wider text-fg-muted">Saldo do dia</span>
+            <span className="font-semibold font-ui text-sm text-fg-muted">Saldo do dia</span>
           </div>
           <span className={`font-mono text-lg ${(faturadoReal + entradasManuais - saidasDia) >= 0 ? 'text-entrada' : 'text-saida'}`}>
             {formatBRL((faturadoReal + entradasManuais - saidasDia))}

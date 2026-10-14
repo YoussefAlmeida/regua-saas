@@ -4,64 +4,67 @@
 
 /* ================================================================
    RÉGUA — Design Tokens
-   Paleta "Aço & Âmbar" · Direção "Oficina Noturna"
+   Direção "Ofício": papel quente, tinta e cobre. Claro, legível no
+   balcão com sol, com cara de barbearia de respeito.
+   (os nomes amber/accent ficaram por compatibilidade: hoje são o cobre)
    ================================================================ */
 @layer base {
   :root {
     /* ── shadcn/ui — sistema HSL ──────────────────────────────── */
-    --background:          240 5% 5%;     /* #0B0B0C */
-    --foreground:          45 18% 94%;    /* #F2F1ED */
-    --card:                240 5% 8%;    /* #141416 */
-    --card-foreground:     45 18% 94%;
-    --popover:             240 5% 12%;   /* #1E1E21 */
-    --popover-foreground:  45 18% 94%;
-    --primary:             38 76% 60%;   /* #E8B04B — âmbar */
-    --primary-foreground:  38 33% 6%;    /* #14110A */
-    --secondary:           240 5% 17%;   /* #2A2A2E */
-    --secondary-foreground: 45 18% 94%;
-    --muted:               240 5% 12%;
-    --muted-foreground:    240 4% 65%;   /* #A1A1A8 */
-    --accent:              38 76% 60%;   /* âmbar — mesma do primary */
-    --accent-foreground:   38 33% 6%;
-    --destructive:         3 72% 59%;    /* #E2564D */
-    --destructive-foreground: 45 18% 94%;
-    --border:              240 5% 17%;   /* #2A2A2E */
-    --input:               240 5% 17%;
-    --ring:                38 76% 60%;
-    --radius:              0.75rem;      /* 12px — cards */
+    --background:          36 33% 95%;    /* #F6F3EE */
+    --foreground:          36 9% 10%;     /* #1B1916 */
+    --card:                0 0% 100%;
+    --card-foreground:     36 9% 10%;
+    --popover:             0 0% 100%;
+    --popover-foreground:  36 9% 10%;
+    --primary:             22 71% 35%;    /* #9A4A1A — cobre */
+    --primary-foreground:  0 0% 100%;
+    --secondary:           36 22% 90%;
+    --secondary-foreground: 36 9% 10%;
+    --muted:               36 22% 90%;
+    --muted-foreground:    32 8% 39%;     /* #6A635B */
+    --accent:              22 71% 35%;
+    --accent-foreground:   0 0% 100%;
+    --destructive:         4 62% 44%;     /* #B4322A */
+    --destructive-foreground: 0 0% 100%;
+    --border:              38 21% 83%;    /* #DDD6CA */
+    --input:               35 9% 52%;
+    --ring:                22 71% 35%;
+    --radius:              0.75rem;
 
-    /* ── RÉGUA custom tokens — hex direto ─────────────────────── */
-    --bg:            #0B0B0C;
-    --surface:       #141416;
-    --surface-2:     #1E1E21;
-    --line:          #2A2A2E;
-    --fg:            #F2F1ED;
-    --fg-muted:      #A1A1A8;
-    --regua-accent:  #E8B04B;
-    --accent-press:  #C9963B;
-    --accent-fg:     #14110A;
+    /* ── RÉGUA custom tokens ──────────────────────────────────── */
+    --bg:            #F6F3EE;   /* papel */
+    --surface:       #FFFFFF;   /* cartões */
+    --surface-2:     #EFEAE2;   /* áreas recuadas, chips */
+    --line:          #DDD6CA;   /* divisórias */
+    --line-forte:    #8C8274;   /* borda de campo (contraste 3:1) */
+    --fg:            #1B1916;   /* tinta */
+    --fg-muted:      #6A635B;
+    --regua-accent:  #9A4A1A;   /* cobre */
+    --accent-press:  #7E3B13;
+    --accent-fg:     #FFFFFF;
 
     /* Semântica financeira — NUNCA usar pra success/error */
-    --entrada:  #4FB477;
-    --saida:    #E2564D;
-    --info:     #6BA3D6;
+    --entrada:  #2E7A4E;
+    --saida:    #B4322A;
+    --info:     #2F5F8A;
 
     /* Mesmas cores em canais RGB — o Tailwind usa pra transparência
        (bg-entrada/10, border-amber/30…). Mudou a cor acima? Mude aqui. */
-    --bg-rgb:           11 11 12;
-    --surface-rgb:      20 20 22;
-    --surface-2-rgb:    30 30 33;
-    --line-rgb:         42 42 46;
-    --fg-rgb:           242 241 237;
-    --fg-muted-rgb:     161 161 168;
-    --accent-rgb:       232 176 75;
-    --accent-press-rgb: 201 150 59;
-    --accent-fg-rgb:    20 17 10;
-    --entrada-rgb:      79 180 119;
-    --saida-rgb:        226 86 77;
-    --info-rgb:         107 163 214;
+    --bg-rgb:           246 243 238;
+    --surface-rgb:      255 255 255;
+    --surface-2-rgb:    239 234 226;
+    --line-rgb:         221 214 202;
+    --fg-rgb:           27 25 22;
+    --fg-muted-rgb:     106 99 91;
+    --accent-rgb:       154 74 26;
+    --accent-press-rgb: 126 59 19;
+    --accent-fg-rgb:    255 255 255;
+    --entrada-rgb:      46 122 78;
+    --saida-rgb:        180 50 42;
+    --info-rgb:         47 95 138;
 
-    /* Tipografia: --font-display/ui/body/mono vêm do next/font (app/layout.tsx).
+    /* Tipografia: --font-display e --font-body vêm do next/font (app/layout.tsx).
        Não redefinir aqui — o :root sobrescrevia a fonte carregada. */
   }
 }
@@ -87,13 +90,39 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-ui);
+    text-wrap: balance;
   }
 
-  /* Números e valores monetários */
-  .valor-monetario {
-    font-family: var(--font-mono);
+  /* Títulos em serifa: um pouco mais justos */
+  .font-display {
+    letter-spacing: -0.015em;
+    font-optical-sizing: auto;
+  }
+
+  /* Rótulos pequenos em caixa alta: espaçamento contido, sem gritar */
+  .font-ui.uppercase {
+    letter-spacing: 0.07em;
+    font-weight: 600;
+  }
+
+  /* Valores: algarismos alinhados (font-mono agora é a mesma sans, tabular) */
+  .font-mono, .valor-monetario {
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  /* Campos com borda visível (contraste 3:1) */
+  input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+    border-color: var(--line-forte);
+  }
+
+  ::selection {
+    background: rgb(var(--accent-rgb) / 0.18);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--regua-accent);
+    outline-offset: 2px;
   }
 }
 

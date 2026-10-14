@@ -39,14 +39,14 @@ export default function PerfilClient({ inicial }: { inicial: { nome: string; esp
     avisar('Perfil salvo.', 'sucesso')
   }
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <form onSubmit={salvar} className="px-4 py-6 max-w-lg mx-auto space-y-8">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Meu perfil</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Meu perfil</h1>
       </div>
 
       <div className="flex flex-col items-center gap-3">
@@ -86,7 +86,7 @@ export default function PerfilClient({ inicial }: { inicial: { nome: string; esp
         </div>
       </div>
 
-      <button type="submit" disabled={salvando} className="w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-colors disabled:opacity-50">
+      <button type="submit" disabled={salvando} className="font-semibold w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50">
         <Check size={14} /> {salvando ? 'Salvando…' : 'Salvar'}
       </button>
     </form>

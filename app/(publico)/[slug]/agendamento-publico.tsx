@@ -170,8 +170,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
     ? new Date(data + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })
     : ''
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
   const cardCls = 'w-full flex items-center gap-4 bg-surface border border-line rounded-card px-4 py-4 hover:border-amber/50 active:scale-[0.99] transition text-left'
 
   return (
@@ -186,7 +186,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
               </button>
             )}
             <div className="flex-1 min-w-0">
-              <h1 className="font-display text-2xl text-amber tracking-wide uppercase leading-tight line-clamp-2 break-words">{barbearia.nome}</h1>
+              <h1 className="font-display text-[26px] font-semibold text-fg leading-tight line-clamp-2 break-words">{barbearia.nome}</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
                 {barbearia.endereco && (
                   <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
@@ -207,9 +207,9 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             </div>
             <Link
               href={`/${barbearia.slug}/meus-agendamentos`}
-              className="shrink-0 flex items-center gap-1 font-ui text-[11px] uppercase tracking-wider text-fg-muted hover:text-amber mt-1"
+              className="shrink-0 flex items-center gap-1.5 font-ui text-sm font-semibold text-fg hover:text-amber mt-1.5 py-1"
             >
-              <CalendarCheck size={13} /> {logado ? 'Meus horários' : 'Entrar'}
+              <CalendarCheck size={15} /> Meus horários
             </Link>
           </div>
 
@@ -226,10 +226,10 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
       <main className="max-w-lg mx-auto px-4 py-6 pb-16">
         {!aceitando ? (
           <div className="text-center py-16 space-y-4">
-            <p className="font-ui text-sm uppercase tracking-wider text-fg-muted">Agendamento online pausado</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted">Agendamento online pausado</p>
             <p className="font-body text-sm text-fg-muted">A barbearia não está recebendo agendamentos pelo link agora.</p>
             {barbearia.telefone && (
-              <a href={waLink(barbearia.telefone, 'Oi! Queria marcar um horário.')} className="inline-flex items-center gap-2 bg-amber text-accent-fg font-ui text-sm uppercase tracking-wider px-5 py-3 rounded-button">
+              <a href={waLink(barbearia.telefone, 'Oi! Queria marcar um horário.')} className="font-semibold inline-flex items-center gap-2 bg-amber text-accent-fg font-ui text-sm px-5 py-3 rounded-button">
                 <MessageCircle size={15} /> Chamar no WhatsApp
               </a>
             )}
@@ -239,8 +239,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             {/* ── 1. Serviço ─────────────────────────── */}
             {etapa === 'servico' && (
               <section>
-                <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-1">O que vai fazer?</h2>
-                {logado && <p className="font-body text-sm text-fg-muted mb-4">Oi, {logado.nome.split(' ')[0]}! 👋</p>}
+                <h2 className="font-semibold font-ui text-lg text-fg mb-1">O que vai fazer?</h2>
+                {logado && <p className="font-body text-sm text-fg-muted mb-4">Olá, {logado.nome.split(' ')[0]}.</p>}
                 {!logado && <p className="font-body text-sm text-fg-muted mb-4">Marca em menos de 1 minuto. Sem baixar app.</p>}
                 {servicos.length === 0 ? (
                   <p className="font-body text-sm text-fg-muted text-center py-8">A barbearia ainda não cadastrou os serviços.</p>
@@ -250,7 +250,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                       <button key={s.id} onClick={() => escolherServico(s)} className={cardCls}>
                         <span className="w-1 self-stretch rounded-full shrink-0" style={{ backgroundColor: s.cor }} />
                         <div className="flex-1 min-w-0">
-                          <p className="font-ui text-sm uppercase tracking-wider text-fg">{s.nome}</p>
+                          <p className="font-semibold font-ui text-sm text-fg">{s.nome}</p>
                           <span className="flex items-center gap-1 font-body text-xs text-fg-muted mt-0.5">
                             <Clock size={11} /> {s.duracao_min} min
                           </span>
@@ -266,7 +266,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             {/* ── 2. Barbeiro ────────────────────────── */}
             {etapa === 'barbeiro' && (
               <section>
-                <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-4">Com quem?</h2>
+                <h2 className="font-semibold font-ui text-lg text-fg mb-4">Com quem?</h2>
                 {profissionais.length === 0 ? (
                   <p className="font-body text-sm text-fg-muted text-center py-8">Nenhum barbeiro disponível no momento.</p>
                 ) : (
@@ -279,7 +279,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                             : p.nome.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-ui text-sm uppercase tracking-wider text-fg">{p.nome}</p>
+                          <p className="font-semibold font-ui text-sm text-fg">{p.nome}</p>
                           {p.especialidade && <p className="font-body text-xs text-fg-muted truncate">{p.especialidade}</p>}
                         </div>
                         <ChevronRight size={16} className="text-fg-muted" />
@@ -293,7 +293,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             {/* ── 3. Dia e horário ───────────────────── */}
             {etapa === 'horario' && (
               <section>
-                <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-1">Quando?</h2>
+                <h2 className="font-semibold font-ui text-lg text-fg mb-1">Quando?</h2>
                 <p className="font-body text-xs text-fg-muted mb-4">{servico?.nome} com {profissional?.nome}</p>
 
                 <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-2 snap-x" role="listbox" aria-label="Dia">
@@ -335,14 +335,14 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                     </div>
                   ) : !algumDiaLivre ? (
                     <div className="text-center py-10 space-y-2">
-                      <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Agenda cheia nas próximas 3 semanas</p>
+                      <p className="font-semibold font-ui text-sm text-fg-muted">Agenda cheia nas próximas 3 semanas</p>
                       <p className="font-body text-xs text-fg-muted">
                         {soUmBarbeiro ? 'Chama a barbearia no WhatsApp aí embaixo.' : 'Tenta com outro barbeiro ou chama a barbearia no WhatsApp.'}
                       </p>
                     </div>
                   ) : slots.length === 0 ? (
                     <div className="text-center py-10 space-y-2">
-                      <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Sem horário livre nesse dia</p>
+                      <p className="font-semibold font-ui text-sm text-fg-muted">Sem horário livre nesse dia</p>
                       <p className="font-body text-xs text-fg-muted">Os dias apagados estão cheios ou fechados. Toca em outro.</p>
                     </div>
                   ) : (
@@ -368,10 +368,10 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             {/* ── 4. Confirmar ───────────────────────── */}
             {etapa === 'dados' && (
               <section>
-                <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-4">Confirma aí</h2>
+                <h2 className="font-semibold font-ui text-lg text-fg mb-4">Confirma aí</h2>
 
                 <div className="bg-surface border border-amber/30 rounded-card p-4 mb-6">
-                  <p className="font-ui text-sm uppercase tracking-wider text-fg">{servico?.nome}</p>
+                  <p className="font-semibold font-ui text-sm text-fg">{servico?.nome}</p>
                   <p className="font-body text-sm text-fg-muted">com {profissional?.nome}</p>
                   <div className="flex items-end justify-between mt-3">
                     <p className="font-body text-sm text-fg inline-block first-letter:uppercase">{dataFormatada}<br /><span className="font-mono text-2xl text-amber">{horario}</span></p>
@@ -391,7 +391,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                     <button
                       onClick={() => confirmar()}
                       disabled={enviando}
-                      className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
+                      className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
                     >
                       {enviando ? 'Confirmando…' : 'Confirmar horário'}
                     </button>
@@ -405,7 +405,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                           role="tab"
                           aria-selected={aba === v}
                           onClick={() => { setAba(v); setErro('') }}
-                          className={`flex-1 py-2.5 font-ui text-xs uppercase tracking-wider transition-colors ${aba === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}
+                          className={`flex-1 py-2.5 font-ui text-sm font-semibold transition-colors ${aba === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}
                         >
                           {t}
                         </button>
@@ -446,7 +446,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                       <button
                         type="submit"
                         disabled={enviando}
-                        className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
+                        className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
                       >
                         {enviando ? 'Confirmando…' : 'Confirmar horário'}
                       </button>
@@ -467,9 +467,9 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <div className="w-16 h-16 rounded-full bg-entrada/10 border border-entrada/30 flex items-center justify-center mx-auto">
                   <Check size={32} className="text-entrada" />
                 </div>
-                <h2 className="font-display text-4xl text-fg tracking-wider uppercase">Tá marcado!</h2>
+                <h2 className="font-display text-4xl text-fg">Tá marcado!</h2>
                 <div className="bg-surface border border-line rounded-card p-4 text-left space-y-1 max-w-xs mx-auto">
-                  <p className="font-ui text-sm uppercase tracking-wider text-fg">{servico?.nome}</p>
+                  <p className="font-semibold font-ui text-sm text-fg">{servico?.nome}</p>
                   <p className="font-body text-sm text-fg-muted">com {profissional?.nome}</p>
                   <p className="font-body text-sm text-fg inline-block first-letter:uppercase pt-1">{dataFormatada} · <span className="font-mono text-amber">{horario}</span></p>
                 </div>
@@ -479,7 +479,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <div className="flex flex-col gap-2 max-w-xs mx-auto">
                   <Link
                     href={`/${barbearia.slug}/meus-agendamentos`}
-                    className="bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-colors"
+                    className="font-semibold bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
                   >
                     Ver meus horários
                   </Link>
@@ -506,7 +506,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
         {/* Feito com RÉGUA — cada agendamento apresenta o sistema pra outros donos */}
         <footer className="mt-12 pt-6 border-t border-line text-center space-y-1.5">
           <Link href={`/?ref=${barbearia.slug}`} className="inline-block font-body text-xs text-fg-muted hover:text-fg py-2">
-            Agendamento por <span className="font-display tracking-widest text-amber">RÉGUA</span> · Tem barbearia? <span className="underline">Teste grátis</span>
+            Agendamento por <span className="font-display font-semibold tracking-[0.12em] text-fg">RÉGUA</span> · Tem barbearia? <span className="underline">Teste grátis</span>
           </Link>
           <p className="font-body text-[11px] text-fg-muted">
             <Link href="/termos" className="hover:text-fg">Termos</Link> · <Link href="/privacidade" className="hover:text-fg">Privacidade</Link>

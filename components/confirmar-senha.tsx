@@ -48,7 +48,7 @@ export default function ConfirmarSenha() {
             <Lock size={16} />
           </div>
           <div>
-            <h2 id="titulo-senha" className="font-ui text-sm uppercase tracking-wider text-fg">{pedido.titulo}</h2>
+            <h2 id="titulo-senha" className="font-semibold font-ui text-sm text-fg">{pedido.titulo}</h2>
             <p className="font-body text-xs text-fg-muted">{pedido.detalhe ?? 'Confirme com sua senha.'}</p>
           </div>
         </div>
@@ -59,13 +59,13 @@ export default function ConfirmarSenha() {
           value={senha}
           onChange={e => setSenha(e.target.value)}
           placeholder="Sua senha"
-          className="w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
+          className="w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
         />
         <div className="flex gap-2">
-          <button type="button" onClick={() => fechar(null)} className="flex-1 border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-3 rounded-button">
+          <button type="button" onClick={() => fechar(null)} className="font-semibold flex-1 border border-line text-fg-muted font-ui text-sm py-3 rounded-button">
             Voltar
           </button>
-          <button type="submit" disabled={!senha} className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-50">
+          <button type="submit" disabled={!senha} className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button disabled:opacity-50">
             Confirmar
           </button>
         </div>

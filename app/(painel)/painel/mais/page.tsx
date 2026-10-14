@@ -29,7 +29,7 @@ export default async function MaisPage() {
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
-      <h1 className="font-ui text-xl uppercase tracking-widest text-fg mb-6">Mais</h1>
+      <h1 className="font-display text-[28px] font-semibold leading-tight text-fg mb-6">Mais</h1>
 
       <div className="space-y-2">
         {itens.map(({ href, label, desc, icon: Icon, bloqueado }) => (
@@ -42,7 +42,7 @@ export default async function MaisPage() {
               <Icon size={18} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-ui text-sm uppercase tracking-wider text-fg">{label}</p>
+              <p className="font-semibold font-ui text-sm text-fg">{label}</p>
               <p className="font-body text-xs text-fg-muted">{desc}</p>
             </div>
             {bloqueado
@@ -74,7 +74,7 @@ function LogoutBtn() {
     >
       <button
         type="submit"
-        className="flex items-center gap-3 text-saida font-ui text-sm uppercase tracking-wider hover:opacity-80 transition-opacity"
+        className="font-semibold flex items-center gap-3 text-saida font-ui text-sm hover:opacity-80 transition-opacity"
       >
         <LogOut size={16} />
         Sair
