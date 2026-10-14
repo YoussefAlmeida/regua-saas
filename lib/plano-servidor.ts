@@ -46,3 +46,40 @@ export async function exigirVagaProfissional(barbearia_id: string): Promise<Next
     upgrade: true,
   }, { status: 403 })
 }
+
+export interface ProfissionalAgenda { id: string; nome: string; usuario_id: string; criado_em: string; permitido: boolean }
+
+/**
+ * Quem está na agenda e quem cabe no plano.
+ * Passou do limite (ex.: rebaixou de plano)? Até o dono escolher quem fica,
+ * só os mais antigos — até o limite — aparecem pros clientes.
+ */
+export const agendaDoPlano = cache(async (barbearia_id: string): Promise<{
+  profissionais: ProfissionalAgenda[]; max: number | null; excedente: number
+}> => {
+  const [p, { data }] = await Promise.all([
+    planoDaBarbearia(barbearia_id),
+    criarClienteServico().from('profissionais')
+      .select('id, nome, usuario_id, criado_em')
+      .eq('barbearia_id', barbearia_id).eq('ativo', true)
+      .order('criado_em', { ascending: true }),
+  ])
+  const lista = data ?? []
+  const max = p.maxProfissionais
+  return {
+    profissionais: lista.map((x, i) => ({ ...x, permitido: max === null || i < max })),
+    max,
+    excedente: max === null ? 0 : Math.max(0, lista.length - max),
+  }
+})
+
+/** 403 se esse profissional está fora do limite do plano (pausado pra agendamento novo) */
+export async function exigirProfissionalNoPlano(barbearia_id: string, profissional_id: string): Promise<NextResponse | null> {
+  const { profissionais, max } = await agendaDoPlano(barbearia_id)
+  const p = profissionais.find(x => x.id === profissional_id)
+  if (!p || p.permitido) return null
+  return NextResponse.json({
+    erro: `Esse profissional está pausado: o plano atual vai até ${max} na agenda. O dono precisa escolher quem fica em Mais → Plano.`,
+    foraDoPlano: true,
+  }, { status: 403 })
+}

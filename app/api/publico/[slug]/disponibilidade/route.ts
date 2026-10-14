@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { horariosLivres, horariosLivresPeriodo } from '@/lib/disponibilidade'
+import { exigirProfissionalNoPlano } from '@/lib/plano-servidor'
 
 const DATA = /^\d{4}-\d{2}-\d{2}$/
 
@@ -44,6 +45,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
   const barbearia = (Array.isArray(servico.barbearia) ? servico.barbearia[0] : servico.barbearia) as {
     id: string; horario_funcionamento: Record<string, never> | null; dias_fechados: string[] | null
+  }
+
+  if (await exigirProfissionalNoPlano(barbearia.id, profissional_id)) {
+    return NextResponse.json({ erro: 'Barbeiro não encontrado' }, { status: 404 })
   }
 
   if (de) {

@@ -6,6 +6,7 @@ import { horariosLivres, dataHoraLocal } from '@/lib/disponibilidade'
 import { SchemaAcesso, resolverCliente } from '@/lib/conta-cliente'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { situacaoPlano } from '@/lib/planos'
+import { exigirProfissionalNoPlano } from '@/lib/plano-servidor'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
 
@@ -44,6 +45,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   if (!servico || !servico.ativo) return NextResponse.json({ erro: 'Esse serviço não está mais disponível' }, { status: 404 })
   if (!profissional) return NextResponse.json({ erro: 'Esse barbeiro não está disponível' }, { status: 404 })
+  if (await exigirProfissionalNoPlano(barbearia.id, profissional_id)) {
+    return NextResponse.json({ erro: 'Esse barbeiro não está disponível' }, { status: 404 })
+  }
 
   // O horário precisa estar livre de verdade (expediente, feriado, bloqueio, passado)
   const inicioDate = new Date(inicio)

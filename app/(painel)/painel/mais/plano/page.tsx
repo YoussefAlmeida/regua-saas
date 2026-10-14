@@ -65,7 +65,10 @@ export default async function PlanoPage() {
         {acimaDoLimite && (
           <p className="flex gap-2 font-body text-xs text-amber">
             <AlertTriangle size={13} className="shrink-0 mt-0.5" />
-            Você tem mais gente na agenda do que o plano permite. Ninguém novo entra até mudar de plano.
+            <span>
+              Você tem mais gente na agenda do que o plano permite.{' '}
+              <Link href="/painel/mais/ajustar-equipe" className="underline">Escolher quem fica</Link> ou mude de plano aqui embaixo.
+            </span>
           </p>
         )}
       </section>

@@ -6,6 +6,7 @@ import { bloqueioSomenteLeitura } from '@/lib/conta'
 import { hashSenha } from '@/lib/auth'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
+import { exigirProfissionalNoPlano } from '@/lib/plano-servidor'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
 
@@ -71,6 +72,9 @@ export async function POST(req: NextRequest) {
   if (!(await podeMexerNaAgendaDe(sessao, profissional_id))) {
     return NextResponse.json({ erro: 'Você só pode marcar na sua própria agenda' }, { status: 403 })
   }
+
+  const foraDoPlano = await exigirProfissionalNoPlano(sessao.barbearia_id, profissional_id)
+  if (foraDoPlano) return foraDoPlano
 
   const db = criarClienteServico()
 

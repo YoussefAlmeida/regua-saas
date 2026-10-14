@@ -1,5 +1,6 @@
 import { cache } from 'react'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { agendaDoPlano } from '@/lib/plano-servidor'
 
 /** Dados que a página pública mostra — sem passar pela própria API (evita depender de URL do site) */
 export const carregarBarbeariaPublica = cache(async (slug: string) => {
@@ -25,5 +26,9 @@ export const carregarBarbeariaPublica = cache(async (slug: string) => {
       .order('preco'),
   ])
 
-  return { barbearia, profissionais: profissionais ?? [], servicos: servicos ?? [] }
+  // Acima do limite do plano (rebaixou): só quem cabe aparece pros clientes
+  const { profissionais: naAgenda } = await agendaDoPlano(barbearia.id)
+  const permitidos = new Set(naAgenda.filter(p => p.permitido).map(p => p.id))
+
+  return { barbearia, profissionais: (profissionais ?? []).filter(p => permitidos.has(p.id)), servicos: servicos ?? [] }
 })

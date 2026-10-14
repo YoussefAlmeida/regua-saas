@@ -80,7 +80,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     ...(a.acao === 'estender_teste' ? { dias: a.dias } : {}),
   })
 
-  return NextResponse.json(data)
+  // Rebaixou pra um plano menor que a equipe atual? Avisa (o dono escolhe quem fica)
+  let aviso: string | null = null
+  if (a.acao === 'ativar_plano') {
+    const max = PLANOS_ADMIN[a.plano].maxProfissionais
+    const { count } = await criarClienteServico().from('profissionais')
+      .select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('ativo', true)
+    if (max !== null && (count ?? 0) > max) {
+      aviso = `Atenção: ${b.nome} tem ${count} na agenda e o ${PLANOS_ADMIN[a.plano].nome} vai até ${max}. O dono vai ver o aviso pra escolher quem fica; até lá só os ${max} mais antigos aparecem pros clientes.`
+    }
+  }
+
+  return NextResponse.json({ ...data, aviso })
 }
 
 /** Apaga a barbearia e TUDO dela. Precisa digitar o link (slug) pra confirmar. */

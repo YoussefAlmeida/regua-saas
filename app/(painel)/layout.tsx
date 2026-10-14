@@ -7,7 +7,7 @@ import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
 import AvisoPlano from '@/components/aviso-plano'
-import { planoDaBarbearia } from '@/lib/plano-servidor'
+import { planoDaBarbearia, agendaDoPlano } from '@/lib/plano-servidor'
 
 export const metadata: Metadata = { robots: { index: false, follow: false } }
 
@@ -34,9 +34,10 @@ export default async function PainelLayout({ children }: { children: React.React
   // Cliente não tem painel — vai pros agendamentos dele
   if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
 
-  const [{ data: usuario }, plano] = await Promise.all([
+  const [{ data: usuario }, plano, agenda] = await Promise.all([
     db.from('usuarios').select('nome').eq('id', usuarioId).single(),
     planoDaBarbearia(barbearia_id),
+    agendaDoPlano(barbearia_id),
   ])
 
   return (
@@ -52,7 +53,7 @@ export default async function PainelLayout({ children }: { children: React.React
         </div>
       </header>
 
-      <AvisoPlano plano={plano} souDono={papel === 'dono'} />
+      <AvisoPlano plano={plano} souDono={papel === 'dono'} excedente={agenda.excedente} />
 
       {/* Conteúdo */}
       <main className="flex-1 pb-20 overflow-y-auto">{children}</main>
