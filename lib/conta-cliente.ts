@@ -42,6 +42,17 @@ type Resultado = { ok: true; cliente: ClienteResolvido } | { ok: false; res: Nex
 const falha = (erro: string, status: number, extra: Record<string, unknown> = {}): Resultado =>
   ({ ok: false, res: NextResponse.json({ erro, ...extra }, { status }) })
 
+/** Erro do banco: registra a causa real no log da Vercel e devolve uma mensagem útil */
+function falhaBanco(onde: string, e: { code?: string; message?: string } | null): Resultado {
+  console.error(`[conta-cliente] ${onde}:`, e?.code, e?.message)
+  if (e?.code === '23505') {
+    return falha('Esse WhatsApp já tem conta aqui. Toca em "Já tenho conta" e entra com sua senha.', 409, { jaTemConta: true })
+  }
+  // 42703 = coluna não existe / 42P01 = tabela não existe → falta rodar atualização do banco
+  const codigo = e?.code ? ` (código ${e.code})` : ''
+  return falha(`Não deu pra criar sua conta agora${codigo}. Tenta de novo em instantes ou chama a barbearia.`, 500)
+}
+
 export async function resolverCliente(acesso: Acesso, barbearia_id: string, req: NextRequest): Promise<Resultado> {
   const db = criarClienteServico()
 
@@ -62,12 +73,13 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
   const espera = await segundosBloqueado([`id:${whatsapp}`, `ip:${ip}`])
   if (espera > 0) return falha(`Muitas tentativas. Espera ${textoEspera(espera)} e tenta de novo.`, 429)
 
-  const { data: existente } = await db
+  const { data: existente, error: erroBusca } = await db
     .from('usuarios')
     .select('id, nome, whatsapp, senha_hash, papel, barbearia_id, ativo, senha_definida')
     .eq('whatsapp', whatsapp)
     .eq('barbearia_id', barbearia_id)   // cada barbearia tem seus clientes
     .maybeSingle()
+  if (erroBusca) return falhaBanco('buscar cliente', erroBusca)
 
   const tokenDe = (id: string) => criarToken({ usuario_id: id, papel: 'cliente', barbearia_id })
 
@@ -87,7 +99,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
         .from('usuarios')
         .update({ senha_hash: await hashSenha(acesso.senha), senha_definida: true, nome: acesso.nome, atualizado_em: new Date().toISOString() })
         .eq('id', existente.id)
-      if (error) return falha('Erro ao criar sua conta', 500)
+      if (error) return falhaBanco('definir senha', error)
       return { ok: true, cliente: { id: existente.id, nome: acesso.nome, whatsapp, token: await tokenDe(existente.id) } }
     }
 
@@ -104,7 +116,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
       })
       .select('id')
       .single()
-    if (error || !novo) return falha('Erro ao criar sua conta', 500)
+    if (error || !novo) return falhaBanco('criar cliente', error)
     return { ok: true, cliente: { id: novo.id, nome: acesso.nome, whatsapp, token: await tokenDe(novo.id) } }
   }
 

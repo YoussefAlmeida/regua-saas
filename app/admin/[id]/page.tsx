@@ -6,6 +6,8 @@ import { adminLogado, PLANOS_ADMIN, STATUS_ADMIN, type PlanoPago } from '@/lib/a
 import { formatBRL } from '@/lib/utils'
 import { urlDoSiteAtual } from '@/lib/site-url'
 import AcoesBarbearia from './acoes'
+import LinkNovaSenha from '@/components/link-nova-senha'
+import Avisos from '@/components/aviso'
 
 const DIA = 86_400_000
 const data = (iso: string | null) => iso
@@ -21,6 +23,7 @@ const ACAO_TEXTO: Record<string, string> = {
   suspender: 'Suspendeu (só leitura)',
   cancelar: 'Cancelou',
   reativar: 'Reativou',
+  link_nova_senha: 'Gerou link de senha nova pro dono',
 }
 
 export default async function AdminBarbeariaPage({ params }: { params: Promise<{ id: string }> }) {
@@ -117,6 +120,7 @@ export default async function AdminBarbeariaPage({ params }: { params: Promise<{
                 <MessageCircle size={13} /> WhatsApp
               </a>
             )}
+            {dono && <LinkNovaSenha endpoint={`/api/admin/barbearias/${b.id}/nova-senha-dono`} nome={dono.nome} />}
             {dono?.email && (
               <a href={`mailto:${dono.email}`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-line text-fg-muted font-ui text-xs uppercase tracking-wider hover:text-fg">
                 <Mail size={13} /> E-mail
@@ -165,6 +169,7 @@ export default async function AdminBarbeariaPage({ params }: { params: Promise<{
           </section>
         )}
       </div>
+      <Avisos />
     </div>
   )
 }
