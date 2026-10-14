@@ -51,6 +51,8 @@ function descrever(l: Linha): { texto: string; alerta: boolean } {
     case 'horarios_trabalho:editar': return { texto: 'mudou o horário de trabalho', alerta: false }
     case 'despesas_fixas:apagar': return { texto: `apagou a despesa fixa "${a.descricao}"`, alerta: true }
     case 'usuarios:aprovar': return { texto: 'aprovou um barbeiro na equipe', alerta: false }
+    case 'usuarios:link_nova_senha': return { texto: `gerou link de senha nova pra ${d.para ?? 'alguém'}`, alerta: false }
+    case 'usuarios:nova_senha': return { texto: 'criou uma senha nova pelo link', alerta: false }
     case 'usuarios:remover': return { texto: `removeu um barbeiro (${d.agendamentos_cancelados ?? 0} horários cancelados)`, alerta: true }
     default: return { texto: `${l.acao} em ${l.tabela}`, alerta: false }
   }

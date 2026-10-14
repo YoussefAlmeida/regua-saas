@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Search, Users } from 'lucide-react'
+import LinkNovaSenha from '@/components/link-nova-senha'
 
 interface Agendamento { id: string; inicio: string; status: string }
 interface Cliente {
@@ -76,6 +77,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
                     )}
                   </div>
                 </div>
+                <LinkNovaSenha endpoint="/api/painel/recuperacao" corpo={{ usuario_id: c.id }} nome={c.nome} compacto />
                 <div className="text-right shrink-0">
                   <p className="font-mono text-sm text-amber">{totalCortes}</p>
                   <p className="font-body text-xs text-fg-muted">{totalCortes === 1 ? 'corte' : 'cortes'}</p>

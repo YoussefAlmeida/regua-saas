@@ -148,12 +148,9 @@ export default function MeusAgendamentos({
               Nunca agendou pelo link?{' '}
               <Link href={`/${barbearia.slug}`} className="text-amber hover:underline">Marcar meu primeiro horário</Link>
             </p>
-            {barbearia.telefone && (
-              <p className="font-body text-xs text-fg-muted text-center mt-3">
-                Esqueceu a senha?{' '}
-                <a href={waLink(barbearia.telefone, 'Oi! Esqueci minha senha do agendamento.')} className="text-amber hover:underline">Fala com a barbearia</a>
-              </p>
-            )}
+            <p className="font-body text-xs text-fg-muted text-center mt-3">
+              <Link href={`/recuperar-senha?b=${barbearia.slug}`} className="text-amber hover:underline">Esqueci minha senha</Link>
+            </p>
           </section>
         ) : (
           <>

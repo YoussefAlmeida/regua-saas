@@ -6,6 +6,7 @@ import { Copy, Check, UserMinus, UserCheck, Clock, MessageCircle, BarChart3, Rot
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { pedirSenha } from '@/components/confirmar-senha'
 import ContatoCliente from '@/components/contato-cliente'
+import LinkNovaSenha from '@/components/link-nova-senha'
 
 interface Cancelado {
   id: string
@@ -209,6 +210,7 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
                     </Link>
                   ) : null
                 })()}
+                <LinkNovaSenha endpoint="/api/painel/recuperacao" corpo={{ usuario_id: b.id }} nome={b.nome} compacto />
                 <button
                   onClick={() => remover(b.id, b.nome)}
                   className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-saida hover:bg-saida/10 transition-colors shrink-0"

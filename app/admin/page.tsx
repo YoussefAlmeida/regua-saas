@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { adminLogado, PLANOS_ADMIN, STATUS_ADMIN, type PlanoPago } from '@/lib/admin'
 import { formatBRL } from '@/lib/utils'
 import SairAdmin from './sair'
+import SaudeSistema from './saude'
 
 const DIA = 86_400_000
 
@@ -61,6 +62,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
           </div>
           <SairAdmin />
         </div>
+
+        <SaudeSistema />
 
         {/* Números do negócio */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">

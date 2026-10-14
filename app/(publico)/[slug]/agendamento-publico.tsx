@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
@@ -51,8 +51,10 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   const [profissional, setProfissional] = useState<Profissional | null>(soUmBarbeiro ? profissionais[0] : null)
   const [data, setData] = useState('')
   const [horario, setHorario] = useState('')
-  const [slots, setSlots] = useState<string[] | null>(null)
-  const [slotsCarregando, setSlotsCarregando] = useState(false)
+  // Agenda das próximas 3 semanas, carregada de uma vez: { 'YYYY-MM-DD': ['09:00', …] }
+  const [agenda, setAgenda] = useState<Record<string, string[]> | null>(null)
+  const [agendaErro, setAgendaErro] = useState(false)
+  const pedidoAtual = useRef(0)
 
   const [logado, setLogado] = useState(clienteLogado)
   const [aba, setAba] = useState<Aba>('novo')
@@ -71,25 +73,29 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
     if (passo > 0) setEtapa(ordem[passo - 1])
   }
 
-  async function buscarSlots(d: string, prof = profissional, srv = servico) {
+  async function carregarAgenda(prof = profissional, srv = servico, preferir = data) {
     if (!prof || !srv) return
-    setData(d)
+    const pedido = ++pedidoAtual.current
+    setAgenda(null)
+    setAgendaErro(false)
     setHorario('')
-    setSlots(null)
-    setSlotsCarregando(true)
     const res = await fetch(
-      `/api/publico/${barbearia.slug}/disponibilidade?profissional_id=${prof.id}&servico_id=${srv.id}&data=${d}`,
+      `/api/publico/${barbearia.slug}/disponibilidade?profissional_id=${prof.id}&servico_id=${srv.id}&de=${dias[0].iso}&dias=${DIAS_A_FRENTE}`,
     ).catch(() => null)
-    setSlotsCarregando(false)
-    const json = res?.ok ? await res.json() : { slots: [] }
-    setSlots(json.slots ?? [])
+    if (pedido !== pedidoAtual.current) return // cliente já trocou de barbeiro/serviço
+    if (!res?.ok) { setAgendaErro(true); return }
+    const porDia: Record<string, string[]> = (await res.json()).dias ?? {}
+    setAgenda(porDia)
+    // Fica no dia escolhido se ainda tiver vaga; senão, vai pro primeiro com vaga
+    const primeiro = dias.find(d => porDia[d.iso]?.length)?.iso
+    setData(preferir && porDia[preferir]?.length ? preferir : primeiro ?? dias[0].iso)
   }
 
   function escolherServico(s: Servico) {
     setServico(s)
     if (soUmBarbeiro) {
       setEtapa('horario')
-      buscarSlots(data || dias[0].iso, profissionais[0], s)
+      carregarAgenda(profissionais[0], s)
     } else {
       setEtapa('barbeiro')
     }
@@ -98,8 +104,11 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   function escolherBarbeiro(p: Profissional) {
     setProfissional(p)
     setEtapa('horario')
-    buscarSlots(data || dias[0].iso, p)
+    carregarAgenda(p)
   }
+
+  const slots = agenda ? agenda[data] ?? [] : null
+  const algumDiaLivre = agenda ? Object.values(agenda).some(l => l.length > 0) : true
 
   async function confirmar(e?: React.FormEvent) {
     e?.preventDefault()
@@ -134,7 +143,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
       setErro(json.erro || 'Erro ao agendar')
       if (json.jaTemConta) setAba('entrar')
       if (json.sessaoExpirada) setLogado(null)
-      if (json.horarioOcupado) { setEtapa('horario'); buscarSlots(data) }
+      if (json.horarioOcupado) { setEtapa('horario'); carregarAgenda(profissional, servico, data) }
       return
     }
     if (json.cliente?.nome) setLogado({ nome: json.cliente.nome })
@@ -153,7 +162,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
     if (!soUmBarbeiro) setProfissional(null)
     setData('')
     setHorario('')
-    setSlots(null)
+    setAgenda(null)
     setErro('')
   }
 
@@ -290,14 +299,18 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-2 snap-x" role="listbox" aria-label="Dia">
                   {dias.map(d => {
                     const ativo = d.iso === data
+                    const semVaga = agenda !== null && !(agenda[d.iso]?.length)
                     return (
                       <button
                         key={d.iso}
                         role="option"
                         aria-selected={ativo}
-                        onClick={() => buscarSlots(d.iso)}
+                        aria-label={semVaga ? `${d.semana} ${d.dia}: sem horário` : `${d.semana} ${d.dia}`}
+                        onClick={() => { setData(d.iso); setHorario('') }}
                         className={`snap-start shrink-0 w-16 py-2.5 rounded-card border flex flex-col items-center transition-colors ${
-                          ativo ? 'bg-amber border-amber text-accent-fg' : 'bg-surface border-line text-fg hover:border-amber/50'
+                          ativo ? 'bg-amber border-amber text-accent-fg'
+                            : semVaga ? 'bg-transparent border-line/60 text-fg-muted opacity-40'
+                            : 'bg-surface border-line text-fg hover:border-amber/50'
                         }`}
                       >
                         <span className={`font-ui text-[10px] uppercase tracking-wider ${ativo ? '' : 'text-fg-muted'}`}>{d.semana}</span>
@@ -309,16 +322,28 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 </div>
 
                 <div className="mt-4">
-                  {slotsCarregando || slots === null ? (
+                  {agendaErro ? (
+                    <div className="text-center py-10 space-y-3">
+                      <p className="font-body text-sm text-fg-muted">Não deu pra carregar os horários.</p>
+                      <button onClick={() => carregarAgenda()} className="text-amber font-ui text-xs uppercase tracking-wider hover:underline">Tentar de novo</button>
+                    </div>
+                  ) : slots === null ? (
                     <div className="grid grid-cols-4 gap-2" aria-busy>
                       {Array.from({ length: 8 }).map((_, i) => (
                         <div key={i} className="h-11 rounded-button bg-surface border border-line animate-pulse" />
                       ))}
                     </div>
+                  ) : !algumDiaLivre ? (
+                    <div className="text-center py-10 space-y-2">
+                      <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Agenda cheia nas próximas 3 semanas</p>
+                      <p className="font-body text-xs text-fg-muted">
+                        {soUmBarbeiro ? 'Chama a barbearia no WhatsApp aí embaixo.' : 'Tenta com outro barbeiro ou chama a barbearia no WhatsApp.'}
+                      </p>
+                    </div>
                   ) : slots.length === 0 ? (
                     <div className="text-center py-10 space-y-2">
                       <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Sem horário livre nesse dia</p>
-                      <p className="font-body text-xs text-fg-muted">Toca em outro dia aí em cima.</p>
+                      <p className="font-body text-xs text-fg-muted">Os dias apagados estão cheios ou fechados. Toca em outro.</p>
                     </div>
                   ) : (
                     <>

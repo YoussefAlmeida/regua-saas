@@ -85,6 +85,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .single()
 
   if (error || !agendamento) {
+    console.error('[agendar] criar agendamento:', error?.code, error?.message)
     const conflito = error?.code === '23P01' || error?.message.includes('sem_conflito')
     return NextResponse.json(
       { erro: conflito ? 'Esse horário acabou de ser ocupado. Escolhe outro.' : 'Erro ao agendar. Tenta de novo.', horarioOcupado: conflito },

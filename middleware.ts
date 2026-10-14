@@ -5,7 +5,7 @@ const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET
 const COOKIE_SESSION = 'regua-session'
 
 // /admin e /api/admin têm login próprio (lib/admin.ts)
-const PUBLICAS = ['/entrar', '/cadastro-barbearia', '/convite', '/_next', '/favicon', '/admin']
+const PUBLICAS = ['/entrar', '/cadastro-barbearia', '/convite', '/_next', '/favicon', '/admin', '/recuperar-senha', '/nova-senha']
 const API_PUBLICAS = ['/api/auth', '/api/webhooks', '/api/cron', '/api/admin']
 
 export async function middleware(req: NextRequest) {

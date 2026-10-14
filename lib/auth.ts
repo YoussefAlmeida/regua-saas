@@ -91,7 +91,7 @@ export const getSessao = cache(async (): Promise<SessaoUsuario | null> => {
 /** Endereços do próprio sistema — nenhuma barbearia pode usar como link */
 export const SLUGS_RESERVADOS = new Set([
   'admin', 'api', 'painel', 'entrar', 'sair', 'cadastro', 'cadastro-barbearia', 'convite',
-  'recuperar-senha', 'planos', 'precos', 'termos', 'privacidade', 'ajuda', 'suporte', 'blog',
+  'recuperar-senha', 'nova-senha', 'planos', 'precos', 'termos', 'privacidade', 'ajuda', 'suporte', 'blog',
   'regua', 'app', 'www', 'login', 'conta', 'minha-conta', '_next', 'favicon', 'static',
 ])
 

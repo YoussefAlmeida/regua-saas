@@ -117,6 +117,12 @@ export default function EntrarPage() {
           </button>
         </form>
 
+        <p className="text-center mt-4">
+          <Link href={`/recuperar-senha${tipo === 'dono' ? '?t=dono' : ''}`} className="font-body text-xs text-fg-muted hover:text-amber">
+            Esqueci minha senha
+          </Link>
+        </p>
+
         {tipo === 'dono' && (
           <p className="text-center font-body text-sm text-fg-muted mt-6">
             Ainda não tem barbearia?{' '}
