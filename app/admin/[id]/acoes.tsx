@@ -30,7 +30,8 @@ export default function AcoesBarbearia({ barbearia: b }: Props) {
     if (!res) { setMsg({ t: 'Sem conexão.', erro: true }); return }
     if (res.status === 401) { router.replace('/admin/login'); return }
     if (!res.ok) { setMsg({ t: (await res.json().catch(() => ({}))).erro ?? 'Erro', erro: true }); return }
-    setMsg({ t: sucesso })
+    const json = await res.json().catch(() => ({}))
+    setMsg(json.aviso ? { t: `${sucesso} ${json.aviso}`, erro: true } : { t: sucesso })
     router.refresh()
   }
 

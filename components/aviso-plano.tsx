@@ -2,7 +2,21 @@ import Link from 'next/link'
 import type { SituacaoPlano } from '@/lib/planos'
 
 /* Faixa no topo do painel: teste acabando ou conta só leitura */
-export default function AvisoPlano({ plano, souDono }: { plano: SituacaoPlano; souDono: boolean }) {
+export default function AvisoPlano({ plano, souDono, excedente = 0 }: { plano: SituacaoPlano; souDono: boolean; excedente?: number }) {
+  if (excedente > 0 && souDono && !plano.somenteLeitura) {
+    return (
+      <div className="bg-saida/10 border-b border-saida/30 px-4 py-2.5">
+        <div className="max-w-lg mx-auto flex items-center gap-3">
+          <p className="flex-1 font-body text-xs text-fg">
+            Seu plano {plano.nome} vai até {plano.maxProfissionais} na agenda e você tem {excedente} a mais. Escolha quem fica.
+          </p>
+          <Link href="/painel/mais/ajustar-equipe" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+            Ajustar
+          </Link>
+        </div>
+      </div>
+    )
+  }
   if (plano.somenteLeitura) {
     return (
       <div className="bg-saida/10 border-b border-saida/30 px-4 py-2.5">

@@ -4,6 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { exigirVagaProfissional } from '@/lib/plano-servidor'
+import { tirarDaAgenda } from '@/lib/agenda-saida'
 import { exigirSenha } from '@/lib/reautenticar'
 import { falhaInterna } from '@/lib/erros'
 
@@ -114,21 +115,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   if (error) return falhaInterna('painel/equipe/id', error, 'Erro ao remover barbeiro')
 
-  await db.from('profissionais').update({ ativo: false }).eq('usuario_id', id)
-
   // Agendamentos futuros dele são cancelados; o histórico fica intacto.
   // Volta a lista pro dono avisar cada cliente pelo WhatsApp.
-  let cancelados: unknown[] = []
-  if (prof) {
-    const { data } = await db
-      .from('agendamentos')
-      .update({ status: 'cancelado', cancelado_por: 'dono', atualizado_em: new Date().toISOString() })
-      .eq('profissional_id', prof.id)
-      .in('status', ['agendado', 'confirmado'])
-      .gt('inicio', new Date().toISOString())
-      .select('id, inicio, cliente:usuarios!cliente_id(nome, whatsapp), servico:servicos!servico_id(nome)')
-    cancelados = data ?? []
-  }
+  const cancelados: unknown[] = prof ? await tirarDaAgenda(prof.id) : []
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,
