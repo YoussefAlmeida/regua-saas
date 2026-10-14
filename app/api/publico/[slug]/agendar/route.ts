@@ -7,6 +7,8 @@ import { SchemaAcesso, resolverCliente } from '@/lib/conta-cliente'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { situacaoPlano } from '@/lib/planos'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
+
+const MAX_HORARIOS_FUTUROS = 3
 import { registrarErro } from '@/lib/erros'
 
 const SchemaAgendar = z.object({
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, nome, status, plano, trial_fim, horario_funcionamento, dias_fechados')
+    .select('id, nome, status, plano, trial_fim, plano_ciclo_fim, horario_funcionamento, dias_fechados')
     .eq('slug', slug)
     .single()
 
@@ -69,6 +71,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .gt('fim', inicioDate.toISOString())
   if (duplicado) {
     return NextResponse.json({ erro: 'Você já tem um horário marcado nesse período. Confere em "Meus agendamentos".' }, { status: 409 })
+  }
+
+  // Limite de horários futuros por cliente (evita agenda travada por abuso)
+  const { count: futuros } = await db
+    .from('agendamentos')
+    .select('id', { count: 'exact', head: true })
+    .eq('cliente_id', cliente.id)
+    .eq('barbearia_id', barbearia.id)
+    .in('status', ['agendado', 'confirmado'])
+    .gt('inicio', new Date().toISOString())
+  if ((futuros ?? 0) >= MAX_HORARIOS_FUTUROS) {
+    return NextResponse.json({
+      erro: `Você já tem ${MAX_HORARIOS_FUTUROS} horários marcados aqui. Pra marcar mais, fala com a barbearia.`,
+    }, { status: 409 })
   }
 
   const { data: agendamento, error } = await db

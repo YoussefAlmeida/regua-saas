@@ -19,6 +19,7 @@ export default async function ClientesPage() {
     `)
     .eq('barbearia_id', barbearia_id)
     .eq('papel', 'cliente')
+    .eq('ativo', true)
     .order('criado_em', { ascending: false })
 
   return <ClientesClient clientesIniciais={clientes ?? []} />

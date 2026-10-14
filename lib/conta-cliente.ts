@@ -5,7 +5,8 @@ import { getSessao, hashSenha, verificarSenha, criarToken } from '@/lib/auth'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { registrarErro } from '@/lib/erros'
-import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
+import { VERSAO_TERMOS } from '@/lib/empresa'
+import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera, permitirUso } from '@/lib/limite-login'
 
 /* ================================================================
    Quem é o cliente que está agendando pelo link — Módulo 1
@@ -52,6 +53,12 @@ async function falhaBanco(onde: string, e: { code?: string; message?: string } |
   // 42703 = coluna não existe / 42P01 = tabela não existe → falta rodar atualização do banco
   const codigo = e?.code ? ` (código ${e.code})` : ''
   return falha(`Não deu pra criar sua conta agora${codigo}. Tenta de novo em instantes ou chama a barbearia.`, 500)
+}
+
+/** Aceite dos Termos/Privacidade ao criar a conta (separado: não quebra se a coluna ainda não existir) */
+async function registrarAceite(usuario_id: string) {
+  await criarClienteServico().from('usuarios')
+    .update({ termos_aceitos_em: new Date().toISOString(), termos_versao: VERSAO_TERMOS }).eq('id', usuario_id)
 }
 
 export async function resolverCliente(acesso: Acesso, barbearia_id: string, req: NextRequest): Promise<Resultado> {
@@ -101,7 +108,13 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
         .update({ senha_hash: await hashSenha(acesso.senha), senha_definida: true, nome: acesso.nome, atualizado_em: new Date().toISOString() })
         .eq('id', existente.id)
       if (error) return falhaBanco('definir senha', error, barbearia_id)
+      await registrarAceite(existente.id)
       return { ok: true, cliente: { id: existente.id, nome: acesso.nome, whatsapp, token: await tokenDe(existente.id) } }
+    }
+
+    // Contra cadastro em massa (e WhatsApp disparado pra números de terceiros)
+    if (!(await permitirUso(`uso:conta-nova:${ip}`, 5, 60 * 60 * 1000))) {
+      return falha('Muitas contas novas a partir desta conexão. Tenta de novo daqui a pouco.', 429)
     }
 
     const { data: novo, error } = await db
@@ -118,6 +131,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
       .select('id')
       .single()
     if (error || !novo) return falhaBanco('criar cliente', error, barbearia_id)
+    await registrarAceite(novo.id)
     return { ok: true, cliente: { id: novo.id, nome: acesso.nome, whatsapp, token: await tokenDe(novo.id) } }
   }
 

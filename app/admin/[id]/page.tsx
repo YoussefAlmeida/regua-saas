@@ -63,7 +63,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
     db.from('agendamentos').select('id', { count: 'exact', head: true }).eq('barbearia_id', id),
     db.from('despesas_fixas').select('id', { count: 'exact', head: true }).eq('barbearia_id', id),
     // Separado: sem a migração do ciclo, a pasta abre do mesmo jeito
-    db.from('barbearias').select('plano_ciclo_fim, plano_agendado, plano_agendado_em').eq('id', id).maybeSingle(),
+    db.from('barbearias').select('plano_ciclo_fim, plano_agendado, plano_agendado_em, indicada_por').eq('id', id).maybeSingle(),
   ])
   if (!b) notFound()
 
@@ -171,6 +171,11 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
               : <span className="text-saida"> · pagamento venceu em {data(ciclo.plano_ciclo_fim)}</span>
           )}
         </p>
+        {ciclo?.indicada_por && (
+          <p className="font-body text-sm text-fg-muted">
+            Chegou pela indicação de <Link href={`/${ciclo.indicada_por}`} className="text-amber hover:underline">/{ciclo.indicada_por}</Link>
+          </p>
+        )}
         {ciclo?.plano_agendado && (
           <p className="font-body text-sm text-amber">
             O dono pediu pra mudar pro {PLANOS_ADMIN[ciclo.plano_agendado as PlanoPago]?.nome ?? ciclo.plano_agendado} em {data(ciclo.plano_agendado_em)}.

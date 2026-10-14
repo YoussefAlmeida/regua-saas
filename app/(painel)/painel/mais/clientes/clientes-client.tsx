@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { Search, Users } from 'lucide-react'
+import { Search, Users, Trash2 } from 'lucide-react'
 import LinkNovaSenha from '@/components/link-nova-senha'
+import { avisar, erroDaResposta } from '@/components/aviso'
+import { pedirSenha } from '@/components/confirmar-senha'
 
 interface Agendamento { id: string; inicio: string; status: string }
 interface Cliente {
@@ -21,8 +23,26 @@ function ultimoCorte(ags: Agendamento[]): string | null {
 
 export default function ClientesClient({ clientesIniciais }: { clientesIniciais: Cliente[] }) {
   const [busca, setBusca] = useState('')
+  const [lista, setLista] = useState(clientesIniciais)
 
-  const filtrados = clientesIniciais.filter(c => {
+  // LGPD: cliente pediu pra apagar os dados
+  async function apagarDados(c: Cliente) {
+    const senha = await pedirSenha(
+      `Apagar dados de ${c.nome}`,
+      'Use quando o cliente pedir (LGPD). Some nome, WhatsApp e senha; os horários marcados são cancelados. Os valores já atendidos ficam no financeiro, sem identificar a pessoa.',
+    )
+    if (!senha) return
+    const res = await fetch(`/api/painel/clientes/${c.id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senha }),
+    }).catch(() => null)
+    if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
+    setLista(prev => prev.filter(x => x.id !== c.id))
+    avisar('Dados do cliente apagados.', 'sucesso')
+  }
+
+  const filtrados = lista.filter(c => {
     const q = busca.toLowerCase()
     return c.nome.toLowerCase().includes(q) || c.whatsapp?.includes(q)
   })
@@ -31,7 +51,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
     <div className="px-4 py-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Clientes</h1>
-        <span className="font-mono text-sm text-fg-muted">{clientesIniciais.length}</span>
+        <span className="font-mono text-sm text-fg-muted">{lista.length}</span>
       </div>
 
       {clientesIniciais.length > 0 && (
@@ -78,6 +98,10 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
                   </div>
                 </div>
                 <LinkNovaSenha endpoint="/api/painel/recuperacao" corpo={{ usuario_id: c.id }} nome={c.nome} compacto />
+                <button onClick={() => apagarDados(c)} title="Apagar dados (LGPD)" aria-label={`Apagar dados de ${c.nome}`}
+                  className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-saida hover:bg-saida/10 transition-colors shrink-0">
+                  <Trash2 size={14} />
+                </button>
                 <div className="text-right shrink-0">
                   <p className="font-mono text-sm text-amber">{totalCortes}</p>
                   <p className="font-body text-xs text-fg-muted">{totalCortes === 1 ? 'corte' : 'cortes'}</p>

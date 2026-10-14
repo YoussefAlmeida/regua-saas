@@ -6,6 +6,25 @@ import {
 import FaqLanding from './_components/faq-landing'
 import { formatBRL } from '@/lib/utils'
 import { LISTA_PLANOS } from '@/lib/planos'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: { absolute: 'RÉGUA — Agenda e caixa da barbearia, sem app pra baixar' },
+  description: 'Seu cliente marca pelo link, recebe lembrete no WhatsApp e você vê o caixa do dia no celular. Planos a partir de R$ 39,99. 14 dias grátis, sem cartão.',
+  alternates: { canonical: '/' },
+  openGraph: { title: 'RÉGUA — Sua barbearia na régua', url: '/' },
+}
+
+// Dados estruturados: o Google entende que é um app com preço
+const JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'RÉGUA',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  description: 'Agendamento online, lembrete no WhatsApp e fluxo de caixa para barbearias.',
+  offers: LISTA_PLANOS.map(p => ({ '@type': 'Offer', name: p.nome, price: p.preco.toFixed(2), priceCurrency: 'BRL' })),
+}
 
 // Planos vêm de lib/planos.ts (mesma tabela do painel e do admin)
 const PLANOS = LISTA_PLANOS.map(p => ({
@@ -63,9 +82,14 @@ const DORES = [
   },
 ]
 
-export default function LandingPage() {
+export default async function LandingPage({ searchParams }: { searchParams: Promise<{ ref?: string }> }) {
+  // Veio pelo "Agendamento por RÉGUA" de uma barbearia: a indicação vai junto pro cadastro
+  const { ref } = await searchParams
+  const cadastro = ref && /^[a-z0-9-]{1,60}$/.test(ref) ? `/cadastro-barbearia?ref=${ref}` : '/cadastro-barbearia'
+
   return (
     <div className="min-h-screen bg-bg text-fg">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, '\\u003c') }} />
 
       {/* ── Nav ─────────────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-bg/90 backdrop-blur border-b border-line px-4 py-3">
@@ -79,7 +103,7 @@ export default function LandingPage() {
               Entrar
             </Link>
             <Link
-              href="/cadastro-barbearia"
+              href={cadastro}
               className="bg-amber text-bg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button hover:opacity-90 transition-opacity"
             >
               Grátis 14 dias
@@ -108,7 +132,7 @@ export default function LandingPage() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/cadastro-barbearia"
+            href={cadastro}
             className="inline-flex items-center justify-center gap-2 bg-amber text-bg font-ui uppercase tracking-wider text-sm px-8 py-4 rounded-button hover:opacity-90 transition-opacity"
           >
             Começar grátis agora
@@ -272,7 +296,7 @@ export default function LandingPage() {
                 </ul>
 
                 <Link
-                  href="/cadastro-barbearia"
+                  href={cadastro}
                   className={`w-full text-center font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-opacity ${
                     plano.destaque
                       ? 'bg-amber text-bg hover:opacity-90'
@@ -334,7 +358,7 @@ export default function LandingPage() {
           Pare de perder cliente e dinheiro por falta de organização.
         </p>
         <Link
-          href="/cadastro-barbearia"
+          href={cadastro}
           className="inline-flex items-center gap-2 bg-amber text-bg font-ui uppercase tracking-wider text-sm px-10 py-4 rounded-button hover:opacity-90 transition-opacity"
         >
           Quero começar agora — é grátis
@@ -349,11 +373,11 @@ export default function LandingPage() {
       <footer className="border-t border-line px-4 py-8">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="font-display text-xl text-amber tracking-widest">RÉGUA</span>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
             <Link href="/entrar" className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
               Entrar
             </Link>
-            <Link href="/cadastro-barbearia" className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+            <Link href={cadastro} className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
               Cadastrar
             </Link>
             <a
@@ -364,6 +388,12 @@ export default function LandingPage() {
             >
               Suporte
             </a>
+            <Link href="/termos" className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+              Termos
+            </Link>
+            <Link href="/privacidade" className="font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+              Privacidade
+            </Link>
           </div>
           <p className="font-body text-xs text-fg-muted">© 2026 RÉGUA</p>
         </div>

@@ -3,13 +3,15 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
 import { cronAutorizado } from '@/lib/segredo'
-import { situacaoPlano } from '@/lib/planos'
+import { situacaoPlano, CARENCIA_DIAS } from '@/lib/planos'
 
 /* ================================================================
    Cron diário (06h na Bahia) — seções 6.1 Módulo 4 e 6.1.3
    1. Lança as despesas fixas que vencem hoje
    2. Trial vencido → modo somente leitura
    3. Lembrete de fim de trial 3 dias antes
+   4. Aviso de vencimento do plano pago (3 dias antes e 1 dia depois)
+   5. Limpeza de dados antigos (LGPD)
    ================================================================ */
 
 function hojeNaBahia(): { iso: string; dia: number; inicioMes: string } {
@@ -24,7 +26,7 @@ async function lancarDespesasFixas(db: ReturnType<typeof criarClienteServico>) {
 
   const { data: despesas, error } = await db
     .from('despesas_fixas')
-    .select('id, barbearia_id, descricao, valor, categoria_id, barbearia:barbearias!barbearia_id(status, plano, trial_fim)')
+    .select('id, barbearia_id, descricao, valor, categoria_id, barbearia:barbearias!barbearia_id(status, plano, trial_fim, plano_ciclo_fim)')
     .eq('ativa', true)
     .eq('dia_vencimento', hoje.dia)
 
@@ -101,6 +103,39 @@ async function avisarFimTrial(db: ReturnType<typeof criarClienteServico>) {
   return avisos
 }
 
+/* Plano pago: lembra 3 dias antes de vencer e no dia seguinte ao vencimento
+   (janela de 24h: roda uma vez por dia, então avisa uma vez só) */
+async function avisarVencimento(db: ReturnType<typeof criarClienteServico>) {
+  const agora = Date.now(), DIA = 86_400_000
+  const janela = (de: number) => ({ gte: new Date(agora + de * DIA).toISOString(), lt: new Date(agora + (de + 1) * DIA).toISOString() })
+  let avisos = 0
+  for (const [de, texto] of [
+    [2, (n: string) => `RÉGUA: o plano da ${n} vence em 3 dias. Pra não parar a agenda, é só pagar a próxima mensalidade. Qualquer dúvida, responde aqui.`],
+    [-2, (n: string) => `RÉGUA: o pagamento do plano da ${n} venceu ontem. Você tem ${CARENCIA_DIAS - 1} dias de carência antes da agenda ficar só leitura. Fala com a gente pra pagar.`],
+  ] as const) {
+    const j = janela(de)
+    const { data } = await db.from('barbearias').select('nome, telefone')
+      .eq('status', 'ativo').gte('plano_ciclo_fim', j.gte).lt('plano_ciclo_fim', j.lt)
+    for (const b of data ?? []) {
+      if (b.telefone && await enviarTexto(b.telefone, texto(b.nome))) avisos++
+    }
+  }
+  return avisos
+}
+
+/* LGPD — não guardar mais que o necessário (prazos na Política de Privacidade) */
+async function limparDadosAntigos(db: ReturnType<typeof criarClienteServico>) {
+  const dias = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString()
+  const r = await Promise.all([
+    db.from('tentativas_login').delete().lt('atualizado_em', dias(30)).select('chave'),
+    db.from('erros_sistema').delete().lt('criado_em', dias(365)).select('id'),
+    // Registro de ações fica (é o histórico do dono), mas o IP some depois de 6 meses
+    db.from('auditoria').update({ ip: null }).lt('criado_em', dias(180)).not('ip', 'is', null).select('id'),
+    db.from('admin_log').update({ ip: null }).lt('criado_em', dias(180)).not('ip', 'is', null).select('id'),
+  ])
+  return r.reduce((t, x) => t + (x.data?.length ?? 0), 0)
+}
+
 export async function GET(req: NextRequest) {
   if (!cronAutorizado(req)) {
     return new NextResponse('Unauthorized', { status: 401 })
@@ -111,11 +146,15 @@ export async function GET(req: NextRequest) {
   const despesas = await lancarDespesasFixas(db)
   const trials_vencidos = await vencerTrials(db)
   const avisos_trial = await avisarFimTrial(db)
+  const avisos_vencimento = await avisarVencimento(db)
+  const dados_limpos = await limparDadosAntigos(db)
 
   return NextResponse.json({
     ok: !despesas.erro,
     despesas_lancadas: despesas.lancadas,
     trials_vencidos,
     avisos_trial,
+    avisos_vencimento,
+    dados_limpos,
   })
 }

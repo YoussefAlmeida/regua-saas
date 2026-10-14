@@ -50,9 +50,9 @@ export default async function PlanoPage() {
           </>
         ) : plano.somenteLeitura ? (
           <>
-            <p className="font-display text-3xl uppercase text-saida">{plano.cancelada ? 'Cancelada' : 'Teste acabou'}</p>
+            <p className="font-display text-3xl uppercase text-saida">{plano.nome}</p>
             <p className="font-body text-sm text-fg">
-              Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam parados até escolher um plano.
+              Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam parados até {plano.nome === 'Pagamento atrasado' ? 'o pagamento ser confirmado' : 'escolher um plano'}.
             </p>
           </>
         ) : (

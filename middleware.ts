@@ -6,7 +6,9 @@ import { chaveSessao, OPCOES_SESSAO } from '@/lib/sessao-chave'
 const COOKIE_SESSION = 'regua-session'
 
 // /admin e /api/admin têm login próprio (lib/admin.ts)
-const PUBLICAS = ['/entrar', '/cadastro-barbearia', '/convite', '/_next', '/favicon', '/admin', '/recuperar-senha', '/nova-senha']
+const PUBLICAS = ['/entrar', '/cadastro-barbearia', '/convite', '/_next', '/favicon', '/admin', '/recuperar-senha', '/nova-senha',
+  // SEO e compartilhamento (Google, WhatsApp, Instagram não têm login)
+  '/sitemap.xml', '/robots.txt', '/opengraph-image', '/icon', '/apple-icon']
 // /api/publico: página de agendamento (cliente pode não ter conta ainda)
 const API_PUBLICAS = ['/api/auth', '/api/webhooks', '/api/cron', '/api/admin', '/api/publico']
 // Cabeçalhos que só o middleware pode definir (nunca confiar no que vem do navegador)
@@ -26,7 +28,7 @@ export async function middleware(req: NextRequest) {
 
   // Rotas públicas por slug da barbearia
   // e "Meus agendamentos" do cliente (a página checa a sessão sozinha)
-  if (/^\/[a-z0-9-]+(\/meus-agendamentos)?$/.test(pathname)) return seguir()
+  if (/^\/[a-z0-9-]+(\/meus-agendamentos|\/opengraph-image[\w-]*)?$/.test(pathname)) return seguir()
 
   const token = req.cookies.get(COOKIE_SESSION)?.value
   if (!token) return NextResponse.redirect(new URL('/entrar', req.url))

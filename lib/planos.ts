@@ -4,6 +4,7 @@
    Teste grátis (14 dias): tudo liberado, sem limite de profissionais.
    Acabou o teste sem plano: só leitura NA HORA (vê os dados, não
    agenda nem lança nada) até escolher um plano.
+   Plano pago vencido: 5 dias de carência, depois só leitura até pagar.
 
    "Profissional" = quem aparece na agenda. O dono só conta se ele
    também corta ("Sou eu que corto").
@@ -104,25 +105,43 @@ export interface SituacaoPlano {
   cancelada: boolean
   maxProfissionais: number | null
   recursos: Recursos
+  /** Plano pago: até quando está pago (null = sem data registrada) */
+  pagoAte: string | null
+  /** Plano pago: dias até vencer (negativo = vencido há N dias) */
+  diasParaVencer: number | null
+  /** Venceu e está na carência: ainda funciona, mas precisa pagar */
+  emCarencia: boolean
 }
 
+/** Dias de tolerância depois do vencimento antes de ficar só leitura */
+export const CARENCIA_DIAS = 5
+
 /** O que a barbearia pode fazer AGORA (vale o relógio, não espera o cron) */
-export function situacaoPlano(b: { plano: string; status: string; trial_fim: string | null }): SituacaoPlano {
+export function situacaoPlano(b: { plano: string; status: string; trial_fim: string | null; plano_ciclo_fim?: string | null }): SituacaoPlano {
   const fim = b.trial_fim ? new Date(b.trial_fim).getTime() : 0
   const diasTeste = Math.max(0, Math.ceil((fim - Date.now()) / 86_400_000))
   const pago = PLANOS[b.plano as PlanoPagoId]
+  const cicloFim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim).getTime() : null
+  const diasParaVencer = cicloFim === null ? null : Math.ceil((cicloFim - Date.now()) / 86_400_000)
+  const ciclo = { pagoAte: b.plano_ciclo_fim ?? null, diasParaVencer, emCarencia: false }
+  const semCiclo = { pagoAte: null, diasParaVencer: null, emCarencia: false }
 
   if (b.status === 'cancelado') {
-    return { plano: (pago?.id ?? 'trial'), nome: 'Cancelada', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: true, maxProfissionais: pago?.maxProfissionais ?? null, recursos: pago?.recursos ?? TUDO }
+    return { plano: (pago?.id ?? 'trial'), nome: 'Cancelada', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: true, maxProfissionais: pago?.maxProfissionais ?? null, recursos: pago?.recursos ?? TUDO, ...semCiclo }
   }
   if (b.status === 'ativo' && pago) {
-    return { plano: pago.id, nome: pago.nome, emTeste: false, diasTeste: 0, somenteLeitura: false, cancelada: false, maxProfissionais: pago.maxProfissionais, recursos: pago.recursos }
+    // Pagamento vencido: funciona na carência; passou dela, só leitura até pagar
+    const atraso = diasParaVencer !== null && cicloFim! <= Date.now()
+    if (atraso && Date.now() > cicloFim! + CARENCIA_DIAS * 86_400_000) {
+      return { plano: pago.id, nome: 'Pagamento atrasado', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: false, maxProfissionais: pago.maxProfissionais, recursos: pago.recursos, ...ciclo }
+    }
+    return { plano: pago.id, nome: pago.nome, emTeste: false, diasTeste: 0, somenteLeitura: false, cancelada: false, maxProfissionais: pago.maxProfissionais, recursos: pago.recursos, ...ciclo, emCarencia: atraso }
   }
   if (b.status === 'trial' && fim > Date.now()) {
-    return { plano: 'trial', nome: 'Teste grátis', emTeste: true, diasTeste, somenteLeitura: false, cancelada: false, maxProfissionais: null, recursos: TUDO }
+    return { plano: 'trial', nome: 'Teste grátis', emTeste: true, diasTeste, somenteLeitura: false, cancelada: false, maxProfissionais: null, recursos: TUDO, ...semCiclo }
   }
   // Teste vencido (mesmo antes do cron virar 'leitura') ou suspensa
-  return { plano: 'trial', nome: 'Teste acabou', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: false, maxProfissionais: pago?.maxProfissionais ?? null, recursos: pago?.recursos ?? TUDO }
+  return { plano: 'trial', nome: 'Teste acabou', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: false, maxProfissionais: pago?.maxProfissionais ?? null, recursos: pago?.recursos ?? TUDO, ...semCiclo }
 }
 
 /** Menor plano que comporta essa quantidade de profissionais */

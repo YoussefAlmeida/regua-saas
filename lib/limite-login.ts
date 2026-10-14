@@ -72,3 +72,23 @@ export function textoEspera(segundos: number): string {
   const min = Math.ceil(segundos / 60)
   return min === 1 ? '1 minuto' : `${min} minutos`
 }
+
+/**
+ * Limite de uso por janela (ex.: contas novas por IP). Usa a mesma tabela:
+ * falhas = quantas vezes na janela; bloqueado_ate = quando a janela acaba.
+ * Devolve false quando passou do limite.
+ */
+export async function permitirUso(chave: string, limite: number, janelaMs: number): Promise<boolean> {
+  const db = criarClienteServico()
+  const agora = Date.now()
+  const { data } = await db.from('tentativas_login').select('falhas, bloqueado_ate').eq('chave', chave).maybeSingle()
+  const dentro = data?.bloqueado_ate && new Date(data.bloqueado_ate).getTime() > agora
+  if (dentro && data!.falhas >= limite) return false
+  await db.from('tentativas_login').upsert({
+    chave,
+    falhas: dentro ? data!.falhas + 1 : 1,
+    bloqueado_ate: dentro ? data!.bloqueado_ate : new Date(agora + janelaMs).toISOString(),
+    atualizado_em: new Date(agora).toISOString(),
+  })
+  return true
+}

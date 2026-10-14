@@ -16,3 +16,10 @@ export async function urlDoSiteAtual(): Promise<string> {
   const proto = h.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https')
   return `${proto}://${host}`
 }
+
+/** Endereço do site sem depender da requisição (metadata, sitemap, imagens) */
+export function urlDoSiteFixa(): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) return limpa(process.env.NEXT_PUBLIC_SITE_URL)
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${limpa(process.env.VERCEL_PROJECT_PRODUCTION_URL)}`
+  return 'http://localhost:3000'
+}
