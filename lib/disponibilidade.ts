@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 
 /* ================================================================
    Disponibilidade de horário — uma regra só, usada em todo lugar
@@ -113,7 +114,10 @@ function expediente(barbearia: BarbeariaHorario, horarios: HorarioTrabalho[], da
   if ((barbearia.dias_fechados ?? []).includes(data)) return null
 
   const dia = diaDaSemana(data)
-  const hBarbearia = barbearia.horario_funcionamento?.[String(dia)]
+  // Barbearia que nunca salvou horário usa o padrão (o mesmo que aparece em Configurações)
+  const hf = barbearia.horario_funcionamento && Object.keys(barbearia.horario_funcionamento).length
+    ? barbearia.horario_funcionamento : HORARIO_PADRAO
+  const hBarbearia = hf[String(dia)]
   if (hBarbearia && hBarbearia.ativo === false) return null
 
   if (horarios.length > 0) {

@@ -107,6 +107,8 @@ const config: Config = {
         DEFAULT: "8px",
         md:   "8px",
         lg:   "12px",  // cards
+        button: "8px",   // rounded-button (usado no app todo)
+        card:   "12px",  // rounded-card
         xl:   "16px",
         full: "9999px",
       },

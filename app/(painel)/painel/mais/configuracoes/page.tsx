@@ -1,7 +1,6 @@
-import { headers, cookies } from 'next/headers'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { urlDoSiteAtual } from '@/lib/site-url'
 import ConfiguracoesClient from './configuracoes-client'
 
@@ -11,9 +10,7 @@ export default async function ConfiguracoesPage() {
   if (papel !== 'dono') redirect('/painel/mais')
 
   const barbearia_id = h.get('x-barbearia-id')!
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const { data: barbearia } = await db
     .from('barbearias')

@@ -2,21 +2,12 @@
 
 import { useState } from 'react'
 import { Check, X, CalendarOff } from 'lucide-react'
+import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 
 const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 type HorarioDia = { ativo: boolean; inicio?: string; fim?: string; intervalo_inicio?: string; intervalo_fim?: string }
 type Horarios = Record<string, HorarioDia>
-
-const HORARIO_PADRAO: Horarios = {
-  '0': { ativo: false },
-  '1': { ativo: true, inicio: '08:00', fim: '19:00' },
-  '2': { ativo: true, inicio: '08:00', fim: '19:00' },
-  '3': { ativo: true, inicio: '08:00', fim: '19:00' },
-  '4': { ativo: true, inicio: '08:00', fim: '19:00' },
-  '5': { ativo: true, inicio: '08:00', fim: '19:00' },
-  '6': { ativo: true, inicio: '08:00', fim: '17:00' },
-}
 
 interface Barbearia {
   id: string

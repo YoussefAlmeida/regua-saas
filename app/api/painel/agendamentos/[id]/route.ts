@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
-import { falhaInterna } from '@/lib/erros'
+import { falhaInterna, registrarErro } from '@/lib/erros'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
 
 const SchemaPatch = z.object({
@@ -97,7 +97,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!count || count === 0) {
       const dataLocal = new Date(data.inicio).toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
       const servicoNome = Array.isArray(data.servico) ? data.servico[0]?.nome : (data.servico as { nome: string } | null)?.nome
-      await db.from('movimentacoes').insert({
+      // Índice único no banco: clique duplo não lança duas vezes (23505 = já lançada)
+      const { error: errEntrada } = await db.from('movimentacoes').insert({
         barbearia_id: sessao.barbearia_id,
         tipo: 'entrada',
         descricao: `Serviço — ${servicoNome ?? 'Atendimento'}`,
@@ -108,7 +109,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         origem: 'automatica',
         criado_por: sessao.usuario_id,
       })
-      entrada = 'lancada'
+      if (!errEntrada) entrada = 'lancada'
+      else if (errEntrada.code !== '23505') await registrarErro('concluir: entrada automática', errEntrada, { barbearia_id: sessao.barbearia_id, usuario_id: sessao.usuario_id })
     }
   }
 

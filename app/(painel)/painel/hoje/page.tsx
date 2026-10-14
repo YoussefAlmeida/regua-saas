@@ -1,6 +1,5 @@
-import { headers, cookies } from 'next/headers'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import HojeClient from './hoje-client'
 
 export default async function HojePage() {
@@ -8,9 +7,7 @@ export default async function HojePage() {
   const barbearia_id = h.get('x-barbearia-id')!
   const souBarbeiro = h.get('x-papel') === 'barbeiro'
   const meuProfissionalId = h.get('x-profissional-id') ?? ''
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
   const [y, m, d] = hoje.split('-').map(Number)

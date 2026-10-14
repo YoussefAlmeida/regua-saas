@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import {
   CalendarCheck, BellRing, TrendingUp, Users, BarChart3, Scissors,
-  CheckCircle2, ArrowRight, Star, Zap, Shield,
+  CheckCircle2, ArrowRight, Zap, Shield,
 } from 'lucide-react'
 import FaqLanding from './_components/faq-landing'
 import { formatBRL } from '@/lib/utils'
@@ -158,7 +158,7 @@ export default function LandingPage() {
 
       {/* ── Como funciona ───────────────────────────────────── */}
       <section className="px-4 py-20 max-w-4xl mx-auto">
-        <p className="font-ui text-xs uppercase tracking-widest text-fg-muted text-center mb-3">Simple assim</p>
+        <p className="font-ui text-xs uppercase tracking-widest text-fg-muted text-center mb-3">Simples assim</p>
         <h2 className="font-display text-3xl md:text-4xl text-fg text-center uppercase mb-12">
           3 passos para<br /><span className="text-amber">dobrar sua organização</span>
         </h2>
@@ -203,15 +203,24 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Prova social ────────────────────────────────────── */}
-      <section className="px-4 py-16 max-w-4xl mx-auto text-center">
-        <div className="flex justify-center gap-1 mb-4">
-          {[...Array(5)].map((_, i) => <Star key={i} size={18} className="text-amber fill-amber" />)}
+      {/* ── Compromisso (sem depoimento inventado: entra quando houver clientes reais) ── */}
+      <section className="px-4 py-16 max-w-4xl mx-auto text-center space-y-6">
+        <p className="font-ui text-xs uppercase tracking-widest text-fg-muted">Feito na Bahia, pra barbearia de verdade</p>
+        <h2 className="font-display text-2xl md:text-3xl text-fg uppercase max-w-2xl mx-auto">
+          Sem fidelidade, sem letra miúda. <span className="text-amber">Seus dados são seus.</span>
+        </h2>
+        <div className="grid sm:grid-cols-3 gap-3 text-left">
+          {[
+            ['Cancela quando quiser', 'Sem multa e sem fidelidade. Seus dados ficam disponíveis por 30 dias.'],
+            ['Teste de 14 dias', 'Tudo liberado, sem cartão. Só paga se fizer sentido pra você.'],
+            ['Suporte de gente', 'Fala direto com quem faz o RÉGUA, pelo WhatsApp.'],
+          ].map(([t, d]) => (
+            <div key={t} className="bg-surface border border-line rounded-card p-4">
+              <p className="font-ui text-sm uppercase tracking-wider text-fg mb-1">{t}</p>
+              <p className="font-body text-xs text-fg-muted">{d}</p>
+            </div>
+          ))}
         </div>
-        <blockquote className="font-display text-2xl md:text-3xl text-fg max-w-2xl mx-auto mb-6 uppercase">
-          &ldquo;Reduzi faltas em 70% no primeiro mês só com o lembrete automático.&rdquo;
-        </blockquote>
-        <p className="font-body text-sm text-fg-muted">— Carlos, Barbearia Estilo · Feira de Santana, BA</p>
       </section>
 
       {/* ── Planos ──────────────────────────────────────────── */}
@@ -238,7 +247,7 @@ export default function LandingPage() {
                 {plano.destaque && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <span className="bg-amber text-bg font-ui text-xs uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
-                      Mais popular
+                      Recomendado
                     </span>
                   </div>
                 )}
@@ -322,7 +331,7 @@ export default function LandingPage() {
           <span className="text-amber">estar na régua.</span>
         </h2>
         <p className="font-body text-fg-muted mb-10">
-          Junte-se a barbearias que pararam de perder cliente e dinheiro por falta de organização.
+          Pare de perder cliente e dinheiro por falta de organização.
         </p>
         <Link
           href="/cadastro-barbearia"

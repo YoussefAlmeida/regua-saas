@@ -1,7 +1,8 @@
-import { headers, cookies } from 'next/headers'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { criarClienteAutenticado, criarClienteServico } from '@/lib/supabase/server'
-import { COOKIE_SESSION, getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
+import { getSessao } from '@/lib/auth'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 import BarbeirosClient from './barbeiros-client'
 
@@ -12,9 +13,7 @@ export default async function BarbeirosPage() {
   const sessao = await getSessao()
   if (!sessao) redirect('/entrar')
 
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const [{ data: barbeiros }, { data: eu }, { data: dono }, plano] = await Promise.all([
     db.from('usuarios')
