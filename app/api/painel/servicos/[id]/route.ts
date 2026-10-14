@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { podeExecutar } from '@/lib/permissoes'
+import { falhaInterna } from '@/lib/erros'
 
 const Schema = z.object({
   nome: z.string().min(1).max(80).optional(),
@@ -33,7 +34,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .select()
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao atualizar' }, { status: 500 })
+  if (error) return falhaInterna('painel/servicos/id', error, 'Erro ao atualizar')
   return NextResponse.json(data)
 }
 
@@ -69,6 +70,6 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     .eq('id', id)
     .eq('barbearia_id', sessao.barbearia_id)
 
-  if (error) return NextResponse.json({ erro: 'Erro ao deletar' }, { status: 500 })
+  if (error) return falhaInterna('painel/servicos/id', error, 'Erro ao deletar')
   return NextResponse.json({ ok: true })
 }

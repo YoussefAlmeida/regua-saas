@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoLembreteCliente, urlDoSite } from '@/lib/whatsapp'
+import { falhaInterna } from '@/lib/erros'
 
 /* Roda a cada 15 minutos. O plano Hobby da Vercel só permite cron diário,
    então quem chama esta rota é um agendador externo (ex.: cron-job.org)
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
     .gte('inicio', em1h45.toISOString())
     .lte('inicio', em2h.toISOString())
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar agendamentos' }, { status: 500 })
+  if (error) return falhaInterna('cron/lembrete-cliente', error, 'Erro ao buscar agendamentos')
   if (!agendamentos || agendamentos.length === 0) {
     return NextResponse.json({ ok: true, lembretes_enviados: 0 })
   }

@@ -4,6 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { exigirSenha } from '@/lib/reautenticar'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPatch = z.object({
   status: z.enum(['aprovado', 'pendente']).optional(),
@@ -41,7 +42,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .select('id, nome, status, ativo')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao atualizar' }, { status: 500 })
+  if (error) return falhaInterna('painel/equipe/id', error, 'Erro ao atualizar')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,
@@ -101,7 +102,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     .eq('barbearia_id', sessao.barbearia_id)
     .eq('papel', 'barbeiro')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao remover barbeiro' }, { status: 500 })
+  if (error) return falhaInterna('painel/equipe/id', error, 'Erro ao remover barbeiro')
 
   await db.from('profissionais').update({ ativo: false }).eq('usuario_id', id)
 

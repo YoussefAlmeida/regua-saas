@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 export async function GET() {
   const sessao = await getSessao()
@@ -14,6 +15,6 @@ export async function GET() {
     .eq('ativo', true)
     .order('nome')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar profissionais' }, { status: 500 })
+  if (error) return falhaInterna('painel/profissionais', error, 'Erro ao buscar profissionais')
   return NextResponse.json(data)
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 /* "Sou eu que corto" — o dono também aparece como barbeiro na agenda
    e na página de agendamento (seção 6.1.2, passo 2). */
@@ -27,6 +28,6 @@ export async function POST() {
     .select('id')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Não deu pra te colocar na agenda' }, { status: 500 })
+  if (error) return falhaInterna('painel/onboarding/eu-corto', error, 'Não deu pra te colocar na agenda')
   return NextResponse.json({ id: data.id }, { status: 201 })
 }

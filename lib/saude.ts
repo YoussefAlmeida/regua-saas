@@ -64,6 +64,11 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     })
   }
   itens.push({
+    nome: 'Registro de erros (pasta da barbearia)',
+    ok: await existeTabela('erros_sistema'), grave: false,
+    oQueFazer: migration('20261014010000_erros_sistema.sql'),
+  })
+  itens.push({
     nome: 'Histórico do painel admin',
     ok: await existeTabela('admin_log'), grave: false,
     oQueFazer: migration('20261013050000_admin_log.sql'),

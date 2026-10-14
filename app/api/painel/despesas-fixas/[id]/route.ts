@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPatch = z.object({
   descricao: z.string().min(1).max(200).optional(),
@@ -31,7 +32,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .select('id, descricao, valor, dia_vencimento, ativa')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao atualizar' }, { status: 500 })
+  if (error) return falhaInterna('painel/despesas-fixas/id', error, 'Erro ao atualizar')
   return NextResponse.json(data)
 }
 
@@ -56,7 +57,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   await db.from('movimentacoes').update({ recorrente_id: null }).eq('recorrente_id', id)
 
   const { error } = await db.from('despesas_fixas').delete().eq('id', id)
-  if (error) return NextResponse.json({ erro: 'Erro ao apagar' }, { status: 500 })
+  if (error) return falhaInterna('painel/despesas-fixas/id', error, 'Erro ao apagar')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

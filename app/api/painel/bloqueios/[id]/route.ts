@@ -3,6 +3,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
@@ -23,7 +24,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   const { error } = await db.from('bloqueios_agenda').delete().eq('id', id)
-  if (error) return NextResponse.json({ erro: 'Erro ao remover bloqueio' }, { status: 500 })
+  if (error) return falhaInterna('painel/bloqueios/id', error, 'Erro ao remover bloqueio')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

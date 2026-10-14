@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 export async function GET() {
   const sessao = await getSessao()
@@ -19,6 +20,6 @@ export async function GET() {
     .eq('papel', 'cliente')
     .order('criado_em', { ascending: false })
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar clientes' }, { status: 500 })
+  if (error) return falhaInterna('painel/clientes', error, 'Erro ao buscar clientes')
   return NextResponse.json(data)
 }

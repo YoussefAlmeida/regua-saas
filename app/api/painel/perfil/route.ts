@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 /* Perfil do próprio barbeiro: nome e especialidade (seção 6.1.1 —
    "editar o próprio nome/foto: liberar pro barbeiro") */
@@ -26,6 +27,6 @@ export async function PATCH(req: NextRequest) {
     db.from('profissionais').update({ nome, especialidade: especialidade || null }).eq('id', sessao.profissional_id),
     db.from('usuarios').update({ nome, atualizado_em: new Date().toISOString() }).eq('id', sessao.usuario_id),
   ])
-  if (e1 || e2) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })
+  if (e1 || e2) return falhaInterna('painel/perfil', e1 ?? e2, 'Erro ao salvar')
   return NextResponse.json({ ok: true })
 }

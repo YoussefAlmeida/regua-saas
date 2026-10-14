@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirSenha } from '@/lib/reautenticar'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { limitesDoMes } from '@/lib/periodo'
+import { falhaInterna } from '@/lib/erros'
 
 /* Exporta o extrato em CSV (abre direto no Excel/Planilhas em português:
    separador ";" e vírgula decimal). Relatório completo pede a senha. */
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
   if (parse.data.profissional_id) q = q.eq('profissional_id', parse.data.profissional_id)
 
   const { data, error } = await q
-  if (error) return NextResponse.json({ erro: 'Erro ao gerar o arquivo' }, { status: 500 })
+  if (error) return falhaInterna('painel/exportar', error, 'Erro ao gerar o arquivo')
 
   const linhas = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Barbeiro', 'Origem', 'Valor (R$)'].join(';')]
   let entradas = 0, saidas = 0
