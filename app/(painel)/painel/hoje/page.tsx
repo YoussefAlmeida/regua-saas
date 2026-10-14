@@ -63,10 +63,11 @@ export default async function HojePage() {
   const pendencias: { href: string; texto: string }[] = []
   if (souBarbeiro && meuProfissionalId) {
     const [{ data: prof }, { count: nHorarios }] = await Promise.all([
-      db.from('profissionais').select('foto_url, especialidade').eq('id', meuProfissionalId).maybeSingle(),
+      db.from('profissionais').select('foto_url, especialidade, ativo').eq('id', meuProfissionalId).maybeSingle(),
       db.from('horarios_trabalho').select('id', { count: 'exact', head: true }).eq('profissional_id', meuProfissionalId),
     ])
-    if (!prof?.foto_url || !prof?.especialidade) pendencias.push({ href: '/painel/mais/perfil', texto: 'Coloca sua foto e especialidade — o cliente escolhe por elas' })
+    if (prof && !prof.ativo) pendencias.push({ href: '/painel/hoje', texto: 'Você está fora da agenda: os clientes não veem seus horários. Fala com o dono da barbearia.' })
+    else if (!prof?.foto_url || !prof?.especialidade) pendencias.push({ href: '/painel/mais/perfil', texto: 'Coloca sua foto e especialidade — o cliente escolhe por elas' })
     if (!nHorarios) pendencias.push({ href: '/painel/mais/horarios', texto: 'Confere seus dias e horário de almoço' })
   }
   if (!souBarbeiro) {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { adminLogado, registrarAcaoAdmin, PLANOS_ADMIN } from '@/lib/admin'
+import { UM_MES } from '@/lib/mudanca-plano'
 
 const Schema = z.discriminatedUnion('acao', [
   z.object({ acao: z.literal('estender_teste'), dias: z.number().int().min(1).max(90) }),
@@ -16,7 +17,7 @@ const DIA = 86_400_000
 async function carregar(id: string) {
   const { data } = await criarClienteServico()
     .from('barbearias')
-    .select('id, nome, slug, plano, status, trial_fim')
+    .select('id, nome, slug, plano, status, trial_fim, plano_ciclo_fim')
     .eq('id', id)
     .maybeSingle()
   return data
@@ -42,9 +43,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       mudanca = { trial_fim: new Date(base + a.dias * DIA).toISOString(), status: 'trial', plano: 'trial' }
       break
     }
-    case 'ativar_plano':
-      mudanca = { status: 'ativo', plano: a.plano }
+    case 'ativar_plano': {
+      // Abre o mês pago se não há um correndo; a escolha do admin vale
+      // por cima de qualquer mudança que o dono tinha agendado
+      const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
+      mudanca = {
+        status: 'ativo', plano: a.plano,
+        plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
+        ...(!fim || fim.getTime() <= Date.now() ? { plano_ciclo_fim: UM_MES(new Date()).toISOString() } : {}),
+      }
       break
+    }
     case 'suspender':
       mudanca = { status: 'leitura' }
       break
@@ -69,7 +78,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .from('barbearias')
     .update({ ...mudanca, atualizado_em: new Date().toISOString() })
     .eq('id', id)
-    .select('id, nome, slug, plano, status, trial_fim')
+    .select('id, nome, slug, plano, status, trial_fim, plano_ciclo_fim')
     .single()
   if (error) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })
 
@@ -87,7 +96,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const { count } = await criarClienteServico().from('profissionais')
       .select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('ativo', true)
     if (max !== null && (count ?? 0) > max) {
-      aviso = `Atenção: ${b.nome} tem ${count} na agenda e o ${PLANOS_ADMIN[a.plano].nome} vai até ${max}. O dono vai ver o aviso pra escolher quem fica; até lá só os ${max} mais antigos aparecem pros clientes.`
+      aviso = `Atenção: ${b.nome} tem ${count} na agenda e o ${PLANOS_ADMIN[a.plano].nome} vai até ${max}. Quando o dono abrir o painel, ele precisa escolher quem fica antes de seguir.`
     }
   }
 

@@ -37,13 +37,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   if (!usuario) return NextResponse.json({ erro: 'Barbeiro não encontrado' }, { status: 404 })
 
-  // Aprovar ou reativar coloca mais alguém na agenda: respeita o limite do plano
+  // Aprovar ou reativar entra na equipe; na agenda só se couber no plano.
+  // Sem vaga ele fica na equipe, fora da agenda, até o dono trocar alguém.
+  let foraDaAgenda = false
   if (parse.data.status === 'aprovado' || parse.data.ativo === true) {
     const { data: prof } = await db.from('profissionais').select('ativo').eq('usuario_id', id).maybeSingle()
-    if (!prof?.ativo) {
-      const semVaga = await exigirVagaProfissional(sessao.barbearia_id)
-      if (semVaga) return semVaga
-    }
+    if (!prof?.ativo) foraDaAgenda = (await exigirVagaProfissional(sessao.barbearia_id)) !== null
   }
 
   const { data, error } = await db
@@ -76,13 +75,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         barbearia_id: sessao.barbearia_id,
         usuario_id: id,
         nome: data.nome,
+        ativo: !foraDaAgenda,
       })
-    } else {
+    } else if (!foraDaAgenda) {
       await db.from('profissionais').update({ ativo: true }).eq('usuario_id', id)
     }
   }
 
-  return NextResponse.json(data)
+  return NextResponse.json({ ...data, foraDaAgenda })
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

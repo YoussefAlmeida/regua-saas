@@ -43,6 +43,11 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
     case 'bloqueios_agenda:apagar': return { texto: 'liberou um horário bloqueado', alerta: false }
     case 'horarios_trabalho:editar': return { texto: 'mudou o horário de trabalho', alerta: false }
     case 'despesas_fixas:apagar': return { texto: `apagou a despesa fixa "${a.descricao}"`, alerta: true }
+    case 'profissionais:ativar_agenda': return { texto: `colocou ${d.quem ?? 'alguém'} na agenda`, alerta: false }
+    case 'profissionais:desativar_agenda': return { texto: `tirou ${d.quem ?? 'alguém'} da agenda${d.agendamentos_cancelados ? ` (${d.agendamentos_cancelados} horários cancelados)` : ''}`, alerta: !!d.agendamentos_cancelados }
+    case 'barbearias:agendar_plano': return { texto: `pediu mudança pro plano ${d.para ?? ''} a partir de ${d.em ? new Date(String(d.em)).toLocaleDateString('pt-BR') : ''}`, alerta: false }
+    case 'barbearias:cancelar_mudanca_plano': return { texto: 'cancelou a mudança de plano', alerta: false }
+    case 'barbearias:aplicar_mudanca_plano': return { texto: `plano mudou pra ${d.para ?? ''}${d.agendamentos_cancelados ? ` (${d.agendamentos_cancelados} horários cancelados)` : ''}`, alerta: !!d.agendamentos_cancelados }
     case 'usuarios:aprovar': return { texto: 'aprovou um barbeiro na equipe', alerta: false }
     case 'usuarios:link_nova_senha': return { texto: `gerou link de senha nova pra ${d.para ?? 'alguém'}`, alerta: false }
     case 'usuarios:nova_senha': return { texto: 'criou uma senha nova pelo link', alerta: false }

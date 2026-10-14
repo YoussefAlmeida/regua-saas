@@ -23,7 +23,7 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
   const { data, error } = await db.rpc('regua_saude')
   const semFuncao = !!error
   const info = (data ?? {}) as {
-    tabelas?: string[]; colunas_usuarios?: string[]; indices_usuarios?: string[]
+    tabelas?: string[]; colunas_usuarios?: string[]; colunas_barbearias?: string[]; indices_usuarios?: string[]
     gatilho_categorias?: boolean; bucket_fotos?: boolean
   }
 
@@ -67,6 +67,14 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     nome: 'Registro de erros (pasta da barbearia)',
     ok: await existeTabela('erros_sistema'), grave: false,
     oQueFazer: migration('20261014010000_erros_sistema.sql'),
+  })
+  itens.push({
+    nome: 'Mudança de plano no fim do mês',
+    ok: info.colunas_barbearias
+      ? info.colunas_barbearias.includes('plano_agendado')
+      : !(await db.from('barbearias').select('plano_agendado').limit(1)).error,
+    grave: true,
+    oQueFazer: migration('20261014020000_plano_ciclo.sql'),
   })
   itens.push({
     nome: 'Histórico do painel admin',
