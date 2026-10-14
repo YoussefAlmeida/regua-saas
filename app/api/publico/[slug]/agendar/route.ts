@@ -97,6 +97,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
       inicio: inicioDate.toISOString(),
       fim: fimDate.toISOString(),
       valor_servico: servico.preco,
+      status: 'agendado',
       criado_por: cliente.id,
     })
     .select('id, inicio, fim, status')
