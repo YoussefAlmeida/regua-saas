@@ -1,18 +1,38 @@
 import Link from 'next/link'
 import type { SituacaoPlano } from '@/lib/planos'
+import CancelarMudanca from '@/components/cancelar-mudanca'
 
-/* Faixa no topo do painel: teste acabando ou conta só leitura */
-export default function AvisoPlano({ plano, souDono, excedente = 0 }: { plano: SituacaoPlano; souDono: boolean; excedente?: number }) {
+/* Faixa no topo do painel: equipe acima do plano, mudança agendada,
+   teste acabando ou conta só leitura */
+export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = null }: {
+  plano: SituacaoPlano
+  souDono: boolean
+  excedente?: number
+  agendado?: { nome: string; em: string } | null
+}) {
   if (excedente > 0 && souDono && !plano.somenteLeitura) {
     return (
       <div className="bg-saida/10 border-b border-saida/30 px-4 py-2.5">
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <p className="flex-1 font-body text-xs text-fg">
-            Seu plano {plano.nome} vai até {plano.maxProfissionais} na agenda e você tem {excedente} a mais. Escolha quem fica.
+            Seu plano {plano.nome} vai até {plano.maxProfissionais} na agenda e tem {excedente} a mais. Escolha quem fica.
           </p>
           <Link href="/painel/mais/ajustar-equipe" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
             Ajustar
           </Link>
+        </div>
+      </div>
+    )
+  }
+  if (agendado && souDono && !plano.somenteLeitura) {
+    const quando = new Date(agendado.em).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit' })
+    return (
+      <div className="bg-amber/10 border-b border-amber/30 px-4 py-2.5">
+        <div className="max-w-lg mx-auto flex items-center gap-3">
+          <p className="flex-1 font-body text-xs text-fg">
+            Seu plano muda pro <Link href="/painel/mais/plano" className="underline">{agendado.nome}</Link> em {quando}.
+          </p>
+          <CancelarMudanca className="shrink-0 border border-amber/50 text-amber px-3 py-1.5 rounded-button" />
         </div>
       </div>
     )

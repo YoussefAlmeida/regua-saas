@@ -2,19 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Copy, Check, UserMinus, UserCheck, Clock, MessageCircle, BarChart3, RotateCcw, X } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Copy, Check, UserMinus, UserCheck, Clock, MessageCircle, BarChart3, RotateCcw } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { pedirSenha } from '@/components/confirmar-senha'
-import ContatoCliente from '@/components/contato-cliente'
 import LinkNovaSenha from '@/components/link-nova-senha'
-
-interface Cancelado {
-  id: string
-  inicio: string
-  cliente: { nome: string; whatsapp: string | null } | { nome: string; whatsapp: string | null }[] | null
-  servico: { nome: string } | { nome: string }[] | null
-}
-const um = <T,>(v: T | T[] | null): T | null => (Array.isArray(v) ? v[0] ?? null : v)
+import AvisarCancelados, { type Cancelado } from '@/components/avisar-cancelados'
+import ListaAgenda from '@/components/lista-agenda'
 
 interface Barbeiro {
   id: string
@@ -23,9 +17,15 @@ interface Barbeiro {
   status: 'pendente' | 'aprovado'
   ativo: boolean
   criado_em: string
+  profissionais?: { id: string; ativo: boolean }[] | null
 }
 
-export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosIniciais: Barbeiro[] }) {
+export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
+  barbeirosIniciais: Barbeiro[]
+  dono: { nome: string; naAgenda: boolean }
+  max: number | null
+}) {
+  const router = useRouter()
   const [barbeiros, setBarbeiros] = useState(barbeirosIniciais)
   const [linkConvite, setLinkConvite] = useState('')
   const [copiado, setCopiado] = useState(false)
@@ -60,8 +60,12 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
       body: JSON.stringify({ status: 'aprovado' }),
     })
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    const json = await res.json()
     setBarbeiros(prev => prev.map(b => b.id === id ? { ...b, status: 'aprovado', ativo: true } : b))
-    avisar('Aprovado. Ele já pode entrar e montar o horário dele.', 'sucesso')
+    avisar(json.foraDaAgenda
+      ? 'Aprovado, mas seu plano já está cheio: ele entrou na equipe fora da agenda. Troque alguém em "Na agenda" ou mude de plano.'
+      : 'Aprovado. Ele já pode entrar e montar o horário dele.', json.foraDaAgenda ? 'info' : 'sucesso')
+    router.refresh()
   }
 
   async function reativar(id: string) {
@@ -71,8 +75,10 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
       body: JSON.stringify({ status: 'aprovado', ativo: true }),
     })
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    const json = await res.json()
     setBarbeiros(prev => prev.map(b => b.id === id ? { ...b, status: 'aprovado', ativo: true } : b))
-    avisar('Barbeiro de volta na equipe.', 'sucesso')
+    avisar(json.foraDaAgenda ? 'De volta na equipe, fora da agenda: seu plano já está cheio.' : 'Barbeiro de volta na equipe.', 'sucesso')
+    router.refresh()
   }
 
   async function rejeitar(id: string) {
@@ -87,7 +93,7 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
   }
 
   async function remover(id: string, nome: string) {
-    const senha = await pedirSenha(`Remover ${nome}`, 'Ele perde o acesso na hora e os horários futuros dele são cancelados. O histórico fica guardado.')
+    const senha = await pedirSenha(`Remover ${nome} da equipe`, 'Ele perde o acesso na hora e os horários futuros dele são cancelados. O histórico fica guardado.')
     if (!senha) return
     const res = await fetch(`/api/painel/equipe/${id}`, {
       method: 'DELETE',
@@ -99,6 +105,7 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
     setBarbeiros(prev => prev.map(b => b.id === id ? { ...b, ativo: false } : b))
     if (json.cancelados?.length) setCancelados({ nome, lista: json.cancelados })
     else avisar(`${nome} saiu da equipe.`, 'sucesso')
+    router.refresh()
   }
 
   return (
@@ -142,6 +149,22 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
           <p className="font-body text-xs text-fg-muted">Ele cria a conta pelo link e aparece aqui pra você aprovar.</p>
         </div>
       )}
+
+      {/* Quem aparece na agenda (liga/desliga) */}
+      <section>
+        <ListaAgenda
+          key={ativos.map(b => b.id).join()}
+          max={max}
+          pessoas={[
+            { alvo: 'eu', nome: dono.nome, naAgenda: dono.naAgenda, souEu: true },
+            ...ativos.map(b => ({ alvo: b.id, nome: b.nome, naAgenda: !!b.profissionais?.[0]?.ativo, souEu: false })),
+          ]}
+        />
+        <p className="font-body text-xs text-fg-muted mt-2">
+          Desligado não aparece pros clientes, mas continua na equipe e com o histórico. Liga de novo quando quiser.
+          {max !== null && ` Seu plano vai até ${max} na agenda.`}
+        </p>
+      </section>
 
       {/* Pendentes */}
       {pendentes.length > 0 && (
@@ -190,7 +213,7 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
       {ativos.length > 0 && (
         <section>
           <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted mb-3">
-            Equipe ativa ({ativos.length})
+            Na equipe ({ativos.length})
           </h2>
           <div className="space-y-2">
             {ativos.map(b => (
@@ -203,7 +226,7 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
                   {b.whatsapp && <p className="font-body text-xs text-fg-muted">{b.whatsapp}</p>}
                 </div>
                 {(() => {
-                  const pid = (b as Barbeiro & { profissionais?: { id: string }[] }).profissionais?.[0]?.id
+                  const pid = b.profissionais?.[0]?.id
                   return pid ? (
                     <Link href={`/painel/mais/desempenho?p=${pid}`} className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-amber transition-colors shrink-0" title="Desempenho" aria-label={`Desempenho de ${b.nome}`}>
                       <BarChart3 size={14} />
@@ -214,8 +237,8 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
                 <button
                   onClick={() => remover(b.id, b.nome)}
                   className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-saida hover:bg-saida/10 transition-colors shrink-0"
-                  title="Remover"
-                  aria-label={`Remover ${b.nome}`}
+                  title="Remover da equipe"
+                  aria-label={`Remover ${b.nome} da equipe`}
                 >
                   <UserMinus size={14} />
                 </button>
@@ -249,33 +272,11 @@ export default function BarbeirosClient({ barbeirosIniciais }: { barbeirosInicia
 
       {/* Clientes que tinham horário com o barbeiro removido */}
       {cancelados && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setCancelados(null)} />
-          <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 max-h-[85dvh] overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">Avise os clientes</h2>
-              <button onClick={() => setCancelados(null)} className="text-fg-muted hover:text-fg" aria-label="Fechar"><X size={18} /></button>
-            </div>
-            <p className="font-body text-sm text-fg-muted">
-              {cancelados.nome} tinha {cancelados.lista.length} horário{cancelados.lista.length > 1 ? 's' : ''} pela frente. Foram cancelados — manda uma mensagem pra remarcar com outro barbeiro.
-            </p>
-            <ul className="divide-y divide-line">
-              {cancelados.lista.map(c => {
-                const cli = um(c.cliente), srv = um(c.servico)
-                const q = new Date(c.inicio).toLocaleString('pt-BR', { timeZone: 'America/Bahia', weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
-                return (
-                  <li key={c.id} className="py-3 space-y-2">
-                    <p className="font-body text-sm text-fg">{cli?.nome ?? 'Cliente'} <span className="text-fg-muted">· {srv?.nome} · {q}</span></p>
-                    <ContatoCliente
-                      whatsapp={cli?.whatsapp}
-                      mensagem={`Oi, ${cli?.nome?.split(' ')[0] ?? ''}! O ${cancelados.nome} não está mais com a gente. Seu horário de ${q} foi cancelado — quer remarcar com outro barbeiro?`}
-                    />
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        </div>
+        <AvisarCancelados
+          lista={cancelados.lista}
+          texto={`${cancelados.nome} tinha ${cancelados.lista.length} horário${cancelados.lista.length > 1 ? 's' : ''} pela frente. Foram cancelados — manda uma mensagem pra remarcar com outro barbeiro.`}
+          onFechar={() => setCancelados(null)}
+        />
       )}
 
       {barbeiros.length === 0 && !linkConvite && (

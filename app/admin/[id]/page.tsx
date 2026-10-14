@@ -50,7 +50,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
   const db = criarClienteServico()
   const trintaDias = new Date(Date.now() - 30 * DIA).toISOString()
 
-  const [{ data: b }, { data: equipe }, { count: nClientes }, { count: nServicos }, { data: ags }, { data: log }, { data: erros }, { count: nProfs }, { count: nHorariosProprios }, { count: nAgsTotal }, { count: nFixas }] = await Promise.all([
+  const [{ data: b }, { data: equipe }, { count: nClientes }, { count: nServicos }, { data: ags }, { data: log }, { data: erros }, { count: nProfs }, { count: nHorariosProprios }, { count: nAgsTotal }, { count: nFixas }, { data: ciclo }] = await Promise.all([
     db.from('barbearias').select('id, nome, slug, telefone, endereco, instagram, plano, status, trial_fim, criado_em, horario_funcionamento').eq('id', id).maybeSingle(),
     db.from('usuarios').select('nome, email, whatsapp, papel, status, ativo, ultimo_acesso').eq('barbearia_id', id).in('papel', ['dono', 'barbeiro']).order('papel'),
     db.from('usuarios').select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('papel', 'cliente'),
@@ -62,6 +62,8 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
     db.from('horarios_trabalho').select('id, profissional:profissionais!inner(barbearia_id)', { count: 'exact', head: true }).eq('profissional.barbearia_id', id),
     db.from('agendamentos').select('id', { count: 'exact', head: true }).eq('barbearia_id', id),
     db.from('despesas_fixas').select('id', { count: 'exact', head: true }).eq('barbearia_id', id),
+    // Separado: sem a migração do ciclo, a pasta abre do mesmo jeito
+    db.from('barbearias').select('plano_ciclo_fim, plano_agendado, plano_agendado_em').eq('id', id).maybeSingle(),
   ])
   if (!b) notFound()
 
@@ -163,7 +165,14 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           Cadastrada em {data(b.criado_em)}
           {b.status === 'trial' && <> · teste {diasTeste > 0 ? `acaba em ${diasTeste} dia${diasTeste > 1 ? 's' : ''} (${data(b.trial_fim)})` : `acabou em ${data(b.trial_fim)}`}</>}
           {b.status === 'ativo' && <> · {formatBRL(PLANOS_ADMIN[b.plano as PlanoPago]?.preco ?? 0)}/mês</>}
+          {b.status === 'ativo' && ciclo?.plano_ciclo_fim && <> · pago até {data(ciclo.plano_ciclo_fim)}</>}
         </p>
+        {ciclo?.plano_agendado && (
+          <p className="font-body text-sm text-amber">
+            O dono pediu pra mudar pro {PLANOS_ADMIN[ciclo.plano_agendado as PlanoPago]?.nome ?? ciclo.plano_agendado} em {data(ciclo.plano_agendado_em)}.
+            Cobre o valor novo a partir daí.
+          </p>
+        )}
 
         {/* Abas da pasta */}
         <nav className="flex gap-1 overflow-x-auto -mx-4 px-4 border-b border-line">

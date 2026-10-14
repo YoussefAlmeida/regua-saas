@@ -24,6 +24,10 @@ const PERGUNTAS = [
     q: 'Qual plano é o meu?',
     r: 'Depende de quantos profissionais aparecem na agenda: 1 é o Cadeira, até 3 é o Barbearia, mais de 3 é o Rede. Se você é o dono e também corta, você conta; se só administra, não.',
   },
+  {
+    q: 'E se eu quiser mudar de plano?',
+    r: 'Subir vale na hora. Descer vale no fim do mês que você já pagou: você escolhe quem continua na agenda e pode desistir até lá. Ninguém perde conta nem histórico.',
+  },
 ]
 
 export default function FaqLanding() {

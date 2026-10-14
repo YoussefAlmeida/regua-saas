@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronLeft, CheckCircle2, MessageCircle, Users, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, CheckCircle2, MessageCircle, Users, AlertTriangle, ArrowDown, CalendarClock } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { formatBRL } from '@/lib/utils'
-import { LISTA_PLANOS, planoParaProfissionais } from '@/lib/planos'
+import { LISTA_PLANOS, PLANOS, planoParaProfissionais, type PlanoPagoId } from '@/lib/planos'
+import CancelarMudanca from '@/components/cancelar-mudanca'
 import { planoDaBarbearia, contarProfissionais } from '@/lib/plano-servidor'
 
 const SUPORTE = process.env.SUPORTE_WHATSAPP ?? '75982727760'
@@ -18,11 +19,17 @@ export default async function PlanoPage() {
   const [plano, nProfs, { data: barbearia }] = await Promise.all([
     planoDaBarbearia(sessao.barbearia_id),
     contarProfissionais(sessao.barbearia_id),
-    criarClienteServico().from('barbearias').select('nome').eq('id', sessao.barbearia_id).single(),
+    criarClienteServico().from('barbearias')
+      .select('nome, status, plano_ciclo_fim, plano_agendado, plano_agendado_em')
+      .eq('id', sessao.barbearia_id).single(),
   ])
   const ideal = planoParaProfissionais(Math.max(1, nProfs))
   const acimaDoLimite = plano.maxProfissionais !== null && nProfs > plano.maxProfissionais
   const nome = barbearia?.nome ?? 'minha barbearia'
+  const pago = barbearia?.status === 'ativo' && !plano.somenteLeitura && !plano.emTeste
+  const ordemAtual = LISTA_PLANOS.findIndex(p => p.id === plano.plano)
+  const data = (iso: string | null | undefined) => iso ? new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit', year: 'numeric' }) : ''
+  const agendado = barbearia?.plano_agendado ? PLANOS[barbearia.plano_agendado as PlanoPagoId] : null
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
@@ -45,14 +52,27 @@ export default async function PlanoPage() {
           <>
             <p className="font-display text-3xl uppercase text-saida">{plano.cancelada ? 'Cancelada' : 'Teste acabou'}</p>
             <p className="font-body text-sm text-fg">
-              Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam pausados até escolher um plano.
+              Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam parados até escolher um plano.
             </p>
           </>
         ) : (
           <>
             <p className="font-display text-3xl uppercase text-entrada">{plano.nome}</p>
-            <p className="font-body text-sm text-fg-muted">{formatBRL(LISTA_PLANOS.find(p => p.id === plano.plano)?.preco ?? 0)} por mês</p>
+            <p className="font-body text-sm text-fg-muted">
+              {formatBRL(LISTA_PLANOS.find(p => p.id === plano.plano)?.preco ?? 0)} por mês
+              {barbearia?.plano_ciclo_fim && ` · pago até ${data(barbearia.plano_ciclo_fim)}`}
+            </p>
           </>
+        )}
+
+        {agendado && (
+          <div className="flex items-start gap-2 rounded-button bg-amber/10 border border-amber/30 px-3 py-2.5">
+            <CalendarClock size={14} className="text-amber shrink-0 mt-0.5" />
+            <p className="flex-1 font-body text-xs text-fg">
+              Muda pro <strong>{agendado.nome}</strong> em {data(barbearia?.plano_agendado_em)}. Até lá, tudo continua como está.
+            </p>
+            <CancelarMudanca className="text-amber hover:underline shrink-0" />
+          </div>
         )}
 
         <div className="flex items-center gap-2 pt-2 border-t border-line">
@@ -107,7 +127,18 @@ export default async function PlanoPage() {
                   </li>
                 ))}
               </ul>
-              {naoCabe ? (
+              {pago && LISTA_PLANOS.indexOf(p) < ordemAtual ? (
+                agendado?.id === p.id ? (
+                  <p className="font-body text-xs text-amber text-center">Mudança agendada pra {data(barbearia?.plano_agendado_em)}</p>
+                ) : (
+                  <Link
+                    href={`/painel/mais/plano/mudar?para=${p.id}`}
+                    className="w-full flex items-center justify-center gap-2 font-ui text-xs uppercase tracking-wider py-3 rounded-button border border-line text-fg hover:border-amber/50 transition-colors"
+                  >
+                    <ArrowDown size={14} /> Mudar pro {p.nome}
+                  </Link>
+                )
+              ) : naoCabe ? (
                 <p className="font-body text-xs text-fg-muted">Não comporta os {nProfs} profissionais que você tem hoje.</p>
               ) : !atual && (
                 <a
@@ -131,7 +162,8 @@ export default async function PlanoPage() {
           <li>Os 14 dias de teste têm tudo liberado, sem limite.</li>
           <li>Se o teste acabar sem plano, a conta fica só leitura na hora: nada se perde, mas pausa agenda e caixa.</li>
           <li>Pagou, voltou tudo no mesmo instante, com todos os seus dados.</li>
-          <li>Dá pra mudar de plano quando quiser.</li>
+          <li>Subir de plano vale na hora.</li>
+          <li>Descer de plano vale no fim do mês já pago: você escolhe quem fica na agenda e pode desistir até lá.</li>
         </ul>
       </section>
     </div>

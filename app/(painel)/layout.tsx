@@ -1,13 +1,15 @@
 import type { Metadata } from 'next'
 import { headers, cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
+import { criarClienteAutenticado, criarClienteServico } from '@/lib/supabase/server'
 import { COOKIE_SESSION, getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
 import AvisoPlano from '@/components/aviso-plano'
+import PlanoDono from '@/components/plano-dono'
 import { planoDaBarbearia, agendaDoPlano } from '@/lib/plano-servidor'
+import { PLANOS, type PlanoPagoId } from '@/lib/planos'
 
 export const metadata: Metadata = { robots: { index: false, follow: false } }
 
@@ -34,11 +36,20 @@ export default async function PainelLayout({ children }: { children: React.React
   // Cliente não tem painel — vai pros agendamentos dele
   if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
 
-  const [{ data: usuario }, plano, agenda] = await Promise.all([
+  const souDono = papel === 'dono'
+  const [{ data: usuario }, plano, agenda, { data: mudanca }] = await Promise.all([
     db.from('usuarios').select('nome').eq('id', usuarioId).single(),
     planoDaBarbearia(barbearia_id),
     agendaDoPlano(barbearia_id),
+    // Sem a migração do ciclo, só não mostra os avisos de mudança
+    souDono
+      ? criarClienteServico().from('barbearias')
+        .select('plano_agendado, plano_agendado_em, aviso_mudanca').eq('id', barbearia_id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ])
+  const agendado = mudanca?.plano_agendado && mudanca.plano_agendado_em
+    ? { nome: PLANOS[mudanca.plano_agendado as PlanoPagoId]?.nome ?? mudanca.plano_agendado, em: mudanca.plano_agendado_em }
+    : null
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
@@ -53,7 +64,7 @@ export default async function PainelLayout({ children }: { children: React.React
         </div>
       </header>
 
-      <AvisoPlano plano={plano} souDono={papel === 'dono'} excedente={agenda.excedente} />
+      <AvisoPlano plano={plano} souDono={souDono} excedente={agenda.excedente} agendado={agendado} />
 
       {/* Conteúdo */}
       <main className="flex-1 pb-20 overflow-y-auto">{children}</main>
@@ -62,6 +73,9 @@ export default async function PainelLayout({ children }: { children: React.React
       <NavInferior papel={papel} />
       <Avisos />
       <ConfirmarSenha />
+      {souDono && !plano.somenteLeitura && (
+        <PlanoDono aviso={mudanca?.aviso_mudanca ?? null} excedente={agenda.excedente} max={agenda.max} plano={plano.nome} />
+      )}
     </div>
   )
 }
