@@ -6,6 +6,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { limitesDoMes } from '@/lib/periodo'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
   tipo: z.enum(['entrada', 'saida']),
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
   }
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar movimentações' }, { status: 500 })
+  if (error) return falhaInterna('painel/movimentacoes', error, 'Erro ao buscar movimentações')
   return NextResponse.json(data)
 }
 
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     .select(CAMPOS_MOV)
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao criar movimentação' }, { status: 500 })
+  if (error) return falhaInterna('painel/movimentacoes', error, 'Erro ao criar movimentação')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

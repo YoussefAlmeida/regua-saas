@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, COOKIE_SESSION } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
+import { falhaInterna } from '@/lib/erros'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
 
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
   })
 
   if (error) {
-    return NextResponse.json({ erro: 'Erro ao criar conta' }, { status: 500 })
+    return falhaInterna('convite/aceitar', error, 'Erro ao criar conta', { barbearia_id, usuario_id: null })
   }
 
   // Não cria sessão — barbeiro precisa esperar aprovação

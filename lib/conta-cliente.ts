@@ -4,6 +4,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { getSessao, hashSenha, verificarSenha, criarToken } from '@/lib/auth'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
+import { registrarErro } from '@/lib/erros'
 import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
 
 /* ================================================================
@@ -43,11 +44,11 @@ const falha = (erro: string, status: number, extra: Record<string, unknown> = {}
   ({ ok: false, res: NextResponse.json({ erro, ...extra }, { status }) })
 
 /** Erro do banco: registra a causa real no log da Vercel e devolve uma mensagem útil */
-function falhaBanco(onde: string, e: { code?: string; message?: string } | null): Resultado {
-  console.error(`[conta-cliente] ${onde}:`, e?.code, e?.message)
+async function falhaBanco(onde: string, e: { code?: string; message?: string } | null, barbearia_id: string): Promise<Resultado> {
   if (e?.code === '23505') {
     return falha('Esse WhatsApp já tem conta aqui. Toca em "Já tenho conta" e entra com sua senha.', 409, { jaTemConta: true })
   }
+  await registrarErro(`conta do cliente: ${onde}`, e, { barbearia_id, usuario_id: null })
   // 42703 = coluna não existe / 42P01 = tabela não existe → falta rodar atualização do banco
   const codigo = e?.code ? ` (código ${e.code})` : ''
   return falha(`Não deu pra criar sua conta agora${codigo}. Tenta de novo em instantes ou chama a barbearia.`, 500)
@@ -79,7 +80,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
     .eq('whatsapp', whatsapp)
     .eq('barbearia_id', barbearia_id)   // cada barbearia tem seus clientes
     .maybeSingle()
-  if (erroBusca) return falhaBanco('buscar cliente', erroBusca)
+  if (erroBusca) return falhaBanco('buscar cliente', erroBusca, barbearia_id)
 
   const tokenDe = (id: string) => criarToken({ usuario_id: id, papel: 'cliente', barbearia_id })
 
@@ -99,7 +100,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
         .from('usuarios')
         .update({ senha_hash: await hashSenha(acesso.senha), senha_definida: true, nome: acesso.nome, atualizado_em: new Date().toISOString() })
         .eq('id', existente.id)
-      if (error) return falhaBanco('definir senha', error)
+      if (error) return falhaBanco('definir senha', error, barbearia_id)
       return { ok: true, cliente: { id: existente.id, nome: acesso.nome, whatsapp, token: await tokenDe(existente.id) } }
     }
 
@@ -116,7 +117,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
       })
       .select('id')
       .single()
-    if (error || !novo) return falhaBanco('criar cliente', error)
+    if (error || !novo) return falhaBanco('criar cliente', error, barbearia_id)
     return { ok: true, cliente: { id: novo.id, nome: acesso.nome, whatsapp, token: await tokenDe(novo.id) } }
   }
 

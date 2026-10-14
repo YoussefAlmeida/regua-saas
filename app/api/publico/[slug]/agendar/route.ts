@@ -6,6 +6,7 @@ import { horariosLivres, dataHoraLocal } from '@/lib/disponibilidade'
 import { SchemaAcesso, resolverCliente } from '@/lib/conta-cliente'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
+import { registrarErro } from '@/lib/erros'
 
 const SchemaAgendar = z.object({
   profissional_id: z.string().uuid(),
@@ -85,8 +86,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     .single()
 
   if (error || !agendamento) {
-    console.error('[agendar] criar agendamento:', error?.code, error?.message)
     const conflito = error?.code === '23P01' || error?.message.includes('sem_conflito')
+    if (!conflito) await registrarErro('agendar (link)', error, { barbearia_id: barbearia.id, usuario_id: cliente.id, detalhe: { profissional_id, servico_id, inicio } })
     return NextResponse.json(
       { erro: conflito ? 'Esse horário acabou de ser ocupado. Escolhe outro.' : 'Erro ao agendar. Tenta de novo.', horarioOcupado: conflito },
       { status: conflito ? 409 : 500 },

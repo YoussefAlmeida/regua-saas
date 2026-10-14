@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 const PALETA = ['#4FB477', '#E2564D', '#E8B04B', '#6BA3D6', '#A1A1A8']
 
@@ -15,7 +16,7 @@ export async function GET() {
     .eq('barbearia_id', sessao.barbearia_id)
     .order('padrao', { ascending: false })
     .order('nome')
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar categorias' }, { status: 500 })
+  if (error) return falhaInterna('painel/categorias', error, 'Erro ao buscar categorias')
   return NextResponse.json(data)
 }
 
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     if (error.code === '23505') return NextResponse.json({ erro: 'Essa categoria já existe' }, { status: 409 })
-    return NextResponse.json({ erro: 'Erro ao criar categoria' }, { status: 500 })
+    return falhaInterna('painel/categorias', error, 'Erro ao criar categoria')
   }
   return NextResponse.json(data, { status: 201 })
 }

@@ -4,6 +4,7 @@ import { getSessao, COOKIE_SESSION } from '@/lib/auth'
 import { criarClienteAutenticado, criarClienteServico } from '@/lib/supabase/server'
 import { cookies } from 'next/headers'
 import { podeExecutar } from '@/lib/permissoes'
+import { falhaInterna } from '@/lib/erros'
 
 const Schema = z.object({
   nome: z.string().min(1).max(80),
@@ -20,7 +21,7 @@ export async function GET() {
   const db = criarClienteAutenticado(token)
   const { data, error } = await db.from('servicos').select('*').order('nome')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar serviços' }, { status: 500 })
+  if (error) return falhaInterna('painel/servicos', error, 'Erro ao buscar serviços')
   return NextResponse.json(data)
 }
 
@@ -42,6 +43,6 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao criar serviço' }, { status: 500 })
+  if (error) return falhaInterna('painel/servicos', error, 'Erro ao criar serviço')
   return NextResponse.json(data, { status: 201 })
 }

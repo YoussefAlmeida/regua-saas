@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPatch = z.object({
   nome: z.string().min(1).max(100).optional(),
@@ -32,7 +33,7 @@ export async function GET() {
     .eq('id', sessao.barbearia_id)
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar dados' }, { status: 500 })
+  if (error) return falhaInterna('painel/barbearia', error, 'Erro ao buscar dados')
   return NextResponse.json(data)
 }
 
@@ -58,6 +59,6 @@ export async function PATCH(req: NextRequest) {
     .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, dias_fechados')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })
+  if (error) return falhaInterna('painel/barbearia', error, 'Erro ao salvar')
   return NextResponse.json(data)
 }

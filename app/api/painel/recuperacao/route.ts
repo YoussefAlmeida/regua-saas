@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { gerarTokenNovaSenha, textoLinkNovaSenha } from '@/lib/recuperacao'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { urlDoSiteAtual } from '@/lib/site-url'
+import { falhaInterna } from '@/lib/erros'
 
 /* Dono gera um link de nova senha pra cliente ou barbeiro da barbearia
    e manda pelo WhatsApp (wa.me — sem custo). Vale 24h e uma vez só. */
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!u.ativo) return NextResponse.json({ erro: 'Essa conta está desativada' }, { status: 400 })
 
   const token = await gerarTokenNovaSenha(u.id, VALIDADE_H)
-  if (!token) return NextResponse.json({ erro: 'Não deu pra gerar o link' }, { status: 500 })
+  if (!token) return falhaInterna('painel/recuperacao', 'sem resultado', 'Não deu pra gerar o link')
   const link = `${await urlDoSiteAtual()}/nova-senha/${token}`
 
   await registrarAuditoria({

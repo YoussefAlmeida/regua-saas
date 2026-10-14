@@ -5,6 +5,7 @@ import { hashSenha, criarToken, gravarCookieSessao } from '@/lib/auth'
 import { problemaNaSenha, SENHA_MIN, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { validarTokenNovaSenha } from '@/lib/recuperacao'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 const Schema = z.object({ token: z.string().min(10), senha: z.string().min(1).max(128) })
 
@@ -26,8 +27,7 @@ export async function POST(req: NextRequest) {
     .update({ senha_hash: await hashSenha(parse.data.senha), senha_definida: true, atualizado_em: new Date().toISOString() })
     .eq('id', u.id)
   if (error) {
-    console.error('[nova-senha]', error.code, error.message)
-    return NextResponse.json({ erro: 'Não deu pra salvar a senha. Tenta de novo.' }, { status: 500 })
+    return falhaInterna('nova-senha', error, 'Não deu pra salvar a senha. Tenta de novo.', { barbearia_id: u.barbearia_id, usuario_id: u.id })
   }
 
   // Libera quem estava travado por errar a senha

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { FOTO_MAX_BYTES, tipoRealDaImagem, EXTENSAO } from '@/lib/upload-imagem'
+import { falhaInterna } from '@/lib/erros'
 
 export async function POST(req: NextRequest) {
   const sessao = await getSessao()
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
   // Nome novo a cada envio: evita cache mostrando a foto antiga
   const caminho = `${sessao.barbearia_id}/barbeiros/${sessao.profissional_id}-${Date.now()}.${EXTENSAO[tipo]}`
   const { error: errUp } = await db.storage.from('fotos').upload(caminho, bytes, { contentType: tipo, upsert: false })
-  if (errUp) return NextResponse.json({ erro: 'Não deu pra enviar a foto' }, { status: 500 })
+  if (errUp) return falhaInterna('painel/perfil/foto', errUp, 'Não deu pra enviar a foto')
 
   const { data: pub } = db.storage.from('fotos').getPublicUrl(caminho)
 

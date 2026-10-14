@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { limitesDoDia } from '@/lib/disponibilidade'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
   profissional_id: z.string().uuid(),
@@ -31,7 +32,7 @@ export async function GET(req: NextRequest) {
       .lt('inicio', lt)
       .gt('fim', gte)
       .order('inicio')
-    if (error) return NextResponse.json({ erro: 'Erro ao buscar bloqueios' }, { status: 500 })
+    if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao buscar bloqueios')
     return NextResponse.json(data)
   }
 
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
     .order('inicio')
     .limit(100)
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar bloqueios' }, { status: 500 })
+  if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao buscar bloqueios')
   return NextResponse.json(data)
 }
 
@@ -102,7 +103,7 @@ export async function POST(req: NextRequest) {
     .select('id, inicio, fim, motivo')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao bloquear horário' }, { status: 500 })
+  if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao bloquear horário')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

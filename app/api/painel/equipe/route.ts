@@ -3,6 +3,7 @@ import { NextRequest } from 'next/server'
 import { SignJWT } from 'jose'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
 
@@ -20,7 +21,7 @@ export async function GET() {
     .eq('papel', 'barbeiro')
     .order('criado_em', { ascending: false })
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar equipe' }, { status: 500 })
+  if (error) return falhaInterna('painel/equipe', error, 'Erro ao buscar equipe')
   return NextResponse.json(data)
 }
 

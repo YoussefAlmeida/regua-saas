@@ -5,6 +5,7 @@ import { CAMPOS_MOV } from '@/lib/financeiro'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirSenha } from '@/lib/reautenticar'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 /* Mexer em dinheiro já lançado pede a senha de novo e fica no log (seção 10) */
 
@@ -54,7 +55,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .eq('id', id)
     .select(CAMPOS)
     .single()
-  if (error) return NextResponse.json({ erro: 'Erro ao salvar' }, { status: 500 })
+  if (error) return falhaInterna('painel/movimentacoes/id', error, 'Erro ao salvar')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,
@@ -89,7 +90,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   const { error } = await criarClienteServico().from('movimentacoes').delete().eq('id', id)
-  if (error) return NextResponse.json({ erro: 'Erro ao apagar' }, { status: 500 })
+  if (error) return falhaInterna('painel/movimentacoes/id', error, 'Erro ao apagar')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

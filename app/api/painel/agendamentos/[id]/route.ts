@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPatch = z.object({
   status: z.enum(['agendado', 'confirmado', 'concluido', 'cancelado', 'faltou']),
@@ -68,7 +69,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         { status: 409 },
       )
     }
-    return NextResponse.json({ erro: 'Erro ao atualizar' }, { status: 500 })
+    return falhaInterna('painel/agendamentos/status', error, 'Erro ao atualizar', { detalhe: { agendamento_id: id, status: parse.data.status } })
   }
 
   // Saiu de "concluído" (marcou por engano): a entrada automática some junto

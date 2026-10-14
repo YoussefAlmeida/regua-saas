@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
+import { registrarErro } from '@/lib/erros'
 
 /* ================================================================
    Cron diário (06h na Bahia) — seções 6.1 Módulo 4 e 6.1.3
@@ -61,7 +62,8 @@ async function lancarDespesasFixas(db: ReturnType<typeof criarClienteServico>) {
       recorrente_id: d.id,
       criado_por: dono.id,
     })
-    if (!errIns) lancadas++
+    if (errIns) await registrarErro('cron: despesa fixa', errIns, { barbearia_id: d.barbearia_id, usuario_id: null, detalhe: { despesa: d.descricao } })
+    else lancadas++
   }
 
   return { lancadas, erro: false }

@@ -24,11 +24,14 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const db = criarClienteServico()
   const trintaDias = new Date(Date.now() - 30 * DIA).toISOString()
 
-  const [{ data: barbearias }, { data: usuarios }, { data: ags }] = await Promise.all([
+  const seteDias = new Date(Date.now() - 7 * DIA).toISOString()
+  const [{ data: barbearias }, { data: usuarios }, { data: ags }, { data: errosAbertos }] = await Promise.all([
     db.from('barbearias').select('id, nome, slug, plano, status, trial_fim, criado_em').order('criado_em', { ascending: false }),
     db.from('usuarios').select('barbearia_id, papel, ultimo_acesso').in('papel', ['dono', 'barbeiro']),
     db.from('agendamentos').select('barbearia_id').gte('inicio', trintaDias).neq('status', 'cancelado'),
+    db.from('erros_sistema').select('barbearia_id').eq('resolvido', false).gte('criado_em', seteDias),
   ])
+  const nErros = (errosAbertos ?? []).length
 
   const lista = (barbearias ?? []).map(b => {
     const equipe = (usuarios ?? []).filter(u => u.barbearia_id === b.id)
@@ -37,6 +40,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       ...b,
       ultimoAcesso: ultimo as string | null,
       agendamentos30: (ags ?? []).filter(a => a.barbearia_id === b.id).length,
+      erros: (errosAbertos ?? []).filter(e => e.barbearia_id === b.id).length,
     }
   })
 
@@ -64,6 +68,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         </div>
 
         <SaudeSistema />
+
+        <Link href="/admin/erros" className={`flex items-center justify-between rounded-card border px-4 py-3 ${nErros ? 'border-saida/40 bg-saida/5' : 'border-line bg-surface'} hover:border-saida/60`}>
+          <span className="font-ui text-xs uppercase tracking-wider text-fg">Erros abertos (7 dias)</span>
+          <span className={`font-mono text-lg ${nErros ? 'text-saida' : 'text-fg-muted'}`}>{nErros}</span>
+        </Link>
 
         {/* Números do negócio */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -131,13 +140,18 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
               const parada = !b.ultimoAcesso || Date.now() - new Date(b.ultimoAcesso).getTime() > 7 * DIA
               return (
                 <li key={b.id}>
-                  <Link href={`/admin/${b.id}`} className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface-alt transition-colors">
+                  <Link href={`/admin/${b.id}${b.erros ? '?aba=erros' : ''}`} className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface-alt transition-colors">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{b.nome}</p>
                         <span className={`px-2 py-0.5 rounded-full border font-ui text-[10px] uppercase tracking-wider ${st.cor}`}>
                           {b.status === 'ativo' ? PLANOS_ADMIN[b.plano as PlanoPago]?.nome ?? st.rotulo : st.rotulo}
                         </span>
+                        {b.erros > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-saida text-bg font-ui text-[10px] uppercase tracking-wider">
+                            {b.erros} erro{b.erros > 1 ? 's' : ''}
+                          </span>
+                        )}
                       </div>
                       <p className="font-body text-xs text-fg-muted mt-0.5">
                         /{b.slug}

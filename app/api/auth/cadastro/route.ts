@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, criarToken, slugify, COOKIE_SESSION, SLUGS_RESERVADOS } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
+import { falhaInterna } from '@/lib/erros'
 
 const Schema = z.object({
   barbearia_nome: z.string().min(2).max(80),
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (errBarbearia || !barbearia) {
-    return NextResponse.json({ erro: 'Erro ao criar barbearia' }, { status: 500 })
+    return falhaInterna('cadastro/barbearia', errBarbearia, 'Erro ao criar barbearia', { barbearia_id: null, usuario_id: null, detalhe: { slug } })
   }
 
   // Cria usuário dono
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
   if (errUsuario || !usuario) {
     // Rollback barbearia
     await db.from('barbearias').delete().eq('id', barbearia.id)
-    return NextResponse.json({ erro: 'Erro ao criar usuário' }, { status: 500 })
+    return falhaInterna('cadastro/dono', errUsuario, 'Erro ao criar usuário', { barbearia_id: null, usuario_id: null, detalhe: { slug } })
   }
 
   const token = await criarToken({

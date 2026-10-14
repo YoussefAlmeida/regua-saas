@@ -4,6 +4,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { clientePodeCancelar } from '@/lib/cancelamento'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { enviarTexto } from '@/lib/whatsapp'
+import { falhaInterna } from '@/lib/erros'
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .from('agendamentos')
     .update({ status: 'cancelado', cancelado_por: 'cliente', atualizado_em: new Date().toISOString() })
     .eq('id', id)
-  if (error) return NextResponse.json({ erro: 'Erro ao cancelar' }, { status: 500 })
+  if (error) return falhaInterna('cliente/agendamentos/id/cancelar', error, 'Erro ao cancelar')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,

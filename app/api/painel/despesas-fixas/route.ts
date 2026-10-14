@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
   descricao: z.string().min(1).max(200),
@@ -24,7 +25,7 @@ export async function GET() {
     .eq('barbearia_id', sessao.barbearia_id)
     .order('dia_vencimento')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar despesas' }, { status: 500 })
+  if (error) return falhaInterna('painel/despesas-fixas', error, 'Erro ao buscar despesas')
   return NextResponse.json(data)
 }
 
@@ -48,6 +49,6 @@ export async function POST(req: NextRequest) {
     .select('id, descricao, valor, dia_vencimento, ativa, criado_em')
     .single()
 
-  if (error) return NextResponse.json({ erro: 'Erro ao criar despesa' }, { status: 500 })
+  if (error) return falhaInterna('painel/despesas-fixas', error, 'Erro ao criar despesa')
   return NextResponse.json(data, { status: 201 })
 }

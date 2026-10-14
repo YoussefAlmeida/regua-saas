@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { paraMin } from '@/lib/disponibilidade'
+import { falhaInterna } from '@/lib/erros'
 
 const hora = z.string().regex(/^\d{2}:\d{2}$/)
 
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
     .eq('profissional_id', profissional_id)
     .order('dia_semana')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar horários' }, { status: 500 })
+  if (error) return falhaInterna('painel/horarios', error, 'Erro ao buscar horários')
   return NextResponse.json(data)
 }
 
@@ -77,7 +78,7 @@ export async function PUT(req: NextRequest) {
     .eq('profissional_id', profissional_id)
 
   const { error: errDel } = await db.from('horarios_trabalho').delete().eq('profissional_id', profissional_id)
-  if (errDel) return NextResponse.json({ erro: 'Erro ao salvar horários' }, { status: 500 })
+  if (errDel) return falhaInterna('painel/horarios', errDel, 'Erro ao salvar horários')
 
   if (dias.length > 0) {
     const { error } = await db.from('horarios_trabalho').insert(
@@ -93,7 +94,7 @@ export async function PUT(req: NextRequest) {
     if (error) {
       // Tenta devolver o que tinha antes pra não deixar o barbeiro sem agenda
       if (antes?.length) await db.from('horarios_trabalho').insert(antes.map(a => ({ ...a, profissional_id })))
-      return NextResponse.json({ erro: 'Erro ao salvar horários' }, { status: 500 })
+      return falhaInterna('painel/horarios', error, 'Erro ao salvar horários')
     }
   }
 

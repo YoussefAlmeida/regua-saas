@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { falhaInterna } from '@/lib/erros'
 
 /** "Meus agendamentos" — só os do próprio cliente */
 export async function GET() {
@@ -19,6 +20,6 @@ export async function GET() {
     .order('inicio', { ascending: false })
     .limit(100)
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar agendamentos' }, { status: 500 })
+  if (error) return falhaInterna('cliente/agendamentos', error, 'Erro ao buscar agendamentos')
   return NextResponse.json(data)
 }

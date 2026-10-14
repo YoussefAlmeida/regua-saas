@@ -7,6 +7,7 @@ import { hashSenha } from '@/lib/auth'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
   profissional_id: z.string().uuid(),
@@ -46,7 +47,7 @@ export async function GET(req: NextRequest) {
     .lt('inicio', inicio_lt)
     .order('inicio')
 
-  if (error) return NextResponse.json({ erro: 'Erro ao buscar agendamentos' }, { status: 500 })
+  if (error) return falhaInterna('painel/agendamentos', error, 'Erro ao buscar agendamentos')
   return NextResponse.json(agendamentos)
 }
 
@@ -149,7 +150,7 @@ export async function POST(req: NextRequest) {
         .select('id')
         .single()
 
-      if (errCliente) return NextResponse.json({ erro: 'Erro ao criar cliente' }, { status: 500 })
+      if (errCliente) return falhaInterna('painel/agendamentos', errCliente, 'Erro ao criar cliente')
       cliente_id = novoCliente.id
     }
   }
