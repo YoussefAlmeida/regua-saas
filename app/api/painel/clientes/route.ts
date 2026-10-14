@@ -18,6 +18,7 @@ export async function GET() {
     `)
     .eq('barbearia_id', sessao.barbearia_id)
     .eq('papel', 'cliente')
+    .eq('ativo', true)
     .order('criado_em', { ascending: false })
 
   if (error) return falhaInterna('painel/clientes', error, 'Erro ao buscar clientes')

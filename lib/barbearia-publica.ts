@@ -6,7 +6,7 @@ export const carregarBarbeariaPublica = cache(async (slug: string) => {
   const db = criarClienteServico()
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, nome, slug, telefone, endereco, instagram, logo_url, status, plano, trial_fim')
+    .select('id, nome, slug, telefone, endereco, instagram, logo_url, status, plano, trial_fim, plano_ciclo_fim')
     .eq('slug', slug)
     .maybeSingle()
 

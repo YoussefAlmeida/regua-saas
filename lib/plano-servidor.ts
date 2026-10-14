@@ -6,7 +6,7 @@ import { situacaoPlano, PLANOS, planoParaProfissionais, type SituacaoPlano, type
 /** Situação do plano da barbearia (uma consulta por requisição) */
 export const planoDaBarbearia = cache(async (barbearia_id: string): Promise<SituacaoPlano> => {
   const { data } = await criarClienteServico()
-    .from('barbearias').select('plano, status, trial_fim').eq('id', barbearia_id).maybeSingle()
+    .from('barbearias').select('plano, status, trial_fim, plano_ciclo_fim').eq('id', barbearia_id).maybeSingle()
   return situacaoPlano(data ?? { plano: 'trial', status: 'leitura', trial_fim: null })
 })
 

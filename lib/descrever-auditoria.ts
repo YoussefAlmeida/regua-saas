@@ -48,6 +48,7 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
     case 'barbearias:agendar_plano': return { texto: `pediu mudança pro plano ${d.para ?? ''}${d.em ? ` a partir de ${new Date(String(d.em)).toLocaleDateString('pt-BR')}` : ' (vale quando pagar)'}`, alerta: false }
     case 'barbearias:cancelar_mudanca_plano': return { texto: 'cancelou o pedido de mudança de plano', alerta: false }
     case 'barbearias:aplicar_mudanca_plano': return { texto: `plano mudou pra ${d.para ?? ''}${Array.isArray(d.saiu) && d.saiu.length ? ` (${d.saiu.join(', ')} saiu da agenda)` : ''}`, alerta: false }
+    case 'usuarios:anonimizar': return { texto: d.pedido_por === 'cliente' ? 'um cliente apagou a própria conta (LGPD)' : `apagou os dados de um cliente a pedido dele (LGPD)${d.agendamentos_cancelados ? `, ${d.agendamentos_cancelados} horários cancelados` : ''}`, alerta: true }
     case 'usuarios:aprovar': return { texto: 'aprovou um barbeiro na equipe', alerta: false }
     case 'usuarios:link_nova_senha': return { texto: `gerou link de senha nova pra ${d.para ?? 'alguém'}`, alerta: false }
     case 'usuarios:nova_senha': return { texto: 'criou uma senha nova pelo link', alerta: false }

@@ -23,6 +23,7 @@ export default function CadastroBarbeariaPage() {
     dono_senha: '',
     dono_senha_confirm: '',
   })
+  const [aceite, setAceite] = useState(false)
 
   function update(campo: string, valor: string) {
     setForm(f => ({ ...f, [campo]: valor }))
@@ -45,6 +46,7 @@ export default function CadastroBarbeariaPage() {
     }
     const problema = problemaNaSenha(form.dono_senha, [form.dono_email.split('@')[0], form.barbearia_telefone])
     if (problema) { setErro(problema); return }
+    if (!aceite) { setErro('Aceite os Termos e a Política de Privacidade pra continuar'); return }
 
     setCarregando(true)
     try {
@@ -59,6 +61,8 @@ export default function CadastroBarbeariaPage() {
           dono_nome: form.dono_nome,
           dono_email: form.dono_email,
           dono_senha: form.dono_senha,
+          aceite: true,
+          ref: new URLSearchParams(window.location.search).get('ref') || undefined,
         }),
       })
 
@@ -219,6 +223,15 @@ export default function CadastroBarbeariaPage() {
                 className={inputCls}
               />
             </div>
+
+            <label className="flex items-start gap-3 cursor-pointer py-1">
+              <input type="checkbox" checked={aceite} onChange={e => { setAceite(e.target.checked); setErro('') }}
+                className="mt-0.5 w-5 h-5 accent-amber shrink-0" />
+              <span className="font-body text-xs text-fg-muted">
+                Li e aceito os <Link href="/termos" target="_blank" className="text-amber hover:underline">Termos de Uso</Link> e
+                a <Link href="/privacidade" target="_blank" className="text-amber hover:underline">Política de Privacidade</Link>.
+              </span>
+            </label>
 
             {erro && <p className="font-body text-sm text-saida">{erro}</p>}
 

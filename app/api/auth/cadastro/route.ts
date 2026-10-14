@@ -5,6 +5,7 @@ import { hashSenha, criarToken, slugify, COOKIE_SESSION, SLUGS_RESERVADOS } from
 import { problemaNaSenha } from '@/lib/senha'
 import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 import { falhaInterna } from '@/lib/erros'
+import { VERSAO_TERMOS } from '@/lib/empresa'
 
 const Schema = z.object({
   barbearia_nome: z.string().min(2).max(80),
@@ -14,13 +15,18 @@ const Schema = z.object({
   dono_nome: z.string().min(2).max(80),
   dono_email: z.string().email(),
   dono_senha: z.string().min(8).max(128),
+  // LGPD: precisa aceitar Termos e Privacidade
+  aceite: z.literal(true, { errorMap: () => ({ message: 'Aceite os Termos e a Política de Privacidade' }) }),
+  // Link de indicação (?ref=slug da barbearia que indicou)
+  ref: z.string().max(60).optional(),
 })
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null)
   const parse = Schema.safeParse(body)
   if (!parse.success) {
-    return NextResponse.json({ erro: 'Dados inválidos', detalhes: parse.error.flatten() }, { status: 400 })
+    const semAceite = parse.error.issues.some(i => i.path[0] === 'aceite')
+    return NextResponse.json({ erro: semAceite ? 'Aceite os Termos e a Política de Privacidade pra continuar' : 'Dados inválidos', detalhes: parse.error.flatten() }, { status: 400 })
   }
 
   const d = parse.data
@@ -84,6 +90,13 @@ export async function POST(req: NextRequest) {
     // Rollback barbearia
     await db.from('barbearias').delete().eq('id', barbearia.id)
     return falhaInterna('cadastro/dono', errUsuario, 'Erro ao criar usuário', { barbearia_id: null, usuario_id: null, detalhe: { slug } })
+  }
+
+  // Separado do cadastro: se a atualização do banco ainda não rodou, o cadastro não quebra
+  await db.from('usuarios').update({ termos_aceitos_em: new Date().toISOString(), termos_versao: VERSAO_TERMOS }).eq('id', usuario.id)
+  if (d.ref && d.ref !== slug) {
+    const { data: indicou } = await db.from('barbearias').select('slug').eq('slug', d.ref).maybeSingle()
+    if (indicou) await db.from('barbearias').update({ indicada_por: indicou.slug }).eq('id', barbearia.id)
   }
 
   const token = await criarToken({

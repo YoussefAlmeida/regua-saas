@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { SituacaoPlano } from '@/lib/planos'
+import { CARENCIA_DIAS, type SituacaoPlano } from '@/lib/planos'
 import CancelarMudanca from '@/components/cancelar-mudanca'
 
 /* Faixa no topo do painel: equipe acima do plano, pedido de mudança,
@@ -41,14 +41,35 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
       <div className="bg-saida/10 border-b border-saida/30 px-4 py-2.5">
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <p className="flex-1 font-body text-xs text-fg">
-            {plano.cancelada ? 'Conta cancelada.' : 'Seu teste grátis acabou.'} Dá pra ver tudo, mas não agendar nem lançar.
+            {plano.cancelada ? 'Conta cancelada.' : plano.nome === 'Pagamento atrasado' ? 'O pagamento do plano está atrasado.' : 'Seu teste grátis acabou.'} Dá pra ver tudo, mas não agendar nem lançar.
             {!souDono && ' Avisa o dono da barbearia.'}
           </p>
           {souDono && (
             <Link href="/painel/mais/plano" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
-              Escolher plano
+              {plano.nome === 'Pagamento atrasado' ? 'Pagar' : 'Escolher plano'}
             </Link>
           )}
+        </div>
+      </div>
+    )
+  }
+  // Plano pago vencendo ou vencido (na carência)
+  if (souDono && plano.diasParaVencer !== null && plano.diasParaVencer <= 3) {
+    const d = plano.diasParaVencer
+    const limite = plano.pagoAte
+      ? new Date(new Date(plano.pagoAte).getTime() + CARENCIA_DIAS * 86_400_000).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit' })
+      : ''
+    return (
+      <div className={`${plano.emCarencia ? 'bg-saida/10 border-saida/30' : 'bg-amber/10 border-amber/30'} border-b px-4 py-2.5`}>
+        <div className="max-w-lg mx-auto flex items-center gap-3">
+          <p className="flex-1 font-body text-xs text-fg">
+            {plano.emCarencia
+              ? `O pagamento do plano venceu. Pague até ${limite} pra agenda não parar.`
+              : d <= 0 ? 'Seu plano vence hoje.' : `Seu plano vence em ${d} dia${d > 1 ? 's' : ''}.`}
+          </p>
+          <Link href="/painel/mais/plano" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+            Pagar
+          </Link>
         </div>
       </div>
     )

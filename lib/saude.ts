@@ -77,6 +77,11 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     oQueFazer: migration('20261014020000_plano_ciclo.sql'),
   })
   itens.push({
+    nome: 'LGPD: aceite dos termos e indicação',
+    ok: await existeColuna('termos_aceitos_em'), grave: false,
+    oQueFazer: migration('20261015010000_lgpd_indicacao.sql'),
+  })
+  itens.push({
     nome: 'Banco trancado pra acesso direto (segurança)',
     ok: !!info.banco_trancado, grave: true,
     oQueFazer: migration('20261015000000_trancar_banco.sql'),

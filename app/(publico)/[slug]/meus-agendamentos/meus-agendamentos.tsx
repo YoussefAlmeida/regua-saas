@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Plus, MessageCircle, LogOut, CalendarX } from 'lucide-react'
+import { ChevronLeft, Plus, MessageCircle, LogOut, CalendarX, Download, Trash2 } from 'lucide-react'
 import { clientePodeCancelar } from '@/lib/cancelamento'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
@@ -60,6 +60,29 @@ export default function MeusAgendamentos({
   const [senha, setSenha] = useState('')
   const [entrando, setEntrando] = useState(false)
   const [erroLogin, setErroLogin] = useState('')
+
+  // LGPD: apagar a própria conta
+  const [apagando, setApagando] = useState(false)
+  const [senhaApagar, setSenhaApagar] = useState('')
+  const [erroApagar, setErroApagar] = useState('')
+  const [ocupadoApagar, setOcupadoApagar] = useState(false)
+
+  async function apagarConta(e: React.FormEvent) {
+    e.preventDefault()
+    setErroApagar('')
+    setOcupadoApagar(true)
+    const res = await fetch('/api/cliente/meus-dados', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ senha: senhaApagar }),
+    }).catch(() => null)
+    setOcupadoApagar(false)
+    if (!res) { setErroApagar('Sem conexão. Tenta de novo.'); return }
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) { setErroApagar(json.erro ?? 'Não deu pra apagar'); return }
+    alert('Pronto: sua conta e seus dados foram apagados.')
+    router.push(`/${barbearia.slug}`)
+  }
 
   const agora = Date.now()
   const proximos = ags
@@ -236,6 +259,47 @@ export default function MeusAgendamentos({
                 <MessageCircle size={13} /> Falar com a barbearia
               </a>
             )}
+
+            {/* Seus dados (LGPD) */}
+            <section className="border-t border-line pt-6 space-y-3">
+              <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Seus dados</h2>
+              <p className="font-body text-xs text-fg-muted">
+                Veja como cuidamos deles na <Link href="/privacidade" className="text-amber hover:underline">Política de Privacidade</Link>.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <a href="/api/cliente/meus-dados" download
+                  className="flex items-center gap-1.5 border border-line text-fg font-ui text-[11px] uppercase tracking-wider px-3 py-2.5 rounded-button hover:border-amber/50">
+                  <Download size={13} /> Baixar meus dados
+                </a>
+                {!apagando && (
+                  <button onClick={() => setApagando(true)}
+                    className="flex items-center gap-1.5 border border-line text-saida font-ui text-[11px] uppercase tracking-wider px-3 py-2.5 rounded-button hover:border-saida/50">
+                    <Trash2 size={13} /> Apagar minha conta
+                  </button>
+                )}
+              </div>
+              {apagando && (
+                <form onSubmit={apagarConta} className="bg-saida/5 border border-saida/30 rounded-card p-4 space-y-3">
+                  <p className="font-body text-sm text-fg">
+                    Isso apaga seu nome, WhatsApp e senha, e cancela os horários marcados. <strong>Não dá pra desfazer.</strong>
+                  </p>
+                  <div>
+                    <label className={labelCls} htmlFor="senha-apagar">Sua senha</label>
+                    <input id="senha-apagar" type="password" autoComplete="current-password" value={senhaApagar}
+                      onChange={e => setSenhaApagar(e.target.value)} required className={inputCls} />
+                  </div>
+                  {erroApagar && <p className="font-body text-sm text-saida" role="alert">{erroApagar}</p>}
+                  <div className="flex gap-2">
+                    <button type="button" onClick={() => { setApagando(false); setSenhaApagar(''); setErroApagar('') }}
+                      className="flex-1 border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button">Voltar</button>
+                    <button type="submit" disabled={ocupadoApagar}
+                      className="flex-1 bg-saida text-bg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-50">
+                      {ocupadoApagar ? 'Apagando…' : 'Apagar de vez'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </section>
           </>
         )}
       </main>

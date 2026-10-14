@@ -450,7 +450,11 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                       >
                         {enviando ? 'Confirmando…' : 'Confirmar horário'}
                       </button>
-                      <p className="font-body text-xs text-fg-muted text-center">Não precisa baixar nenhum app.</p>
+                      <p className="font-body text-[11px] text-fg-muted text-center leading-relaxed">
+                        Ao confirmar, você aceita os <Link href="/termos" target="_blank" className="underline hover:text-fg">Termos</Link> e
+                        a <Link href="/privacidade" target="_blank" className="underline hover:text-fg">Privacidade</Link>, e recebe a confirmação
+                        e o lembrete deste horário no WhatsApp. Não precisa baixar nenhum app.
+                      </p>
                     </form>
                   </>
                 )}
@@ -498,6 +502,16 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             <MessageCircle size={13} /> Dúvida? Fala com a barbearia
           </a>
         )}
+
+        {/* Feito com RÉGUA — cada agendamento apresenta o sistema pra outros donos */}
+        <footer className="mt-12 pt-6 border-t border-line text-center space-y-1.5">
+          <Link href={`/?ref=${barbearia.slug}`} className="inline-block font-body text-xs text-fg-muted hover:text-fg py-2">
+            Agendamento por <span className="font-display tracking-widest text-amber">RÉGUA</span> · Tem barbearia? <span className="underline">Teste grátis</span>
+          </Link>
+          <p className="font-body text-[11px] text-fg-muted">
+            <Link href="/termos" className="hover:text-fg">Termos</Link> · <Link href="/privacidade" className="hover:text-fg">Privacidade</Link>
+          </p>
+        </footer>
       </main>
     </div>
   )

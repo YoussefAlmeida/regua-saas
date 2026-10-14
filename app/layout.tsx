@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Anton, Oswald, Open_Sans, Space_Mono } from "next/font/google"
 import "./globals.css"
+import { urlDoSiteFixa } from "@/lib/site-url"
 
 const anton = Anton({
   weight: "400",
@@ -33,7 +34,11 @@ export const metadata: Metadata = {
     template: "%s — RÉGUA",
     default: "RÉGUA — Sua barbearia na régua.",
   },
-  description: "Sistema de agendamento e fluxo de caixa para barbearias do interior da Bahia. Sem app pra baixar. Sem planilha.",
+  description: "Agenda online, lembrete no WhatsApp e caixa da barbearia no celular. Seu cliente marca pelo link, sem baixar app. 14 dias grátis.",
+  metadataBase: new URL(urlDoSiteFixa()),
+  applicationName: "RÉGUA",
+  openGraph: { type: "website", locale: "pt_BR", siteName: "RÉGUA" },
+  twitter: { card: "summary_large_image" },
   // Landing e páginas de agendamento podem aparecer no Google; painel e admin ficam fora
 }
 

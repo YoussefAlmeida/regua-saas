@@ -25,6 +25,14 @@ const PERGUNTAS = [
     r: 'Depende de quantos profissionais aparecem na agenda: 1 é o Cadeira, até 3 é o Barbearia, mais de 3 é o Rede. Se você é o dono e também corta, você conta; se só administra, não.',
   },
   {
+    q: 'Meus dados e os dos meus clientes estão seguros?',
+    r: 'Sim. Servidores no Brasil, conexão criptografada, senhas embaralhadas e cada barbearia só enxerga o que é dela. Seguimos a LGPD: o cliente pode baixar ou apagar os próprios dados quando quiser.',
+  },
+  {
+    q: 'Como eu pago?',
+    r: 'Por Pix, todo mês, adiantado. Sem cartão de crédito e sem fidelidade. Se atrasar, você tem 5 dias de carência antes da agenda pausar.',
+  },
+  {
     q: 'E se eu quiser mudar de plano?',
     r: 'O plano muda quando o pagamento é confirmado. Subir: paga o valor cheio do plano novo e vale na hora. Descer: você escolhe quem continua na agenda e, ao pagar o plano menor, a troca acontece. Ninguém perde horário já marcado, conta ou histórico.',
   },
@@ -39,6 +47,7 @@ export default function FaqLanding() {
         <div key={i} className="bg-surface border border-line rounded-card overflow-hidden">
           <button
             onClick={() => setAberto(aberto === i ? null : i)}
+            aria-expanded={aberto === i}
             className="w-full flex items-center justify-between px-5 py-4 text-left gap-4"
           >
             <span className="font-ui text-sm uppercase tracking-wider text-fg">{item.q}</span>
