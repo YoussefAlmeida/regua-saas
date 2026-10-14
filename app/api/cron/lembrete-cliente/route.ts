@@ -2,21 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoLembreteCliente, urlDoSite } from '@/lib/whatsapp'
 import { falhaInterna } from '@/lib/erros'
+import { cronAutorizado } from '@/lib/segredo'
 
 /* Roda a cada 15 minutos. O plano Hobby da Vercel só permite cron diário,
    então quem chama esta rota é um agendador externo (ex.: cron-job.org)
    com o header  Authorization: Bearer <CRON_SECRET>. */
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!cronAutorizado(req)) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 
   const db = criarClienteServico()
 
   const agora = new Date()
+  // Janela de 30 min pra tolerar atraso do agendador; a marca
+  // lembrete_cliente_enviado garante um lembrete só por horário
   const em1h45 = new Date(agora.getTime() + 105 * 60 * 1000) // +1h45m
-  const em2h   = new Date(agora.getTime() + 120 * 60 * 1000) // +2h
+  const em2h   = new Date(agora.getTime() + 135 * 60 * 1000) // +2h15m
 
   const { data: agendamentos, error } = await db
     .from('agendamentos')
@@ -27,7 +29,7 @@ export async function GET(req: NextRequest) {
       profissional:profissionais!profissional_id(nome),
       servico:servicos!servico_id(nome)
     `)
-    .in('status', ['confirmado'])
+    .in('status', ['agendado', 'confirmado'])
     .eq('lembrete_cliente_enviado', false)
     .gte('inicio', em1h45.toISOString())
     .lte('inicio', em2h.toISOString())

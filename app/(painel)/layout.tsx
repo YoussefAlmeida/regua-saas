@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
-import { headers, cookies } from 'next/headers'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { criarClienteAutenticado, criarClienteServico } from '@/lib/supabase/server'
-import { COOKIE_SESSION, getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
+import { getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
@@ -23,9 +24,7 @@ export default async function PainelLayout({ children }: { children: React.React
   const barbearia_id = h.get('x-barbearia-id')!
   const papel = h.get('x-papel') as 'dono' | 'barbeiro' | 'cliente'
 
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const { data: barbearia } = await db
     .from('barbearias')

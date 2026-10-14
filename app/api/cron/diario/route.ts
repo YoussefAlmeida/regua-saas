@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
+import { cronAutorizado } from '@/lib/segredo'
 import { situacaoPlano } from '@/lib/planos'
 
 /* ================================================================
@@ -101,7 +102,7 @@ async function avisarFimTrial(db: ReturnType<typeof criarClienteServico>) {
 }
 
 export async function GET(req: NextRequest) {
-  if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!cronAutorizado(req)) {
     return new NextResponse('Unauthorized', { status: 401 })
   }
 

@@ -4,8 +4,7 @@ import { cookies } from 'next/headers'
 import { cache } from 'react'
 import { criarClienteServico } from '@/lib/supabase/server'
 import type { NextResponse } from 'next/server'
-
-const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+import { chaveSessao, OPCOES_SESSAO } from '@/lib/sessao-chave'
 export const COOKIE_SESSION = 'regua-session'
 
 export interface SessaoUsuario {
@@ -36,9 +35,11 @@ export async function criarToken(sessao: SessaoUsuario): Promise<string> {
   })
     .setProtectedHeader({ alg: 'HS256' })
     .setSubject(sessao.usuario_id)
+    .setIssuer(OPCOES_SESSAO.issuer)
+    .setAudience(OPCOES_SESSAO.audience)
     .setIssuedAt()
     .setExpirationTime('30d')
-    .sign(getSecret())
+    .sign(chaveSessao())
 }
 
 /** Grava o cookie de sessão na resposta (30 dias, httpOnly) */
@@ -54,7 +55,7 @@ export function gravarCookieSessao(res: NextResponse, token: string): void {
 
 export async function verificarToken(token: string): Promise<SessaoUsuario | null> {
   try {
-    const { payload } = await jwtVerify(token, getSecret())
+    const { payload } = await jwtVerify(token, chaveSessao(), OPCOES_SESSAO)
     return {
       usuario_id: payload.sub!,
       papel: payload.papel as SessaoUsuario['papel'],

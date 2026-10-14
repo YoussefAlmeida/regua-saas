@@ -26,6 +26,31 @@ export const UM_MES = (de: Date) => {
   return d
 }
 
+export interface BarbeariaPagamento {
+  id: string
+  plano: string
+  status: string
+  plano_ciclo_fim: string | null
+  plano_agendado: string | null
+}
+
+/**
+ * Pagamento confirmado (admin ou Asaas) — o que muda na barbearia.
+ * Mesmo plano em dia: soma 1 mês ao que já tinha. Plano diferente
+ * (subiu ou desceu): valor cheio, vale na hora e o mês começa hoje.
+ * Se era o plano que o dono pediu, tira da agenda quem ele não escolheu.
+ */
+export async function pagamentoConfirmado(b: BarbeariaPagamento, plano: PlanoPagoId): Promise<Record<string, unknown>> {
+  const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
+  const renovacao = b.status === 'ativo' && b.plano === plano && fim !== null && fim.getTime() > Date.now()
+  if (b.plano_agendado === plano) await aplicarMudanca(b.id)
+  return {
+    status: 'ativo', plano,
+    plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
+    plano_ciclo_fim: UM_MES(renovacao ? fim! : new Date()).toISOString(),
+  }
+}
+
 /** Pagamento do plano pedido confirmado: troca e tira da agenda quem não ficou */
 export async function aplicarMudanca(barbearia_id: string): Promise<{ ok: boolean; saiu: string[] }> {
   const db = criarClienteServico()

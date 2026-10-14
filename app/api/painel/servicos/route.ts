@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessao, COOKIE_SESSION } from '@/lib/auth'
-import { criarClienteAutenticado, criarClienteServico } from '@/lib/supabase/server'
-import { cookies } from 'next/headers'
+import { getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { podeExecutar } from '@/lib/permissoes'
 import { falhaInterna } from '@/lib/erros'
 
@@ -14,11 +14,9 @@ const Schema = z.object({
 })
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)?.value
-  if (!token) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+  if (!(await getSessao())) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
 
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
   const { data, error } = await db.from('servicos').select('*').order('nome')
 
   if (error) return falhaInterna('painel/servicos', error, 'Erro ao buscar serviços')

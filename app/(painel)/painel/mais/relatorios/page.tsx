@@ -1,7 +1,6 @@
 import Link from 'next/link'
-import { headers, cookies } from 'next/headers'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { formatBRL } from '@/lib/utils'
 import { limitesDoMes, mesVizinho } from '@/lib/periodo'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
@@ -10,9 +9,7 @@ import RecursoBloqueado from '@/components/recurso-bloqueado'
 export default async function RelatoriosPage() {
   const h = await headers()
   const barbearia_id = h.get('x-barbearia-id')!
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const mesAtual = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }).slice(0, 7)
   const { de: inicioMes, ate: fimMes } = limitesDoMes(mesAtual)

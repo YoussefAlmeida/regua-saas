@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { adminLogado, registrarAcaoAdmin, PLANOS_ADMIN } from '@/lib/admin'
-import { UM_MES, aplicarMudanca } from '@/lib/mudanca-plano'
+import { pagamentoConfirmado } from '@/lib/mudanca-plano'
 
 const Schema = z.discriminatedUnion('acao', [
   z.object({ acao: z.literal('estender_teste'), dias: z.number().int().min(1).max(90) }),
@@ -43,21 +43,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       mudanca = { trial_fim: new Date(base + a.dias * DIA).toISOString(), status: 'trial', plano: 'trial' }
       break
     }
-    case 'ativar_plano': {
-      // = pagamento confirmado. Plano só muda quando paga:
-      // - renovou o mesmo plano em dia: soma um mês ao que já tinha
-      // - trocou de plano (subiu ou desceu): valor cheio, o mês novo começa hoje
-      const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
-      const renovacao = b.status === 'ativo' && b.plano === a.plano && fim !== null && fim.getTime() > Date.now()
-      // Era o plano que o dono pediu: tira da agenda quem ele não escolheu
-      if (b.plano_agendado === a.plano) await aplicarMudanca(id)
-      mudanca = {
-        status: 'ativo', plano: a.plano,
-        plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
-        plano_ciclo_fim: UM_MES(renovacao ? fim! : new Date()).toISOString(),
-      }
+    case 'ativar_plano':
+      // = pagamento confirmado (mesma regra do Asaas)
+      mudanca = await pagamentoConfirmado(b, a.plano)
       break
-    }
     case 'suspender':
       mudanca = { status: 'leitura' }
       break

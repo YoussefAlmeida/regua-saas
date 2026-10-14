@@ -24,7 +24,7 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
   const semFuncao = !!error
   const info = (data ?? {}) as {
     tabelas?: string[]; colunas_usuarios?: string[]; colunas_barbearias?: string[]; indices_usuarios?: string[]
-    gatilho_categorias?: boolean; bucket_fotos?: boolean
+    gatilho_categorias?: boolean; bucket_fotos?: boolean; banco_trancado?: boolean; entrada_unica?: boolean
   }
 
   // Sem a função, testa direto o que dá pra testar
@@ -69,12 +69,22 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     oQueFazer: migration('20261014010000_erros_sistema.sql'),
   })
   itens.push({
-    nome: 'Mudança de plano no fim do mês',
+    nome: 'Mudança de plano',
     ok: info.colunas_barbearias
       ? info.colunas_barbearias.includes('plano_agendado')
       : !(await db.from('barbearias').select('plano_agendado').limit(1)).error,
     grave: true,
     oQueFazer: migration('20261014020000_plano_ciclo.sql'),
+  })
+  itens.push({
+    nome: 'Banco trancado pra acesso direto (segurança)',
+    ok: !!info.banco_trancado, grave: true,
+    oQueFazer: migration('20261015000000_trancar_banco.sql'),
+  })
+  itens.push({
+    nome: 'Entrada do atendimento sem duplicar',
+    ok: !!info.entrada_unica, grave: false,
+    oQueFazer: migration('20261015000000_trancar_banco.sql'),
   })
   itens.push({
     nome: 'Histórico do painel admin',

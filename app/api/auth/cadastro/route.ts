@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, criarToken, slugify, COOKIE_SESSION, SLUGS_RESERVADOS } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
+import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 import { falhaInterna } from '@/lib/erros'
 
 const Schema = z.object({
@@ -54,6 +55,8 @@ export async function POST(req: NextRequest) {
       instagram: d.barbearia_instagram || null,
       telefone: d.barbearia_telefone || null,
       endereco: d.barbearia_endereco || null,
+      // Já nasce com horário: o link de agendamento funciona de cara
+      horario_funcionamento: HORARIO_PADRAO,
     })
     .select('id')
     .single()

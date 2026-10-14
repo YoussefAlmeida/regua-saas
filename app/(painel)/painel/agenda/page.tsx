@@ -1,6 +1,5 @@
-import { headers, cookies } from 'next/headers'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import AgendaClient, { type Agendamento } from './agenda-client'
 
 export default async function AgendaPage() {
@@ -8,9 +7,7 @@ export default async function AgendaPage() {
   const barbearia_id = h.get('x-barbearia-id')!
   const papel = h.get('x-papel')
   const meuProfissionalId = h.get('x-profissional-id')
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const db = await criarClienteAutenticado()
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
 
