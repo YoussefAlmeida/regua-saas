@@ -26,7 +26,7 @@ const PERGUNTAS = [
   },
   {
     q: 'E se eu quiser mudar de plano?',
-    r: 'Subir vale na hora. Descer vale no fim do mês que você já pagou: você escolhe quem continua na agenda e pode desistir até lá. Ninguém perde conta nem histórico.',
+    r: 'O plano muda quando o pagamento é confirmado. Subir: paga o valor cheio do plano novo e vale na hora. Descer: você escolhe quem continua na agenda e, ao pagar o plano menor, a troca acontece. Ninguém perde horário já marcado, conta ou histórico.',
   },
 ]
 

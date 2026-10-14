@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { SituacaoPlano } from '@/lib/planos'
 import CancelarMudanca from '@/components/cancelar-mudanca'
 
-/* Faixa no topo do painel: equipe acima do plano, mudança agendada,
+/* Faixa no topo do painel: equipe acima do plano, pedido de mudança,
    teste acabando ou conta só leitura */
 export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = null }: {
   plano: SituacaoPlano
@@ -25,12 +25,11 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
     )
   }
   if (agendado && souDono && !plano.somenteLeitura) {
-    const quando = new Date(agendado.em).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit' })
     return (
       <div className="bg-amber/10 border-b border-amber/30 px-4 py-2.5">
         <div className="max-w-lg mx-auto flex items-center gap-3">
           <p className="flex-1 font-body text-xs text-fg">
-            Seu plano muda pro <Link href="/painel/mais/plano" className="underline">{agendado.nome}</Link> em {quando}.
+            Você pediu o <Link href="/painel/mais/plano" className="underline">{agendado.nome}</Link>. A troca acontece quando o pagamento for confirmado.
           </p>
           <CancelarMudanca className="shrink-0 border border-amber/50 text-amber px-3 py-1.5 rounded-button" />
         </div>

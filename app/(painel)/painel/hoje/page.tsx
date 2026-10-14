@@ -66,7 +66,7 @@ export default async function HojePage() {
       db.from('profissionais').select('foto_url, especialidade, ativo').eq('id', meuProfissionalId).maybeSingle(),
       db.from('horarios_trabalho').select('id', { count: 'exact', head: true }).eq('profissional_id', meuProfissionalId),
     ])
-    if (prof && !prof.ativo) pendencias.push({ href: '/painel/hoje', texto: 'Você está fora da agenda: os clientes não veem seus horários. Fala com o dono da barbearia.' })
+    if (prof && !prof.ativo) pendencias.push({ href: '/painel/hoje', texto: 'Você está fora da agenda: os horários já marcados continuam, mas não entra horário novo. Fala com o dono da barbearia.' })
     else if (!prof?.foto_url || !prof?.especialidade) pendencias.push({ href: '/painel/mais/perfil', texto: 'Coloca sua foto e especialidade — o cliente escolhe por elas' })
     if (!nHorarios) pendencias.push({ href: '/painel/mais/horarios', texto: 'Confere seus dias e horário de almoço' })
   }

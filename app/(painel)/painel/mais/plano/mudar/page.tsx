@@ -29,11 +29,7 @@ export default async function MudarPlanoPage({ searchParams }: { searchParams: P
     redirect('/painel/mais/plano')
   }
 
-  const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
-  const imediato = !fim || fim.getTime() <= Date.now()
-  const em = imediato ? new Date() : fim!
-
-  // Quem está na agenda e quantos horários cada um tem depois da troca
+  // Quem está na agenda e quantos horários já marcados cada um tem (continuam)
   const pessoas = (await pessoasDaEquipe(sessao.barbearia_id)).filter(p => p.naAgenda)
   const { data: profs } = await db.from('profissionais')
     .select('id, usuario_id').eq('barbearia_id', sessao.barbearia_id).eq('ativo', true)
@@ -41,7 +37,7 @@ export default async function MudarPlanoPage({ searchParams }: { searchParams: P
   const { data: ags } = idDe.size
     ? await db.from('agendamentos').select('profissional_id')
       .in('profissional_id', [...idDe.keys()]).in('status', ['agendado', 'confirmado'])
-      .gte('inicio', em.toISOString())
+      .gte('inicio', new Date().toISOString())
     : { data: [] as { profissional_id: string }[] }
   const futuros: Record<string, number> = {}
   for (const a of ags ?? []) {
@@ -62,8 +58,7 @@ export default async function MudarPlanoPage({ searchParams }: { searchParams: P
       <MudarPlano
         de={{ nome: atual.nome, preco: atual.preco }}
         para={{ id: novo.id, nome: novo.nome, preco: novo.preco, max: novo.maxProfissionais }}
-        em={em.toISOString()}
-        imediato={imediato}
+        pagoAte={b.plano_ciclo_fim && new Date(b.plano_ciclo_fim).getTime() > Date.now() ? b.plano_ciclo_fim : null}
         perde={perde}
         pessoas={pessoas.map(p => ({ id: p.usuario_id, nome: p.nome, souEu: p.souDono, futuros: futuros[p.usuario_id] ?? 0 }))}
       />

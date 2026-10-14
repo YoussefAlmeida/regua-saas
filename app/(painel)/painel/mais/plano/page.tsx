@@ -66,12 +66,21 @@ export default async function PlanoPage() {
         )}
 
         {agendado && (
-          <div className="flex items-start gap-2 rounded-button bg-amber/10 border border-amber/30 px-3 py-2.5">
-            <CalendarClock size={14} className="text-amber shrink-0 mt-0.5" />
-            <p className="flex-1 font-body text-xs text-fg">
-              Muda pro <strong>{agendado.nome}</strong> em {data(barbearia?.plano_agendado_em)}. Até lá, tudo continua como está.
-            </p>
-            <CancelarMudanca className="text-amber hover:underline shrink-0" />
+          <div className="rounded-button bg-amber/10 border border-amber/30 px-3 py-3 space-y-2.5">
+            <div className="flex items-start gap-2">
+              <CalendarClock size={14} className="text-amber shrink-0 mt-0.5" />
+              <p className="flex-1 font-body text-xs text-fg">
+                Você pediu o <strong>{agendado.nome}</strong>. A troca acontece quando o pagamento de {formatBRL(agendado.preco)} for confirmado.
+                Até lá, tudo continua como está.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <a href={wa(`Oi! Quero pagar o plano ${agendado.nome} (${formatBRL(agendado.preco)}/mês) pra ${nome}.`)} target="_blank" rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider py-2.5 rounded-button">
+                <MessageCircle size={13} /> Pagar o {agendado.nome}
+              </a>
+              <CancelarMudanca className="text-amber hover:underline shrink-0" />
+            </div>
           </div>
         )}
 
@@ -129,7 +138,7 @@ export default async function PlanoPage() {
               </ul>
               {pago && LISTA_PLANOS.indexOf(p) < ordemAtual ? (
                 agendado?.id === p.id ? (
-                  <p className="font-body text-xs text-amber text-center">Mudança agendada pra {data(barbearia?.plano_agendado_em)}</p>
+                  <p className="font-body text-xs text-amber text-center">Pedido feito · a troca acontece no pagamento</p>
                 ) : (
                   <Link
                     href={`/painel/mais/plano/mudar?para=${p.id}`}
@@ -151,6 +160,9 @@ export default async function PlanoPage() {
                   <MessageCircle size={14} /> Quero o {p.nome}
                 </a>
               )}
+              {pago && LISTA_PLANOS.indexOf(p) > ordemAtual && (
+                <p className="font-body text-[11px] text-fg-muted text-center">Paga o valor cheio do {p.nome}; vale na hora e o mês novo começa no dia do pagamento.</p>
+              )}
             </article>
           )
         })}
@@ -162,8 +174,9 @@ export default async function PlanoPage() {
           <li>Os 14 dias de teste têm tudo liberado, sem limite.</li>
           <li>Se o teste acabar sem plano, a conta fica só leitura na hora: nada se perde, mas pausa agenda e caixa.</li>
           <li>Pagou, voltou tudo no mesmo instante, com todos os seus dados.</li>
-          <li>Subir de plano vale na hora.</li>
-          <li>Descer de plano vale no fim do mês já pago: você escolhe quem fica na agenda e pode desistir até lá.</li>
+          <li>O plano só muda quando o pagamento é confirmado.</li>
+          <li>Subir: paga o valor cheio do plano novo, mesmo que o mês atual ainda não tenha vencido. Vale na hora e o mês novo começa no dia do pagamento.</li>
+          <li>Descer: você faz o pedido e escolhe quem fica na agenda. Quando pagar o plano menor, a troca acontece. Quem sai atende os horários já marcados, só não recebe horário novo.</li>
         </ul>
       </section>
     </div>

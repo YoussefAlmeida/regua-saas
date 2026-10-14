@@ -7,13 +7,15 @@ import { PLANOS_ADMIN, type PlanoPago } from '@/lib/admin-planos'
 
 interface Props {
   barbearia: { id: string; nome: string; slug: string; status: string; plano: string }
+  /** Plano que o dono pediu pra mudar (vale quando pagar) */
+  pedido?: string | null
 }
 
-export default function AcoesBarbearia({ barbearia: b }: Props) {
+export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
   const router = useRouter()
   const [ocupado, setOcupado] = useState(false)
   const [msg, setMsg] = useState<{ t: string; erro?: boolean } | null>(null)
-  const [plano, setPlano] = useState<PlanoPago>((b.plano in PLANOS_ADMIN ? b.plano : 'barbearia') as PlanoPago)
+  const [plano, setPlano] = useState<PlanoPago>((pedido && pedido in PLANOS_ADMIN ? pedido : b.plano in PLANOS_ADMIN ? b.plano : 'barbearia') as PlanoPago)
   const [apagando, setApagando] = useState(false)
   const [confirmacao, setConfirmacao] = useState('')
 
@@ -76,7 +78,10 @@ export default function AcoesBarbearia({ barbearia: b }: Props) {
 
       {/* Plano */}
       <div className="space-y-2">
-        <p className="font-body text-sm text-fg">Ativar plano (pagou por fora, ex.: Pix)</p>
+        <p className="font-body text-sm text-fg">Registrar pagamento (Pix ou por fora)</p>
+        <p className="font-body text-xs text-fg-muted">
+          O plano só muda aqui. Mesmo plano em dia: soma 1 mês. Plano diferente: vale na hora e o mês começa hoje.
+        </p>
         <div className="flex gap-2">
           <select value={plano} onChange={e => setPlano(e.target.value as PlanoPago)} aria-label="Plano"
             className="flex-1 bg-bg border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber">
@@ -84,9 +89,9 @@ export default function AcoesBarbearia({ barbearia: b }: Props) {
               <option key={id} value={id}>{p.nome} — R$ {p.preco.toFixed(2).replace('.', ',')}/mês</option>
             ))}
           </select>
-          <button disabled={ocupado} onClick={() => agir({ acao: 'ativar_plano', plano }, `Plano ${PLANOS_ADMIN[plano].nome} ativado.`, `Ativar o plano ${PLANOS_ADMIN[plano].nome} pra ${b.nome}?`)}
+          <button disabled={ocupado} onClick={() => agir({ acao: 'ativar_plano', plano }, `Pagamento do ${PLANOS_ADMIN[plano].nome} registrado.`, `${b.nome} pagou o ${PLANOS_ADMIN[plano].nome} (R$ ${PLANOS_ADMIN[plano].preco.toFixed(2).replace('.', ',')})?`)}
             className={`${btn} border-entrada/40 text-entrada hover:bg-entrada/10`}>
-            <BadgeCheck size={13} /> Ativar
+            <BadgeCheck size={13} /> Pagou
           </button>
         </div>
       </div>

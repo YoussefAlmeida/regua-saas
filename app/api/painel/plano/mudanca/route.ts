@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { exigirSenha } from '@/lib/reautenticar'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
 import { PLANOS, LISTA_PLANOS, type PlanoPagoId } from '@/lib/planos'
-import { aplicarMudanca } from '@/lib/mudanca-plano'
 
-/* Agendar (POST) ou desistir (DELETE) da mudança pra um plano menor.
-   Vale no fim do mês já pago; sem mês pago registrado, vale na hora. */
+/* Pedir (POST) ou desistir (DELETE) da mudança pra um plano menor.
+   É só um pedido: a troca acontece quando o pagamento do plano novo
+   é confirmado (lib/mudanca-plano). Até lá, nada muda. */
 
 const Schema = z.object({
   para: z.enum(['cadeira', 'barbearia', 'rede']),
   manter: z.array(z.string().uuid()).max(50),
-  senha: z.string().optional(),
 })
 
 const ordem = (id: string) => LISTA_PLANOS.findIndex(p => p.id === id)
@@ -30,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const db = criarClienteServico()
   const { data: b } = await db.from('barbearias')
-    .select('plano, status, plano_ciclo_fim').eq('id', sessao.barbearia_id).single()
+    .select('plano, status').eq('id', sessao.barbearia_id).single()
   if (!b || b.status !== 'ativo' || !(b.plano in PLANOS)) {
     return NextResponse.json({ erro: 'A mudança de plano vale pra conta com plano ativo. Fale com a gente pelo WhatsApp.' }, { status: 400 })
   }
@@ -48,28 +46,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: `O plano ${PLANOS[para].nome} vai até ${max} na agenda. Escolha no máximo ${max}.` }, { status: 400 })
   }
 
-  const negado = await exigirSenha(sessao, body?.senha, req)
-  if (negado) return negado
-
-  const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
-  const imediato = !fim || fim.getTime() <= Date.now()
-  const em = imediato ? new Date().toISOString() : fim!.toISOString()
-
+  const em = new Date().toISOString()   // quando pediu
   const { error } = await db.from('barbearias').update({
     plano_agendado: para,
     plano_agendado_em: em,
     plano_agendado_manter: escolhidos,
   }).eq('id', sessao.barbearia_id)
-  if (error) return falhaInterna('plano/mudanca', error, 'Não deu pra agendar a mudança')
+  if (error) return falhaInterna('plano/mudanca', error, 'Não deu pra salvar o pedido')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id, usuario_id: sessao.usuario_id,
     acao: 'agendar_plano', tabela: 'barbearias', registro_id: sessao.barbearia_id,
-    antes: { plano: b.plano }, depois: { para, em, manter: escolhidos.length }, req,
+    antes: { plano: b.plano }, depois: { para, manter: escolhidos.length }, req,
   })
-
-  if (imediato) await aplicarMudanca(sessao.barbearia_id)
-  return NextResponse.json({ ok: true, em, imediato })
+  return NextResponse.json({ ok: true })
 }
 
 export async function DELETE(req: NextRequest) {
@@ -84,7 +74,7 @@ export async function DELETE(req: NextRequest) {
   const { error } = await db.from('barbearias').update({
     plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
   }).eq('id', sessao.barbearia_id)
-  if (error) return falhaInterna('plano/mudanca', error, 'Não deu pra cancelar a mudança')
+  if (error) return falhaInterna('plano/mudanca', error, 'Não deu pra cancelar o pedido')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id, usuario_id: sessao.usuario_id,

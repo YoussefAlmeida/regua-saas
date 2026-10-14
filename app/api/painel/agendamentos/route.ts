@@ -74,6 +74,16 @@ export async function POST(req: NextRequest) {
 
   const db = criarClienteServico()
 
+  // Fora da agenda: os horários já marcados continuam, mas não entra horário novo
+  const { data: prof } = await db.from('profissionais').select('nome, ativo').eq('id', profissional_id).maybeSingle()
+  if (!prof?.ativo) {
+    return NextResponse.json({
+      erro: sessao.papel === 'barbeiro'
+        ? 'Você está fora da agenda: dá pra ver e atender o que já está marcado, mas não marcar horário novo.'
+        : `${prof?.nome ?? 'Esse barbeiro'} está fora da agenda. Ligue ele de novo em Mais → Equipe pra marcar horário novo.`,
+    }, { status: 409 })
+  }
+
   // Busca serviço para calcular fim e pegar preço snapshot
   const { data: servico } = await db
     .from('servicos')

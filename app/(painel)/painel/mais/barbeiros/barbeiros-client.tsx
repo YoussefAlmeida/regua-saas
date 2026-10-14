@@ -161,7 +161,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
           ]}
         />
         <p className="font-body text-xs text-fg-muted mt-2">
-          Desligado não aparece pros clientes, mas continua na equipe e com o histórico. Liga de novo quando quiser.
+          Desligado não recebe horário novo, mas atende o que já está marcado e continua na equipe. Pra trocar de barbeiro, desligue um e ligue o outro.
           {max !== null && ` Seu plano vai até ${max} na agenda.`}
         </p>
       </section>
