@@ -1,27 +1,24 @@
 import { NextResponse } from 'next/server'
-import { criarClienteServico } from '@/lib/supabase/server'
+import { planoDaBarbearia } from '@/lib/plano-servidor'
 
 /* ================================================================
    Modo somente leitura — seção 6.1.3
-   Trial vencido ('leitura') ou cancelado: vê os dados, mas não cria
-   agendamento novo nem lança financeiro.
+   Teste vencido (na hora, sem esperar o cron), suspensa ou cancelada:
+   vê os dados, mas não cria agendamento nem lança financeiro.
    ================================================================ */
-
-const STATUS_BLOQUEADOS = ['leitura', 'cancelado']
 
 /** Retorna uma resposta 402 se a conta não pode escrever; null se pode */
 export async function bloqueioSomenteLeitura(barbearia_id: string): Promise<NextResponse | null> {
-  const db = criarClienteServico()
-  const { data } = await db
-    .from('barbearias')
-    .select('status')
-    .eq('id', barbearia_id)
-    .single()
-
-  if (data && !STATUS_BLOQUEADOS.includes(data.status)) return null
+  const p = await planoDaBarbearia(barbearia_id)
+  if (!p.somenteLeitura) return null
 
   return NextResponse.json(
-    { erro: 'Seu teste acabou. Escolha um plano em Mais → Meu plano pra voltar a lançar.' },
+    {
+      erro: p.cancelada
+        ? 'Essa conta está cancelada. Escolha um plano em Mais → Plano pra voltar a usar.'
+        : 'Seu teste grátis acabou. Escolha um plano em Mais → Plano pra voltar a agendar e lançar.',
+      somenteLeitura: true,
+    },
     { status: 402 },
   )
 }

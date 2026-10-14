@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
+import { exigirRecurso } from '@/lib/plano-servidor'
 import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
@@ -37,6 +38,8 @@ export async function POST(req: NextRequest) {
 
   const bloqueio = await bloqueioSomenteLeitura(sessao.barbearia_id)
   if (bloqueio) return bloqueio
+  const semRecurso = await exigirRecurso(sessao.barbearia_id, 'despesasFixas')
+  if (semRecurso) return semRecurso
 
   const body = await req.json().catch(() => null)
   const parse = SchemaPost.safeParse(body)

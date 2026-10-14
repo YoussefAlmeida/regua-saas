@@ -6,6 +6,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirSenha } from '@/lib/reautenticar'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
+import { bloqueioSomenteLeitura } from '@/lib/conta'
 
 /* Mexer em dinheiro já lançado pede a senha de novo e fica no log (seção 10) */
 
@@ -31,6 +32,8 @@ async function carregar(id: string, barbearia_id: string) {
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (leitura) return leitura
 
   const parse = SchemaPatch.safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
@@ -74,6 +77,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (leitura) return leitura
 
   const body = await req.json().catch(() => ({}))
   const negado = await exigirSenha(sessao, body?.senha, req)

@@ -3,6 +3,9 @@ import { headers, cookies } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/server'
 import { COOKIE_SESSION } from '@/lib/auth'
 import { formatBRL } from '@/lib/utils'
+import { limitesDoMes, mesVizinho } from '@/lib/periodo'
+import { planoDaBarbearia } from '@/lib/plano-servidor'
+import RecursoBloqueado from '@/components/recurso-bloqueado'
 
 export default async function RelatoriosPage() {
   const h = await headers()
@@ -12,27 +15,26 @@ export default async function RelatoriosPage() {
   const db = criarClienteAutenticado(token)
 
   const mesAtual = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }).slice(0, 7)
-  const [y, m] = mesAtual.split('-').map(Number)
-  const inicioMes = `${mesAtual}-01`
-  const fimMes = `${y}-${String(m + 1).padStart(2, '0')}-01`
-
-  const mesAnteriorDate = new Date(y, m - 2, 1)
-  const mesAnterior = mesAnteriorDate.toLocaleDateString('sv-SE').slice(0, 7)
-  const inicioMesAnt = `${mesAnterior}-01`
+  const { de: inicioMes, ate: fimMes } = limitesDoMes(mesAtual)
+  const inicioMesAnt = limitesDoMes(mesVizinho(mesAtual, -1)).de
+  // Meia-noite na Bahia = 03:00 UTC
+  const T = 'T03:00:00Z'
+  const plano = await planoDaBarbearia(barbearia_id)
+  const avancado = plano.recursos.relatoriosAvancados
 
   const [{ data: agMes }, { data: agMesAnt }] = await Promise.all([
     db
       .from('agendamentos')
       .select('id, valor_servico, status, criado_em, cliente_id, profissional_id, profissional:profissionais!profissional_id(nome)')
       .eq('barbearia_id', barbearia_id)
-      .gte('inicio', `${inicioMes}T00:00:00`)
-      .lt('inicio', `${fimMes}T00:00:00`),
+      .gte('inicio', `${inicioMes}${T}`)
+      .lt('inicio', `${fimMes}${T}`),
     db
       .from('agendamentos')
       .select('id, status')
       .eq('barbearia_id', barbearia_id)
-      .gte('inicio', `${inicioMesAnt}T00:00:00`)
-      .lt('inicio', `${inicioMes}T00:00:00`),
+      .gte('inicio', `${inicioMesAnt}${T}`)
+      .lt('inicio', `${inicioMes}${T}`),
   ])
 
   const concluidos = (agMes ?? []).filter(a => a.status === 'concluido')
@@ -63,7 +65,7 @@ export default async function RelatoriosPage() {
     .from('agendamentos')
     .select('cliente_id')
     .eq('barbearia_id', barbearia_id)
-    .lt('inicio', `${inicioMes}T00:00:00`)
+    .lt('inicio', `${inicioMes}${T}`)
     .eq('status', 'concluido')
     .in('cliente_id', [...clientesDoMes].filter(Boolean) as string[])
 
@@ -71,7 +73,7 @@ export default async function RelatoriosPage() {
   const novos = [...clientesDoMes].filter(id => id && !clientesRetorno.has(id)).length
   const retorno = [...clientesDoMes].filter(id => id && clientesRetorno.has(id)).length
 
-  const nomeMes = new Date(`${mesAtual}-15`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const nomeMes = new Date(`${mesAtual}-15T12:00:00Z`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
@@ -105,8 +107,15 @@ export default async function RelatoriosPage() {
         </div>
       </div>
 
+      {!avancado && (
+        <RecursoBloqueado
+          titulo="Relatórios avançados"
+          texto="Clientes novos x quem voltou e o ranking de cada barbeiro fazem parte do plano Barbearia."
+        />
+      )}
+
       {/* Novos vs Retorno */}
-      {clientesDoMes.size > 0 && (
+      {avancado && clientesDoMes.size > 0 && (
         <div className="bg-surface border border-line rounded-card p-4 space-y-3">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Clientes</p>
           <div className="flex gap-4">
@@ -134,7 +143,7 @@ export default async function RelatoriosPage() {
       )}
 
       {/* Ranking barbeiros */}
-      {ranking.length > 0 && (
+      {avancado && ranking.length > 0 && (
         <div className="bg-surface border border-line rounded-card overflow-hidden">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted px-4 py-3 border-b border-line">
             Ranking da equipe

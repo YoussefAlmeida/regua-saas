@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
+import { situacaoPlano } from '@/lib/planos'
 
 /* ================================================================
    Cron diário (06h na Bahia) — seções 6.1 Módulo 4 e 6.1.3
@@ -22,7 +23,7 @@ async function lancarDespesasFixas(db: ReturnType<typeof criarClienteServico>) {
 
   const { data: despesas, error } = await db
     .from('despesas_fixas')
-    .select('id, barbearia_id, descricao, valor, categoria_id, barbearia:barbearias!barbearia_id(status)')
+    .select('id, barbearia_id, descricao, valor, categoria_id, barbearia:barbearias!barbearia_id(status, plano, trial_fim)')
     .eq('ativa', true)
     .eq('dia_vencimento', hoje.dia)
 
@@ -31,7 +32,9 @@ async function lancarDespesasFixas(db: ReturnType<typeof criarClienteServico>) {
   let lancadas = 0
   for (const d of despesas) {
     const barbearia = Array.isArray(d.barbearia) ? d.barbearia[0] : d.barbearia
-    if (!barbearia || !['trial', 'ativo'].includes(barbearia.status)) continue
+    if (!barbearia) continue
+    const p = situacaoPlano(barbearia)
+    if (p.somenteLeitura || !p.recursos.despesasFixas) continue
 
     // Idempotente: não lança duas vezes no mesmo mês se o cron rodar de novo
     const { count } = await db

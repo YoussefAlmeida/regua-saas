@@ -4,6 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
+import { bloqueioSomenteLeitura } from '@/lib/conta'
 
 const SchemaPatch = z.object({
   status: z.enum(['agendado', 'confirmado', 'concluido', 'cancelado', 'faltou']),
@@ -13,6 +14,9 @@ const SchemaPatch = z.object({
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+
+  const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (leitura) return leitura
 
   const { id } = await params
   const body = await req.json().catch(() => null)

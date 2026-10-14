@@ -700,10 +700,12 @@ Referência real (seção 1): Barbeiro.app tem plano grátis e Pro a R$ 59,90; E
 
 | Plano | Preço/mês | Quem é | O que tem |
 |---|---|---|---|
-| **Teste** | Grátis, 14 dias | Todo mundo | Tudo liberado, sem cartão |
-| **Cadeira** | **R$ 39,99** | Barbeiro autônomo, 1 cadeira | Agenda, link público, financeiro completo, dashboard |
-| **Barbearia** ⭐ | **R$ 79,99** | Até 3 profissionais | Tudo do Cadeira + auditoria, relatórios avançados |
-| **Rede** | **R$ 129,99** | Profissionais ilimitados / mais de uma unidade | Tudo + multi-unidade, relatório consolidado |
+| **Teste** | Grátis, 14 dias | Todo mundo | Tudo liberado, sem limite, sem cartão. Acabou sem plano → **só leitura na hora** (vê tudo, não agenda nem lança; link pausa) |
+| **Cadeira** | **R$ 39,99** | 1 profissional na agenda | Agenda, link público, lembrete, financeiro (entradas e saídas à mão), resumo do mês. **Sem:** histórico, relatórios avançados, despesas fixas automáticas. Suporte 2 vezes por mês |
+| **Barbearia** ⭐ | **R$ 79,99** | Até 3 profissionais | Tudo do Cadeira + despesas fixas automáticas, histórico (auditoria), relatórios por barbeiro e de clientes. Suporte pelo WhatsApp |
+| **Rede** | **R$ 129,99** | Mais de 3 profissionais | Tudo do Barbearia, profissionais sem limite, suporte prioritário, implantação presencial, multi-unidade (em breve) |
+
+> **Profissional** = quem aparece na agenda. O dono só conta se também corta ("Sou eu que corto"). Regras no código: `lib/planos.ts`.
 
 **Anual:** paga 10, leva 12 (economia de ~16%). Melhora seu caixa e derruba o churn.
 

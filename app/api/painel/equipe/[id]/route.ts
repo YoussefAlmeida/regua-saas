@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { exigirVagaProfissional } from '@/lib/plano-servidor'
 import { exigirSenha } from '@/lib/reautenticar'
 import { falhaInterna } from '@/lib/erros'
 
@@ -34,6 +35,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .maybeSingle()
 
   if (!usuario) return NextResponse.json({ erro: 'Barbeiro não encontrado' }, { status: 404 })
+
+  // Aprovar ou reativar coloca mais alguém na agenda: respeita o limite do plano
+  if (parse.data.status === 'aprovado' || parse.data.ativo === true) {
+    const { data: prof } = await db.from('profissionais').select('ativo').eq('usuario_id', id).maybeSingle()
+    if (!prof?.ativo) {
+      const semVaga = await exigirVagaProfissional(sessao.barbearia_id)
+      if (semVaga) return semVaga
+    }
+  }
 
   const { data, error } = await db
     .from('usuarios')

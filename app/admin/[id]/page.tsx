@@ -6,6 +6,7 @@ import { adminLogado, PLANOS_ADMIN, STATUS_ADMIN, type PlanoPago } from '@/lib/a
 import { formatBRL } from '@/lib/utils'
 import { urlDoSiteAtual } from '@/lib/site-url'
 import AcoesBarbearia from './acoes'
+import { planoParaProfissionais } from '@/lib/planos'
 import LinkNovaSenha from '@/components/link-nova-senha'
 import Avisos from '@/components/aviso'
 import ListaErros, { type ErroSistema } from '../lista-erros'
@@ -108,6 +109,13 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
     b.status === 'trial' && diasTeste <= 3
       ? { nivel: 'aviso', titulo: diasTeste > 0 ? `Teste acaba em ${diasTeste} dia${diasTeste > 1 ? 's' : ''}` : 'Teste acabou', detalhe: 'Hora de conversar sobre o plano.' }
       : { nivel: 'ok', titulo: 'Situação da conta', detalhe: st.rotulo },
+    (() => {
+      const max = b.status === 'ativo' ? PLANOS_ADMIN[b.plano as PlanoPago]?.maxProfissionais ?? null : null
+      const n = nProfs ?? 0
+      return max !== null && n > max
+        ? { nivel: 'aviso' as Nivel, titulo: 'Acima do limite do plano', detalhe: `${n} na agenda, o plano ${PLANOS_ADMIN[b.plano as PlanoPago].nome} vai até ${max}. Sugira o ${PLANOS_ADMIN[planoParaProfissionais(n)].nome}.` }
+        : { nivel: 'ok' as Nivel, titulo: 'Dentro do limite do plano', detalhe: max === null ? `${n} na agenda` : `${n} de ${max} na agenda` }
+    })(),
     (nFixas ?? 0) > 0
       ? { nivel: 'ok', titulo: 'Despesas fixas cadastradas', detalhe: `${nFixas}` }
       : { nivel: 'dica', titulo: 'Sem despesas fixas', detalhe: 'O financeiro fica incompleto sem aluguel, energia etc.' },

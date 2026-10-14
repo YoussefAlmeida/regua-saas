@@ -1,181 +1,136 @@
-import { headers, cookies } from 'next/headers'
-import { criarClienteAutenticado } from '@/lib/supabase/server'
-import { COOKIE_SESSION } from '@/lib/auth'
-import { CheckCircle2, Circle } from 'lucide-react'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
+import { ChevronLeft, CheckCircle2, MessageCircle, Users, AlertTriangle } from 'lucide-react'
+import { getSessao } from '@/lib/auth'
+import { criarClienteServico } from '@/lib/supabase/server'
 import { formatBRL } from '@/lib/utils'
+import { LISTA_PLANOS, planoParaProfissionais } from '@/lib/planos'
+import { planoDaBarbearia, contarProfissionais } from '@/lib/plano-servidor'
 
-const PLANOS = [
-  {
-    id: 'cadeira',
-    label: 'Cadeira',
-    preco: 39.99,
-    descricao: 'Ideal para profissional solo',
-    funcionalidades: [
-      'Agenda online',
-      'Link de agendamento público',
-      'WhatsApp automático',
-      'Relatórios básicos',
-      '1 profissional',
-    ],
-  },
-  {
-    id: 'barbearia',
-    label: 'Barbearia',
-    preco: 79.99,
-    descricao: 'Para barbearias com equipe',
-    funcionalidades: [
-      'Tudo do Cadeira',
-      'Até 5 profissionais',
-      'Financeiro completo',
-      'Despesas fixas',
-      'Relatórios avançados',
-    ],
-  },
-  {
-    id: 'rede',
-    label: 'Rede',
-    preco: 129.99,
-    descricao: 'Para redes e franquias',
-    funcionalidades: [
-      'Tudo do Barbearia',
-      'Profissionais ilimitados',
-      'Multi-unidades (em breve)',
-      'Suporte prioritário',
-    ],
-  },
-]
-
-const STATUS_LABEL: Record<string, string> = {
-  trial: 'Trial',
-  ativo: 'Ativo',
-  leitura: 'Vencido',
-  cancelado: 'Cancelado',
-}
-
-const STATUS_COR: Record<string, string> = {
-  trial: 'text-amber',
-  ativo: 'text-entrada',
-  leitura: 'text-info',
-  cancelado: 'text-saida',
-}
+const SUPORTE = process.env.SUPORTE_WHATSAPP ?? '75982727760'
+const wa = (texto: string) => `https://wa.me/55${SUPORTE.replace(/\D/g, '').replace(/^55/, '')}?text=${encodeURIComponent(texto)}`
 
 export default async function PlanoPage() {
-  const h = await headers()
-  const barbearia_id = h.get('x-barbearia-id')!
-  const cookieStore = await cookies()
-  const token = cookieStore.get(COOKIE_SESSION)!.value
-  const db = criarClienteAutenticado(token)
+  const sessao = await getSessao()
+  if (!sessao) redirect('/entrar')
+  if (sessao.papel !== 'dono') redirect('/painel/mais')
 
-  const { data: barbearia } = await db
-    .from('barbearias')
-    .select('plano, status, trial_fim')
-    .eq('id', barbearia_id)
-    .single()
-
-  const diasRestantesTrial = barbearia?.trial_fim
-    ? Math.max(0, Math.ceil((new Date(barbearia.trial_fim).getTime() - Date.now()) / 86400000))
-    : 0
-
-  const planoAtual = barbearia?.plano ?? 'trial'
-  const status = barbearia?.status ?? 'trial'
+  const [plano, nProfs, { data: barbearia }] = await Promise.all([
+    planoDaBarbearia(sessao.barbearia_id),
+    contarProfissionais(sessao.barbearia_id),
+    criarClienteServico().from('barbearias').select('nome').eq('id', sessao.barbearia_id).single(),
+  ])
+  const ideal = planoParaProfissionais(Math.max(1, nProfs))
+  const acimaDoLimite = plano.maxProfissionais !== null && nProfs > plano.maxProfissionais
+  const nome = barbearia?.nome ?? 'minha barbearia'
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
-      <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Plano</h1>
-
-      {/* Status atual */}
-      <div className="bg-surface border border-line rounded-card p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="font-ui text-xs uppercase tracking-wider text-fg-muted">Status</span>
-          <span className={`font-ui text-sm uppercase tracking-wider ${STATUS_COR[status] ?? 'text-fg-muted'}`}>
-            {STATUS_LABEL[status] ?? status}
-          </span>
-        </div>
-        {status !== 'trial' && (
-          <div className="flex items-center justify-between">
-            <span className="font-ui text-xs uppercase tracking-wider text-fg-muted">Plano atual</span>
-            <span className="font-ui text-sm uppercase tracking-wider text-fg">{planoAtual}</span>
-          </div>
-        )}
-        {status === 'trial' && (
-          <div className="flex items-center justify-between">
-            <span className="font-ui text-xs uppercase tracking-wider text-fg-muted">Trial restante</span>
-            <span className={`font-ui text-sm ${diasRestantesTrial <= 2 ? 'text-saida' : 'text-amber'}`}>
-              {diasRestantesTrial} {diasRestantesTrial === 1 ? 'dia' : 'dias'}
-            </span>
-          </div>
-        )}
-        {status === 'leitura' && (
-          <p className="font-body text-xs text-saida">
-            Pagamento vencido. Regularize para retomar o acesso completo.
-          </p>
-        )}
-        {status === 'cancelado' && (
-          <p className="font-body text-xs text-saida">
-            Assinatura cancelada. Escolha um plano para reativar.
-          </p>
-        )}
+      <div className="flex items-center gap-3">
+        <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
+        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Plano</h1>
       </div>
 
-      {/* Comparativo de planos */}
-      <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Planos disponíveis</h2>
+      {/* Situação agora */}
+      <section className={`rounded-card border p-5 space-y-3 ${plano.somenteLeitura ? 'border-saida/40 bg-saida/5' : 'border-line bg-surface'}`}>
+        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Seu plano</p>
+        {plano.emTeste ? (
+          <>
+            <p className="font-display text-3xl uppercase text-amber">Teste grátis</p>
+            <p className="font-body text-sm text-fg">
+              {plano.diasTeste <= 1 ? 'Acaba hoje.' : `Faltam ${plano.diasTeste} dias.`} Tudo liberado até lá.
+            </p>
+          </>
+        ) : plano.somenteLeitura ? (
+          <>
+            <p className="font-display text-3xl uppercase text-saida">{plano.cancelada ? 'Cancelada' : 'Teste acabou'}</p>
+            <p className="font-body text-sm text-fg">
+              Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam pausados até escolher um plano.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-display text-3xl uppercase text-entrada">{plano.nome}</p>
+            <p className="font-body text-sm text-fg-muted">{formatBRL(LISTA_PLANOS.find(p => p.id === plano.plano)?.preco ?? 0)} por mês</p>
+          </>
+        )}
 
-      <div className="space-y-3">
-        {PLANOS.map(plano => {
-          const ativo = planoAtual === plano.id && status === 'ativo'
+        <div className="flex items-center gap-2 pt-2 border-t border-line">
+          <Users size={14} className="text-fg-muted" />
+          <p className="font-body text-sm text-fg">
+            {nProfs} profissional{nProfs === 1 ? '' : 'is'} na agenda
+            {plano.maxProfissionais !== null && !plano.emTeste && <span className="text-fg-muted"> · seu plano vai até {plano.maxProfissionais}</span>}
+          </p>
+        </div>
+        {acimaDoLimite && (
+          <p className="flex gap-2 font-body text-xs text-amber">
+            <AlertTriangle size={13} className="shrink-0 mt-0.5" />
+            Você tem mais gente na agenda do que o plano permite. Ninguém novo entra até mudar de plano.
+          </p>
+        )}
+      </section>
+
+      <p className="font-body text-xs text-fg-muted -mt-2">
+        Conta como profissional quem aparece na agenda. Se você é dono e também corta, você conta; se só administra, não.
+      </p>
+
+      {/* Planos */}
+      <section className="space-y-3">
+        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Planos</h2>
+        {LISTA_PLANOS.map(p => {
+          const atual = !plano.emTeste && !plano.somenteLeitura && plano.plano === p.id
+          const recomendado = !atual && p.id === ideal
+          const naoCabe = p.maxProfissionais !== null && nProfs > p.maxProfissionais
           return (
-            <div
-              key={plano.id}
-              className={`bg-surface border rounded-card p-4 space-y-3 ${ativo ? 'border-amber/60' : 'border-line'}`}
-            >
-              <div className="flex items-start justify-between gap-2">
+            <article key={p.id} className={`rounded-card border p-5 space-y-4 ${atual ? 'border-entrada/50 bg-entrada/5' : recomendado ? 'border-amber/60 bg-surface' : 'border-line bg-surface'}`}>
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-ui text-base uppercase tracking-wider text-fg">{plano.label}</span>
-                    {ativo && (
-                      <span className="font-ui text-xs uppercase tracking-wider text-amber border border-amber/40 rounded-full px-2 py-0.5">
-                        Atual
-                      </span>
-                    )}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-ui text-lg uppercase tracking-wider text-fg">{p.nome}</p>
+                    {atual && <span className="px-2 py-0.5 rounded-full border border-entrada/40 text-entrada font-ui text-[10px] uppercase tracking-wider">Seu plano</span>}
+                    {recomendado && <span className="px-2 py-0.5 rounded-full bg-amber text-accent-fg font-ui text-[10px] uppercase tracking-wider">Ideal pra você</span>}
                   </div>
-                  <p className="font-body text-xs text-fg-muted mt-0.5">{plano.descricao}</p>
+                  <p className="font-body text-xs text-fg-muted">{p.resumo}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-mono text-xl text-amber">{formatBRL(plano.preco)}</p>
-                  <p className="font-body text-xs text-fg-muted">/mês</p>
+                  <p className="font-mono text-2xl text-amber whitespace-nowrap">{formatBRL(p.preco)}</p>
+                  <p className="font-body text-[11px] text-fg-muted">por mês</p>
                 </div>
               </div>
-
               <ul className="space-y-1.5">
-                {plano.funcionalidades.map(f => (
-                  <li key={f} className="flex items-center gap-2">
-                    {ativo ? (
-                      <CheckCircle2 size={14} className="text-entrada shrink-0" />
-                    ) : (
-                      <Circle size={14} className="text-fg-muted shrink-0" />
-                    )}
-                    <span className="font-body text-xs text-fg-muted">{f}</span>
+                {p.itens.map(item => (
+                  <li key={item} className="flex gap-2 font-body text-sm text-fg">
+                    <CheckCircle2 size={14} className="text-entrada shrink-0 mt-0.5" /> {item}
                   </li>
                 ))}
               </ul>
-            </div>
+              {naoCabe ? (
+                <p className="font-body text-xs text-fg-muted">Não comporta os {nProfs} profissionais que você tem hoje.</p>
+              ) : !atual && (
+                <a
+                  href={wa(`Oi! Quero o plano ${p.nome} (${formatBRL(p.preco)}/mês) pra ${nome}.`)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-full flex items-center justify-center gap-2 font-ui text-xs uppercase tracking-wider py-3 rounded-button transition-colors ${
+                    recomendado ? 'bg-amber hover:bg-accent-press text-accent-fg' : 'border border-line text-fg hover:border-amber/50'}`}
+                >
+                  <MessageCircle size={14} /> Quero o {p.nome}
+                </a>
+              )}
+            </article>
           )
         })}
-      </div>
+      </section>
 
-      <div className="bg-surface border border-amber/20 rounded-card p-4">
-        <p className="font-body text-xs text-fg-muted text-center">
-          Para assinar ou alterar seu plano, entre em contato via WhatsApp.
-        </p>
-        <a
-          href="https://wa.me/5575982727760?text=Olá! Quero assinar o RÉGUA."
-          target="_blank"
-          rel="noreferrer"
-          className="mt-3 block w-full bg-amber text-bg font-ui text-sm uppercase tracking-wider rounded-button py-2 text-center hover:opacity-90 transition-opacity"
-        >
-          Falar no WhatsApp
-        </a>
-      </div>
+      <section className="bg-surface border border-line rounded-card p-4 space-y-2">
+        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Como funciona</p>
+        <ul className="space-y-1.5 font-body text-sm text-fg-muted list-disc pl-4">
+          <li>Os 14 dias de teste têm tudo liberado, sem limite.</li>
+          <li>Se o teste acabar sem plano, a conta fica só leitura na hora: nada se perde, mas pausa agenda e caixa.</li>
+          <li>Pagou, voltou tudo no mesmo instante, com todos os seus dados.</li>
+          <li>Dá pra mudar de plano quando quiser.</li>
+        </ul>
+      </section>
     </div>
   )
 }
