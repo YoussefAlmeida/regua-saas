@@ -103,6 +103,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   return NextResponse.json({ ...data, aviso })
 }
 
+/** Todas as fotos da barbearia no Storage ({id}/barbeiros/…, {id}/…) */
+async function apagarFotos(db: ReturnType<typeof criarClienteServico>, id: string) {
+  const caminhos: string[] = []
+  const pastas = [id]
+  while (pastas.length) {
+    const pasta = pastas.pop()!
+    for (let pagina = 0; ; pagina++) {
+      const { data } = await db.storage.from('fotos').list(pasta, { limit: 100, offset: pagina * 100 })
+      if (!data?.length) break
+      for (const f of data) {
+        // Sem id = é uma pasta
+        if (f.id) caminhos.push(`${pasta}/${f.name}`)
+        else pastas.push(`${pasta}/${f.name}`)
+      }
+      if (data.length < 100) break
+    }
+  }
+  for (let i = 0; i < caminhos.length; i += 100) {
+    await db.storage.from('fotos').remove(caminhos.slice(i, i + 100))
+  }
+}
+
 /** Apaga a barbearia e TUDO dela. Precisa digitar o link (slug) pra confirmar. */
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await adminLogado())) return NextResponse.json({ erro: 'Entre de novo no admin' }, { status: 401 })
@@ -118,18 +140,32 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const db = criarClienteServico()
 
-  // Um comando só: o banco apaga em cascata usuários, agendamentos, financeiro…
-  // Se algo falhar, nada é apagado (é tudo ou nada).
+  // Antes de apagar: quem é da barbearia (pra limpar os bloqueios de login deles)
+  const { data: pessoas } = await db.from('usuarios').select('id, email, whatsapp').eq('barbearia_id', id)
+  const chavesLogin = (pessoas ?? []).flatMap(u => [
+    `id:reauth:${u.id}`,
+    ...(u.email ? [`id:${u.email.toLowerCase()}`, `id:rec:${u.email.toLowerCase()}`] : []),
+    ...(u.whatsapp ? [`id:${u.whatsapp}`, `id:rec:${u.whatsapp}`] : []),
+  ])
+
+  // Um comando só: o banco apaga em cascata usuários, agendamentos, financeiro,
+  // serviços, horários, auditoria… Se algo falhar, nada é apagado (tudo ou nada).
   const { error } = await db.from('barbearias').delete().eq('id', id)
   if (error) {
     console.error('[admin apagar]', error.message)
     return NextResponse.json({ erro: 'Não deu pra apagar a barbearia. Nada foi removido.' }, { status: 500 })
   }
 
-  // Fotos guardadas no Storage
-  const { data: pastas } = await db.storage.from('fotos').list(`${id}/barbeiros`, { limit: 100 })
-  if (pastas?.length) await db.storage.from('fotos').remove(pastas.map(f => `${id}/barbeiros/${f.name}`))
+  // O que fica fora do banco da barbearia: a pasta do admin (erros e
+  // ações), bloqueios de login e as fotos no Storage
+  await Promise.all([
+    db.from('erros_sistema').delete().eq('barbearia_id', id),
+    db.from('admin_log').delete().eq('barbearia_id', id),
+    chavesLogin.length ? db.from('tentativas_login').delete().in('chave', chavesLogin) : null,
+    apagarFotos(db, id),
+  ])
 
-  await registrarAcaoAdmin(req, 'apagar', b, { slug: b.slug, status: b.status, plano: b.plano })
+  // Só um recibo no registro geral (sem ligação com a pasta, que não existe mais)
+  await registrarAcaoAdmin(req, 'apagar', null, { barbearia: b.nome, slug: b.slug, status: b.status, plano: b.plano })
   return NextResponse.json({ ok: true })
 }

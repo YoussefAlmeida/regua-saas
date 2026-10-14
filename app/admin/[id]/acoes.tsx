@@ -125,7 +125,7 @@ export default function AcoesBarbearia({ barbearia: b }: Props) {
         ) : (
           <div className="bg-saida/5 border border-saida/30 rounded-button p-3 space-y-2">
             <p className="font-body text-sm text-fg">
-              Isso apaga <strong>tudo</strong> de {b.nome}: dono, barbeiros, clientes, agendamentos e financeiro. <strong>Não dá pra desfazer.</strong>
+              Isso apaga <strong>tudo</strong> de {b.nome}: dono, barbeiros, clientes, agendamentos, financeiro, fotos e a pasta aqui do admin (erros e atividade). <strong>Não dá pra desfazer.</strong>
             </p>
             <p className="font-body text-xs text-fg-muted">Pra confirmar, digite <span className="font-mono text-fg">{b.slug}</span>:</p>
             <input value={confirmacao} onChange={e => setConfirmacao(e.target.value)} autoFocus aria-label="Confirmação"
