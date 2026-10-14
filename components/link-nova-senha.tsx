@@ -47,7 +47,7 @@ export default function LinkNovaSenha({
         aria-label={`Link de nova senha pra ${nome}`}
         className={compacto
           ? 'w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-amber transition-colors shrink-0 disabled:opacity-40'
-          : 'inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-line text-fg-muted hover:text-fg font-ui text-xs uppercase tracking-wider disabled:opacity-40'}
+          : 'font-semibold inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-line text-fg-muted hover:text-fg font-ui text-xs disabled:opacity-40'}
       >
         <KeyRound size={14} /> {!compacto && (gerando ? 'Gerando…' : 'Link de nova senha')}
       </button>
@@ -58,18 +58,18 @@ export default function LinkNovaSenha({
           <div className="relative w-full max-w-sm bg-surface border border-line rounded-t-card sm:rounded-card p-6 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 className="font-ui text-sm uppercase tracking-wider text-fg">Senha nova pra {nome.split(' ')[0]}</h2>
+                <h2 className="font-semibold font-ui text-sm text-fg">Senha nova pra {nome.split(' ')[0]}</h2>
                 <p className="font-body text-xs text-fg-muted mt-0.5">O link vale 24 horas e funciona uma vez só.</p>
               </div>
               <button onClick={() => setRes(null)} aria-label="Fechar"><X size={18} className="text-fg-muted" /></button>
             </div>
             <a href={wa} target="_blank" rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:bg-entrada/20">
+              className="font-semibold w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button hover:bg-entrada/20">
               <MessageCircle size={14} /> Mandar no WhatsApp
             </a>
             <button
               onClick={async () => { await navigator.clipboard.writeText(res.link).catch(() => null); setCopiado(true); setTimeout(() => setCopiado(false), 2000) }}
-              className="w-full flex items-center justify-center gap-2 border border-line text-fg-muted hover:text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button"
+              className="font-semibold w-full flex items-center justify-center gap-2 border border-line text-fg-muted hover:text-fg font-ui text-sm py-3 rounded-button"
             >
               {copiado ? <><Check size={14} /> Copiado</> : <><Copy size={14} /> Copiar link</>}
             </button>

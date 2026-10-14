@@ -20,7 +20,7 @@ export default function ContatoCliente({
   if (!whatsapp) return null
   const numero = soDigitos(whatsapp)
   const wa = `https://wa.me/${numero}${mensagem ? `?text=${encodeURIComponent(mensagem)}` : ''}`
-  const base = 'flex items-center justify-center gap-1.5 border border-line bg-surface-alt text-fg-muted hover:text-fg font-ui text-xs uppercase tracking-wider rounded-button transition-colors'
+  const base = 'font-semibold flex items-center justify-center gap-1.5 border border-line bg-surface-alt text-fg-muted hover:text-fg font-ui text-xs rounded-button transition-colors'
   const tam = compacto ? 'px-3 py-1.5' : 'flex-1 py-2.5'
 
   return (

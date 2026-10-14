@@ -39,27 +39,25 @@ const PERGUNTAS = [
 ]
 
 export default function FaqLanding() {
-  const [aberto, setAberto] = useState<number | null>(null)
+  const [aberto, setAberto] = useState<number | null>(0)
 
   return (
-    <div className="space-y-2">
+    <div className="border-t border-line">
       {PERGUNTAS.map((item, i) => (
-        <div key={i} className="bg-surface border border-line rounded-card overflow-hidden">
+        <div key={i} className="border-b border-line">
           <button
             onClick={() => setAberto(aberto === i ? null : i)}
             aria-expanded={aberto === i}
-            className="w-full flex items-center justify-between px-5 py-4 text-left gap-4"
+            className="w-full flex items-center justify-between py-5 text-left gap-6"
           >
-            <span className="font-ui text-sm uppercase tracking-wider text-fg">{item.q}</span>
+            <span className="text-base sm:text-lg font-semibold text-fg">{item.q}</span>
             <ChevronDown
-              size={16}
+              size={20}
               className={`text-fg-muted shrink-0 transition-transform duration-200 ${aberto === i ? 'rotate-180' : ''}`}
             />
           </button>
           {aberto === i && (
-            <div className="px-5 pb-4">
-              <p className="font-body text-sm text-fg-muted">{item.r}</p>
-            </div>
+            <p className="pb-6 -mt-1 text-fg-muted leading-relaxed max-w-2xl">{item.r}</p>
           )}
         </div>
       ))}

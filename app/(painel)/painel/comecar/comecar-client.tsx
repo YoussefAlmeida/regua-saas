@@ -20,11 +20,11 @@ const PASSOS: { id: Passo; t: string }[] = [
 interface Servico { id: string; nome: string; preco: number; duracao_min: number }
 
 const SUGESTOES = [
-  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#E8B04B' },
+  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#9A4A1A' },
   { nome: 'Barba', preco: '20', duracao_min: 20, cor: '#6BA3D6' },
   { nome: 'Corte + barba', preco: '45', duracao_min: 50, cor: '#4FB477' },
-  { nome: 'Pezinho', preco: '10', duracao_min: 10, cor: '#A1A1A8' },
-  { nome: 'Sobrancelha', preco: '10', duracao_min: 10, cor: '#A1A1A8' },
+  { nome: 'Pezinho', preco: '10', duracao_min: 10, cor: '#6A635B' },
+  { nome: 'Sobrancelha', preco: '10', duracao_min: 10, cor: '#6A635B' },
   { nome: 'Pigmentação', preco: '25', duracao_min: 30, cor: '#E2564D' },
 ]
 
@@ -93,14 +93,14 @@ export default function ComecarClient({
   }
 
   const textoDivulgar = `Agora dá pra marcar horário na ${barbearia.nome} direto pelo celular, sem baixar app: ${linkPublico}`
-  const inputCls = 'w-full bg-bg border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const primario = 'w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3.5 rounded-button transition-colors disabled:opacity-40'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const primario = 'font-semibold w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-40'
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div>
         <p className="font-ui text-xs uppercase tracking-wider text-amber">Primeiros passos</p>
-        <h1 className="font-display text-3xl uppercase tracking-wide text-fg mt-1">
+        <h1 className="font-display text-3xl text-fg mt-1">
           {passo === 'equipe' && `Bem-vindo, ${donoNome.split(' ')[0]}`}
           {passo === 'servicos' && 'O que vocês fazem?'}
           {passo === 'link' && 'Seu link tá pronto'}
@@ -128,7 +128,7 @@ export default function ComecarClient({
               {euCorto ? <Check size={18} /> : <Scissors size={18} />}
             </span>
             <span className="flex-1">
-              <span className="block font-ui text-sm uppercase tracking-wider text-fg">Sou eu que corto</span>
+              <span className="font-semibold block font-ui text-sm text-fg">Sou eu que corto</span>
               <span className="block font-body text-xs text-fg-muted">{euCorto ? 'Você já aparece na agenda' : 'Você aparece como barbeiro na agenda'}</span>
             </span>
           </button>
@@ -137,7 +137,7 @@ export default function ComecarClient({
             <div className="flex items-center gap-4">
               <span className="w-10 h-10 rounded-full bg-surface-alt text-amber flex items-center justify-center shrink-0"><UserPlus size={18} /></span>
               <span className="flex-1">
-                <span className="block font-ui text-sm uppercase tracking-wider text-fg">Convidar barbeiro</span>
+                <span className="font-semibold block font-ui text-sm text-fg">Convidar barbeiro</span>
                 <span className="block font-body text-xs text-fg-muted">Ele cria a conta pelo link e você aprova</span>
               </span>
             </div>
@@ -146,12 +146,12 @@ export default function ComecarClient({
                 href={`https://wa.me/?text=${encodeURIComponent(`Fala! Te adicionei na equipe da ${barbearia.nome} no RÉGUA. Cria sua conta por aqui (vale 7 dias): ${conviteLink}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-3 rounded-button"
+                className="font-semibold w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button"
               >
                 <MessageCircle size={14} /> Enviar convite no WhatsApp
               </a>
             ) : (
-              <button onClick={gerarConvite} disabled={ocupado} className="w-full border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:border-amber/50">
+              <button onClick={gerarConvite} disabled={ocupado} className="font-semibold w-full border border-line text-fg font-ui text-sm py-3 rounded-button hover:border-amber/50">
                 Gerar convite
               </button>
             )}
@@ -205,11 +205,11 @@ export default function ComecarClient({
           ) : (
             <div className="flex flex-wrap gap-2">
               {SUGESTOES.filter(s => !servicos.some(x => x.nome.toLowerCase() === s.nome.toLowerCase())).map(s => (
-                <button key={s.nome} onClick={() => setRascunho({ ...s })} className="flex items-center gap-1 px-3 py-2 rounded-full border border-line bg-surface font-ui text-xs uppercase tracking-wider text-fg hover:border-amber/50">
+                <button key={s.nome} onClick={() => setRascunho({ ...s })} className="font-semibold flex items-center gap-1 px-3 py-2 rounded-full border border-line bg-surface font-ui text-xs text-fg hover:border-amber/50">
                   <Plus size={12} /> {s.nome}
                 </button>
               ))}
-              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#E8B04B' })} className="px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-amber">
+              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#9A4A1A' })} className="font-semibold px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs text-fg-muted hover:text-amber">
                 Outro…
               </button>
             </div>
@@ -230,10 +230,10 @@ export default function ComecarClient({
             <p className="font-mono text-base text-amber break-all">{linkPublico.replace(/^https?:\/\//, '')}</p>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={copiar} className="flex items-center justify-center gap-2 border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:border-amber/50">
+            <button onClick={copiar} className="font-semibold flex items-center justify-center gap-2 border border-line text-fg font-ui text-sm py-3 rounded-button hover:border-amber/50">
               {copiado ? <><Check size={14} /> Copiado</> : <><Copy size={14} /> Copiar</>}
             </button>
-            <a href={`https://wa.me/?text=${encodeURIComponent(textoDivulgar)}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-3 rounded-button">
+            <a href={`https://wa.me/?text=${encodeURIComponent(textoDivulgar)}`} target="_blank" rel="noopener noreferrer" className="font-semibold flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button">
               <MessageCircle size={14} /> WhatsApp
             </a>
           </div>
@@ -250,7 +250,7 @@ export default function ComecarClient({
           <a href={`/${barbearia.slug}`} target="_blank" rel="noopener noreferrer" className={primario}>
             <ExternalLink size={15} /> Abrir minha página
           </a>
-          <button onClick={() => { router.push('/painel/agenda'); router.refresh() }} className="w-full border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button hover:border-amber/50">
+          <button onClick={() => { router.push('/painel/agenda'); router.refresh() }} className="font-semibold w-full border border-line text-fg font-ui text-sm py-3 rounded-button hover:border-amber/50">
             Já marquei — ver na agenda
           </button>
           <p className="font-body text-xs text-fg-muted text-center">

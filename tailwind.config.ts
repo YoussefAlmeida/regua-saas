@@ -82,10 +82,11 @@ const config: Config = {
 
       // ── Tipografia ────────────────────────────────────────────
       fontFamily: {
-        display: ["var(--font-display)"],
-        ui: ["var(--font-ui)"],
-        body: ["var(--font-body)"],
-        mono: ["var(--font-mono)"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        // Interface, texto e valores na mesma sans (valores com algarismos tabulares)
+        ui: ["var(--font-body)", "system-ui", "sans-serif"],
+        body: ["var(--font-body)", "system-ui", "sans-serif"],
+        mono: ["var(--font-body)", "system-ui", "sans-serif"],
       },
 
       // ── Escala tipográfica (12/14/16/20/28/40/64) ─────────────

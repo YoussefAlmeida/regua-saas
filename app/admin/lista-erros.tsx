@@ -50,7 +50,7 @@ export default function ListaErros({ erros, barbearia_id, mostrarBarbearia = fal
   }
 
   if (erros.length === 0) {
-    return <p className="font-body text-sm text-fg-muted text-center py-8">Nenhum erro registrado. 🎉</p>
+    return <p className="font-body text-sm text-fg-muted text-center py-8">Nenhum erro registrado.</p>
   }
 
   return (

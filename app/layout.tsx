@@ -1,31 +1,21 @@
 import type { Metadata, Viewport } from "next"
-import { Anton, Oswald, Open_Sans, Space_Mono } from "next/font/google"
+import { Fraunces, Instrument_Sans } from "next/font/google"
 import "./globals.css"
 import { urlDoSiteFixa } from "@/lib/site-url"
 
-const anton = Anton({
-  weight: "400",
+// Títulos: serifa com personagem (ofício, tradição) — sem caixa alta
+const fraunces = Fraunces({
   subsets: ["latin"],
+  style: ["normal", "italic"],
+  axes: ["opsz", "SOFT"],
   variable: "--font-display",
   display: "swap",
 })
 
-const oswald = Oswald({
-  subsets: ["latin"],
-  variable: "--font-ui",
-  display: "swap",
-})
-
-const openSans = Open_Sans({
+// Interface e texto: sans limpa e humana; valores usam algarismos tabulares
+const instrument = Instrument_Sans({
   subsets: ["latin"],
   variable: "--font-body",
-  display: "swap",
-})
-
-const spaceMono = Space_Mono({
-  weight: ["400", "700"],
-  subsets: ["latin"],
-  variable: "--font-mono",
   display: "swap",
 })
 
@@ -45,19 +35,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0B0B0C",
+  themeColor: "#F6F3EE",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="pt-BR"
-      className={`
-        ${anton.variable}
-        ${oswald.variable}
-        ${openSans.variable}
-        ${spaceMono.variable}
-      `}
+      className={`${fraunces.variable} ${instrument.variable}`}
     >
       <body className="bg-bg text-fg font-body antialiased min-h-screen">
         {children}

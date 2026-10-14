@@ -126,8 +126,8 @@ export default function MeusAgendamentos({
     setMsg({ t: 'Cancelado. A barbearia já foi avisada.' })
   }
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <div className="min-h-screen bg-bg">
@@ -137,7 +137,7 @@ export default function MeusAgendamentos({
             <ChevronLeft size={20} />
           </Link>
           <div className="flex-1 min-w-0">
-            <p className="font-display text-xl text-amber tracking-wide uppercase leading-tight line-clamp-2 break-words">{barbearia.nome}</p>
+            <p className="font-display text-xl text-amber leading-tight line-clamp-2 break-words">{barbearia.nome}</p>
             <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted">Meus horários</p>
           </div>
           {nome && (
@@ -151,7 +151,7 @@ export default function MeusAgendamentos({
       <main className="max-w-lg mx-auto px-4 py-6 pb-16 space-y-8">
         {!nome ? (
           <section>
-            <h1 className="font-ui text-lg uppercase tracking-wider text-fg mb-1">Entrar</h1>
+            <h1 className="font-semibold font-ui text-lg text-fg mb-1">Entrar</h1>
             <p className="font-body text-sm text-fg-muted mb-5">Use o WhatsApp e a senha que você criou ao agendar.</p>
             <form onSubmit={entrar} className="bg-surface border border-line rounded-card p-5 space-y-4">
               <div>
@@ -163,7 +163,7 @@ export default function MeusAgendamentos({
                 <input id="senha" type="password" autoComplete="current-password" value={senha} onChange={e => setSenha(e.target.value)} required className={inputCls} />
               </div>
               {erroLogin && <p className="font-body text-sm text-saida" role="alert">{erroLogin}</p>}
-              <button type="submit" disabled={entrando} className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors disabled:opacity-50">
+              <button type="submit" disabled={entrando} className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50">
                 {entrando ? 'Entrando…' : 'Entrar'}
               </button>
             </form>
@@ -178,8 +178,8 @@ export default function MeusAgendamentos({
         ) : (
           <>
             <div className="flex items-center justify-between">
-              <h1 className="font-ui text-lg uppercase tracking-wider text-fg">Oi, {nome.split(' ')[0]}</h1>
-              <Link href={`/${barbearia.slug}`} className="flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button transition-colors">
+              <h1 className="font-semibold font-ui text-lg text-fg">Oi, {nome.split(' ')[0]}</h1>
+              <Link href={`/${barbearia.slug}`} className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors">
                 <Plus size={13} /> Marcar
               </Link>
             </div>
@@ -191,7 +191,7 @@ export default function MeusAgendamentos({
             )}
 
             <section className="space-y-3">
-              <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Próximos</h2>
+              <h2 className="font-semibold font-ui text-sm text-fg-muted">Próximos</h2>
               {proximos.length === 0 ? (
                 <div className="text-center py-10 bg-surface border border-line rounded-card">
                   <CalendarX size={28} strokeWidth={1.5} className="mx-auto text-fg-muted opacity-50 mb-2" />
@@ -217,7 +217,7 @@ export default function MeusAgendamentos({
                       <button
                         onClick={() => cancelar(a)}
                         disabled={cancelando === a.id}
-                        className="w-full border border-saida/30 text-saida hover:bg-saida/5 font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors disabled:opacity-50"
+                        className="font-semibold w-full border border-saida/30 text-saida hover:bg-saida/5 font-ui text-sm py-2.5 rounded-button transition-colors disabled:opacity-50"
                       >
                         {cancelando === a.id ? 'Cancelando…' : 'Cancelar horário'}
                       </button>
@@ -236,7 +236,7 @@ export default function MeusAgendamentos({
 
             {historico.length > 0 && (
               <section className="space-y-2">
-                <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Histórico</h2>
+                <h2 className="font-semibold font-ui text-sm text-fg-muted">Histórico</h2>
                 <ul className="bg-surface border border-line rounded-card divide-y divide-line">
                   {historico.map(a => {
                     const q = quando(a.inicio)
@@ -262,18 +262,18 @@ export default function MeusAgendamentos({
 
             {/* Seus dados (LGPD) */}
             <section className="border-t border-line pt-6 space-y-3">
-              <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Seus dados</h2>
+              <h2 className="font-semibold font-ui text-sm text-fg-muted">Seus dados</h2>
               <p className="font-body text-xs text-fg-muted">
                 Veja como cuidamos deles na <Link href="/privacidade" className="text-amber hover:underline">Política de Privacidade</Link>.
               </p>
               <div className="flex flex-wrap gap-2">
                 <a href="/api/cliente/meus-dados" download
-                  className="flex items-center gap-1.5 border border-line text-fg font-ui text-[11px] uppercase tracking-wider px-3 py-2.5 rounded-button hover:border-amber/50">
+                  className="font-semibold flex items-center gap-1.5 border border-line text-fg font-ui text-[11px] px-3 py-2.5 rounded-button hover:border-amber/50">
                   <Download size={13} /> Baixar meus dados
                 </a>
                 {!apagando && (
                   <button onClick={() => setApagando(true)}
-                    className="flex items-center gap-1.5 border border-line text-saida font-ui text-[11px] uppercase tracking-wider px-3 py-2.5 rounded-button hover:border-saida/50">
+                    className="font-semibold flex items-center gap-1.5 border border-line text-saida font-ui text-[11px] px-3 py-2.5 rounded-button hover:border-saida/50">
                     <Trash2 size={13} /> Apagar minha conta
                   </button>
                 )}
@@ -291,9 +291,9 @@ export default function MeusAgendamentos({
                   {erroApagar && <p className="font-body text-sm text-saida" role="alert">{erroApagar}</p>}
                   <div className="flex gap-2">
                     <button type="button" onClick={() => { setApagando(false); setSenhaApagar(''); setErroApagar('') }}
-                      className="flex-1 border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button">Voltar</button>
+                      className="font-semibold flex-1 border border-line text-fg font-ui text-sm py-3 rounded-button">Voltar</button>
                     <button type="submit" disabled={ocupadoApagar}
-                      className="flex-1 bg-saida text-bg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-50">
+                      className="font-semibold flex-1 bg-saida text-bg font-ui text-sm py-3 rounded-button disabled:opacity-50">
                       {ocupadoApagar ? 'Apagando…' : 'Apagar de vez'}
                     </button>
                   </div>

@@ -50,7 +50,7 @@ export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
     router.refresh()
   }
 
-  const btn = 'flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-button border font-ui text-xs uppercase tracking-wider transition-colors disabled:opacity-40'
+  const btn = 'font-semibold flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-button border font-ui text-sm transition-colors disabled:opacity-40'
   const parado = b.status === 'leitura' || b.status === 'cancelado'
 
   return (
@@ -84,7 +84,7 @@ export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
         </p>
         <div className="flex gap-2">
           <select value={plano} onChange={e => setPlano(e.target.value as PlanoPago)} aria-label="Plano"
-            className="flex-1 bg-bg border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber">
+            className="flex-1 bg-surface border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber">
             {Object.entries(PLANOS_ADMIN).map(([id, p]) => (
               <option key={id} value={id}>{p.nome} — R$ {p.preco.toFixed(2).replace('.', ',')}/mês</option>
             ))}
@@ -134,7 +134,7 @@ export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
             </p>
             <p className="font-body text-xs text-fg-muted">Pra confirmar, digite <span className="font-mono text-fg">{b.slug}</span>:</p>
             <input value={confirmacao} onChange={e => setConfirmacao(e.target.value)} autoFocus aria-label="Confirmação"
-              className="w-full bg-bg border border-saida/40 rounded-button px-3 py-2 font-mono text-sm text-fg focus:outline-none focus:ring-1 focus:ring-saida" />
+              className="w-full bg-surface border border-saida/40 rounded-button px-3 py-2 font-mono text-sm text-fg focus:outline-none focus:ring-1 focus:ring-saida" />
             <div className="flex gap-2">
               <button onClick={() => { setApagando(false); setConfirmacao('') }} className={`${btn} flex-1 border-line text-fg-muted`}>Voltar</button>
               <button disabled={ocupado || confirmacao !== b.slug} onClick={apagar} className={`${btn} flex-1 bg-saida border-saida text-bg`}>

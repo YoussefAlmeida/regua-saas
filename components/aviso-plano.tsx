@@ -17,7 +17,7 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
           <p className="flex-1 font-body text-xs text-fg">
             Seu plano {plano.nome} vai até {plano.maxProfissionais} na agenda e tem {excedente} a mais. Escolha quem fica.
           </p>
-          <Link href="/painel/mais/ajustar-equipe" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+          <Link href="/painel/mais/ajustar-equipe" className="font-semibold shrink-0 bg-amber text-accent-fg font-ui text-[11px] px-3 py-1.5 rounded-button">
             Ajustar
           </Link>
         </div>
@@ -45,7 +45,7 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
             {!souDono && ' Avisa o dono da barbearia.'}
           </p>
           {souDono && (
-            <Link href="/painel/mais/plano" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+            <Link href="/painel/mais/plano" className="font-semibold shrink-0 bg-amber text-accent-fg font-ui text-[11px] px-3 py-1.5 rounded-button">
               {plano.nome === 'Pagamento atrasado' ? 'Pagar' : 'Escolher plano'}
             </Link>
           )}
@@ -67,7 +67,7 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
               ? `O pagamento do plano venceu. Pague até ${limite} pra agenda não parar.`
               : d <= 0 ? 'Seu plano vence hoje.' : `Seu plano vence em ${d} dia${d > 1 ? 's' : ''}.`}
           </p>
-          <Link href="/painel/mais/plano" className="shrink-0 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+          <Link href="/painel/mais/plano" className="font-semibold shrink-0 bg-amber text-accent-fg font-ui text-[11px] px-3 py-1.5 rounded-button">
             Pagar
           </Link>
         </div>
@@ -81,7 +81,7 @@ export default function AvisoPlano({ plano, souDono, excedente = 0, agendado = n
           <p className="flex-1 font-body text-xs text-fg">
             {plano.diasTeste <= 1 ? 'Seu teste grátis acaba hoje.' : `Faltam ${plano.diasTeste} dias de teste grátis.`} Escolha um plano pra não parar.
           </p>
-          <Link href="/painel/mais/plano" className="shrink-0 border border-amber/50 text-amber font-ui text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-button">
+          <Link href="/painel/mais/plano" className="font-semibold shrink-0 border border-amber/50 text-amber font-ui text-[11px] px-3 py-1.5 rounded-button">
             Ver planos
           </Link>
         </div>

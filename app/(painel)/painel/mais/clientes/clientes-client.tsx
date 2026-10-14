@@ -50,7 +50,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Clientes</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Clientes</h1>
         <span className="font-mono text-sm text-fg-muted">{lista.length}</span>
       </div>
 
@@ -62,7 +62,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
             value={busca}
             onChange={e => setBusca(e.target.value)}
             placeholder="Buscar por nome ou WhatsApp…"
-            className="w-full bg-surface-alt border border-line rounded-button pl-9 pr-4 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
+            className="w-full bg-surface border border-line rounded-button pl-9 pr-4 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber"
           />
         </div>
       )}
@@ -72,11 +72,11 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
           {clientesIniciais.length === 0 ? (
             <>
               <Users size={40} className="mx-auto mb-3 text-fg-muted opacity-30" strokeWidth={1} />
-              <p className="font-ui text-sm uppercase tracking-wider text-fg-muted">Nenhum cliente ainda</p>
+              <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum cliente ainda</p>
               <p className="font-body text-xs text-fg-muted mt-2">Os clientes aparecem aqui após o primeiro agendamento.</p>
             </>
           ) : (
-            <p className="font-ui text-sm uppercase tracking-wider text-fg-muted">Nenhum resultado</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum resultado</p>
           )}
         </div>
       ) : (
@@ -90,7 +90,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
                   {c.nome.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{c.nome}</p>
+                  <p className="font-semibold font-ui text-sm text-fg truncate">{c.nome}</p>
                   <div className="flex items-center gap-3 mt-0.5">
                     {c.whatsapp && (
                       <span className="font-body text-xs text-fg-muted">{c.whatsapp}</span>

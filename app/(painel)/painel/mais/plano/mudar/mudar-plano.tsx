@@ -110,7 +110,7 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
                       {fica && <Check size={13} className="text-accent-fg" />}
                     </span>
                     <span className="flex-1 min-w-0">
-                      <span className="block font-ui text-sm uppercase tracking-wider text-fg truncate">
+                      <span className="font-semibold block font-ui text-sm text-fg truncate">
                         {p.nome}{p.souEu && <span className="normal-case text-fg-muted"> (você)</span>}
                       </span>
                       <span className="block font-body text-xs text-fg-muted">
@@ -154,7 +154,7 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
 
       <div className="flex gap-3">
         {passo > 0 && (
-          <button onClick={() => setPasso(passo - 1)} className="flex-1 border border-line text-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button">
+          <button onClick={() => setPasso(passo - 1)} className="font-semibold flex-1 border border-line text-fg font-ui text-sm py-3 rounded-button">
             Voltar
           </button>
         )}
@@ -162,13 +162,13 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
           <button
             onClick={() => setPasso(passo + 1)}
             disabled={etapa === 'Quem fica' && ficam.length === 0}
-            className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-40"
+            className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button disabled:opacity-40"
           >
             Continuar
           </button>
         ) : (
           <button onClick={confirmar} disabled={enviando}
-            className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-40">
+            className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button disabled:opacity-40">
             {enviando ? 'Salvando…' : `Pedir o ${para.nome}`}
           </button>
         )}

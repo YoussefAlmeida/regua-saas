@@ -43,13 +43,12 @@ export function textoConfirmacaoCliente(opts: {
     weekday: 'long', day: '2-digit', month: 'long',
   })
   return (
-    `✂️ *${opts.barbeariaNome}* — Agendamento confirmado!\n\n` +
-    `Olá, ${opts.clienteNome}!\n\n` +
-    `📋 *${opts.servicoNome}*\n` +
-    `💈 ${opts.barbeiiroNome}\n` +
-    `📅 ${dataFmt}\n` +
-    `🕐 ${opts.hora}\n\n` +
-    `Até lá! 👋`
+    `*${opts.barbeariaNome}* · horário confirmado\n\n` +
+    `Olá, ${opts.clienteNome}.\n\n` +
+    `Serviço: *${opts.servicoNome}*\n` +
+    `Com: ${opts.barbeiiroNome}\n` +
+    `Quando: ${dataFmt}, às ${opts.hora}\n\n` +
+    `Até lá.`
   )
 }
 
@@ -62,12 +61,11 @@ export function textoLembreteCliente(opts: {
   linkCancelar?: string
 }): string {
   return (
-    `⏰ *Lembrete — ${opts.barbeariaNome}*\n\n` +
-    `Oi, ${opts.clienteNome}! Seu agendamento é em 2 horas:\n\n` +
-    `💈 ${opts.barbeiiroNome} · ${opts.servicoNome}\n` +
-    `🕐 ${opts.hora}\n\n` +
+    `*${opts.barbeariaNome}* · lembrete\n\n` +
+    `Oi, ${opts.clienteNome}. Seu horário é daqui a 2 horas:\n\n` +
+    `${opts.servicoNome} com ${opts.barbeiiroNome}, às *${opts.hora}*\n\n` +
     (opts.linkCancelar ? `Precisa cancelar? Toque aqui (até 1h antes):\n${opts.linkCancelar}\n\n` : '') +
-    `Até logo! ✂️`
+    `Até já.`
   )
 }
 
@@ -82,11 +80,10 @@ export function textoNotificacaoBarbeiro(opts: {
     weekday: 'short', day: '2-digit', month: '2-digit',
   })
   return (
-    `📩 *Novo agendamento!*\n\n` +
-    `Oi, ${opts.barbeiiroNome}!\n\n` +
-    `👤 ${opts.clienteNome}\n` +
-    `✂️ ${opts.servicoNome}\n` +
-    `📅 ${dataFmt} às ${opts.hora}`
+    `*Novo horário marcado*\n\n` +
+    `${opts.barbeiiroNome}, entrou um cliente na sua agenda:\n\n` +
+    `${opts.clienteNome} · ${opts.servicoNome}\n` +
+    `${dataFmt}, às ${opts.hora}`
   )
 }
 

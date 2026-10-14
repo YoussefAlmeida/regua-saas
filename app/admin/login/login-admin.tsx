@@ -31,12 +31,12 @@ export default function LoginAdmin() {
       <div className="w-full max-w-xs space-y-6">
         <div className="text-center">
           <ShieldCheck size={28} className="mx-auto text-amber mb-2" />
-          <h1 className="font-display text-4xl text-amber tracking-widest uppercase">Régua</h1>
+          <h1 className="font-display text-4xl text-amber">Régua</h1>
           <p className="font-ui text-[11px] uppercase tracking-[0.2em] text-fg-muted">Painel do dono do sistema</p>
         </div>
         <form onSubmit={entrar} className="bg-surface border border-line rounded-card p-6 space-y-4">
           <div className="space-y-1">
-            <label htmlFor="senha" className="font-ui text-xs uppercase tracking-wider text-fg-muted">Senha do admin</label>
+            <label htmlFor="senha" className="font-ui text-sm font-medium text-fg">Senha do admin</label>
             <input
               id="senha"
               type="password"
@@ -45,11 +45,11 @@ export default function LoginAdmin() {
               value={senha}
               onChange={e => setSenha(e.target.value)}
               required
-              className="w-full bg-bg border border-line rounded-button px-3 py-2.5 font-body text-base text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+              className="w-full bg-surface border border-line rounded-button px-3 py-2.5 font-body text-base text-fg focus:outline-none focus:ring-1 focus:ring-amber"
             />
           </div>
           {erro && <p className="font-body text-sm text-saida" role="alert">{erro}</p>}
-          <button type="submit" disabled={entrando} className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider rounded-button py-3 transition-colors disabled:opacity-50">
+          <button type="submit" disabled={entrando} className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm rounded-button py-3 transition-colors disabled:opacity-50">
             {entrando ? 'Entrando…' : 'Entrar'}
           </button>
         </form>

@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: Promise<{ token: string
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center px-4">
         <div className="w-full max-w-sm text-center space-y-4">
-          <h1 className="font-display text-3xl uppercase tracking-wide text-fg">Link inválido</h1>
+          <h1 className="font-display text-3xl text-fg">Link inválido</h1>
           <p className="font-body text-sm text-fg-muted">{v.erro}</p>
           <Link href="/recuperar-senha" className="inline-block text-amber font-ui text-xs uppercase tracking-wider hover:underline">Pedir outro link</Link>
         </div>

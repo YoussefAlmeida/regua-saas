@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { problemaNaSenha } from '@/lib/senha'
 import { useRouter } from 'next/navigation'
+import { Marca } from '@/components/marca'
 import Link from 'next/link'
 
 type Etapa = 'barbearia' | 'dono'
@@ -76,15 +77,15 @@ export default function CadastroBarbeariaPage() {
     }
   }
 
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg'
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-12">
       <div className="mb-8 text-center">
-        <h1 className="font-display text-5xl text-amber tracking-widest">RÉGUA</h1>
-        <p className="font-ui text-fg-muted text-xs uppercase tracking-[0.2em] mt-1">
-          {etapa === 'barbearia' ? 'sua barbearia' : 'seu acesso'}
+        <h1 aria-label="RÉGUA"><Marca className="text-fg scale-150 origin-center" /></h1>
+        <p className="font-body text-fg-muted text-sm mt-4">
+          {etapa === 'barbearia' ? 'Passo 1 de 2 · sua barbearia' : 'Passo 2 de 2 · seu acesso'}
         </p>
       </div>
 
@@ -103,7 +104,7 @@ export default function CadastroBarbeariaPage() {
       <div className="w-full max-w-sm bg-surface rounded-card border border-line p-6">
         {etapa === 'barbearia' ? (
           <form onSubmit={avancar} className="space-y-4">
-            <h2 className="font-ui text-lg uppercase tracking-wider text-fg mb-2">Sua barbearia</h2>
+            <h2 className="font-semibold font-ui text-lg text-fg mb-2">Sua barbearia</h2>
 
             <div className="space-y-1">
               <label className={labelCls}>Nome da barbearia *</label>
@@ -157,7 +158,7 @@ export default function CadastroBarbeariaPage() {
 
             <button
               type="submit"
-              className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors"
+              className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
             >
               Próximo
             </button>
@@ -172,7 +173,7 @@ export default function CadastroBarbeariaPage() {
               >
                 ← Voltar
               </button>
-              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">Seu acesso</h2>
+              <h2 className="font-semibold font-ui text-lg text-fg">Seu acesso</h2>
             </div>
 
             <div className="space-y-1">
@@ -238,7 +239,7 @@ export default function CadastroBarbeariaPage() {
             <button
               type="submit"
               disabled={carregando}
-              className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui uppercase tracking-wider text-sm py-3 rounded-button transition-colors disabled:opacity-50"
+              className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50"
             >
               {carregando ? 'Criando conta…' : 'Criar barbearia'}
             </button>

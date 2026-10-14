@@ -168,8 +168,8 @@ export default function AgendaClient({
     ...bloqsProfAtual.map(item => ({ tipo: 'bloq' as const, item })),
   ].sort((a, b) => a.item.inicio.localeCompare(b.item.inicio))
 
-  const inputCls = 'w-full bg-bg border border-line rounded-button px-3 py-2 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem)]">
@@ -180,7 +180,7 @@ export default function AgendaClient({
         </button>
 
         <div className="text-center">
-          <p className="font-ui text-sm uppercase tracking-wider text-fg">{formatarData(data)}</p>
+          <p className="font-semibold font-ui text-sm text-fg">{formatarData(data)}</p>
           {data === hoje && (
             <span className="font-body text-xs text-amber">Hoje</span>
           )}
@@ -200,7 +200,7 @@ export default function AgendaClient({
           </button>
           <button
             onClick={() => setModalNovo(true)}
-            className="flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-3 py-2 rounded-button transition-colors ml-2"
+            className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-3 py-2 rounded-button transition-colors ml-2"
           >
             <Plus size={13} />
             Novo
@@ -238,15 +238,15 @@ export default function AgendaClient({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {carregando ? (
           <div className="flex items-center justify-center py-16">
-            <p className="font-ui text-sm text-fg-muted uppercase tracking-wider animate-pulse">Carregando…</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse">Carregando…</p>
           </div>
         ) : profissionais.length === 0 ? (
           <div className="text-center py-16">
-            <p className="font-ui text-sm text-fg-muted uppercase tracking-wider">Nenhum barbeiro cadastrado</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum barbeiro cadastrado</p>
           </div>
         ) : linha.length === 0 ? (
           <div className="text-center py-16">
-            <p className="font-ui text-sm text-fg-muted uppercase tracking-wider mb-2">Dia livre</p>
+            <p className="font-semibold font-ui text-sm text-fg-muted mb-2">Dia livre</p>
             {profAtual?.ativo === false ? (
               <p className="font-body text-sm text-fg-muted">Fora da agenda: só os horários que já estavam marcados.</p>
             ) : (
@@ -287,11 +287,11 @@ export default function AgendaClient({
                 <div className="flex items-start gap-3">
                   <div
                     className="w-3 h-3 rounded-full shrink-0 mt-1"
-                    style={{ backgroundColor: ag.servico?.cor ?? '#E8B04B' }}
+                    style={{ backgroundColor: ag.servico?.cor ?? '#9A4A1A' }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">
+                      <p className="font-semibold font-ui text-sm text-fg truncate">
                         {ag.cliente?.nome ?? '—'}
                       </p>
                       <span className={`font-ui text-[10px] uppercase tracking-wider ${st.cor} shrink-0`}>
@@ -319,7 +319,7 @@ export default function AgendaClient({
           <div className="absolute inset-0 bg-black/60" onClick={() => setSelecionado(null)} />
           <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">Agendamento</h2>
+              <h2 className="font-semibold font-ui text-lg text-fg">Agendamento</h2>
               <button onClick={() => setSelecionado(null)} className="text-fg-muted hover:text-fg">
                 <X size={18} />
               </button>
@@ -360,14 +360,14 @@ export default function AgendaClient({
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'confirmado')}
                   disabled={salvandoStatus}
-                  className="flex-1 flex items-center justify-center gap-2 bg-entrada/10 hover:bg-entrada/20 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
+                  className="font-semibold flex-1 flex items-center justify-center gap-2 bg-entrada/10 hover:bg-entrada/20 border border-entrada/30 text-entrada font-ui text-sm py-2.5 rounded-button transition-colors"
                 >
                   <Check size={13} /> Confirmar
                 </button>
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'cancelado')}
                   disabled={salvandoStatus}
-                  className="flex-1 bg-saida/10 hover:bg-saida/20 border border-saida/30 text-saida font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
+                  className="font-semibold flex-1 bg-saida/10 hover:bg-saida/20 border border-saida/30 text-saida font-ui text-sm py-2.5 rounded-button transition-colors"
                 >
                   Cancelar
                 </button>
@@ -378,14 +378,14 @@ export default function AgendaClient({
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'concluido')}
                   disabled={salvandoStatus}
-                  className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
+                  className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
                 >
                   Concluir atendimento
                 </button>
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'faltou')}
                   disabled={salvandoStatus}
-                  className="px-4 bg-surface-alt border border-line text-fg-muted font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors"
+                  className="font-semibold px-4 bg-surface-alt border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button transition-colors"
                 >
                   Faltou
                 </button>
@@ -396,13 +396,13 @@ export default function AgendaClient({
               if (!voltarPara) return null
               return (
                 <div className="space-y-3">
-                  <p className={`text-center font-ui text-sm uppercase tracking-wider ${STATUS_CONFIG[selecionado.status].cor}`}>
+                  <p className={`font-semibold text-center font-ui text-sm ${STATUS_CONFIG[selecionado.status].cor}`}>
                     {STATUS_CONFIG[selecionado.status].label}
                   </p>
                   <button
                     onClick={() => atualizarStatus(selecionado.id, voltarPara)}
                     disabled={salvandoStatus}
-                    className="w-full flex items-center justify-center gap-2 border border-line text-fg-muted hover:text-fg font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors disabled:opacity-50"
+                    className="font-semibold w-full flex items-center justify-center gap-2 border border-line text-fg-muted hover:text-fg font-ui text-sm py-2.5 rounded-button transition-colors disabled:opacity-50"
                   >
                     <Undo2 size={13} />
                     {selecionado.status === 'concluido' ? 'Desfazer — tira a entrada do caixa' : 'Desfazer'}
@@ -420,7 +420,7 @@ export default function AgendaClient({
           <div className="absolute inset-0 bg-black/60" onClick={() => { setModalNovo(false); setNovoErro('') }} />
           <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 max-h-[85dvh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-ui text-lg uppercase tracking-wider text-fg">Novo agendamento</h2>
+              <h2 className="font-semibold font-ui text-lg text-fg">Novo agendamento</h2>
               <button onClick={() => { setModalNovo(false); setNovoErro('') }} className="text-fg-muted hover:text-fg">
                 <X size={18} />
               </button>
@@ -504,7 +504,7 @@ export default function AgendaClient({
               <button
                 type="submit"
                 disabled={novoSalvando}
-                className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-colors disabled:opacity-50"
+                className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50"
               >
                 {novoSalvando ? 'Criando…' : 'Criar agendamento'}
               </button>

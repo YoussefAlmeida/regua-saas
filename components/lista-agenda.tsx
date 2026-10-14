@@ -61,7 +61,7 @@ export default function ListaAgenda({ pessoas, max }: { pessoas: PessoaAgenda[];
                 {p.nome.charAt(0).toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`font-ui text-sm uppercase tracking-wider truncate ${p.naAgenda ? 'text-fg' : 'text-fg-muted'}`}>
+                <p className={`font-semibold font-ui text-sm truncate ${p.naAgenda ? 'text-fg' : 'text-fg-muted'}`}>
                   {p.nome}{p.souEu && <span className="normal-case"> (você)</span>}
                 </p>
                 <p className="font-body text-xs text-fg-muted">

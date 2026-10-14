@@ -40,7 +40,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
   }
 
   const voltar = slug ? `/${slug}/meus-agendamentos` : '/entrar'
-  const inputCls = 'w-full bg-surface-alt border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-10">
@@ -49,7 +49,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
           <ChevronLeft size={15} /> Voltar
         </Link>
         <div>
-          <h1 className="font-display text-4xl uppercase tracking-wide text-fg">Esqueci a senha</h1>
+          <h1 className="font-display text-4xl text-fg">Esqueci a senha</h1>
           <p className="font-body text-sm text-fg-muted mt-1">Sem problema — você cria uma nova.</p>
         </div>
 
@@ -59,7 +59,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
               <div className="flex rounded-button border border-line overflow-hidden" role="tablist">
                 {([['email', 'Sou dono (e-mail)'], ['whatsapp', 'Barbeiro ou cliente']] as const).map(([v, t]) => (
                   <button key={v} role="tab" aria-selected={tipo === v} onClick={() => { setTipo(v); setValor(''); setErro('') }}
-                    className={`flex-1 py-2.5 font-ui text-xs uppercase tracking-wider transition-colors ${tipo === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}>
+                    className={`flex-1 py-2.5 font-ui text-sm font-semibold transition-colors ${tipo === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}>
                     {t}
                   </button>
                 ))}
@@ -67,7 +67,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
             )}
             <form onSubmit={pedir} className="bg-surface border border-line rounded-card p-5 space-y-4">
               <div>
-                <label htmlFor="v" className="font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1">
+                <label htmlFor="v" className="font-ui text-sm font-medium text-fg block mb-1">
                   {tipo === 'email' ? 'E-mail da conta' : 'WhatsApp com DDD'}
                 </label>
                 <input id="v" type={tipo === 'email' ? 'email' : 'tel'} inputMode={tipo === 'email' ? 'email' : 'tel'}
@@ -75,7 +75,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
                   placeholder={tipo === 'email' ? 'dono@exemplo.com' : '(75) 99999-0000'} required className={inputCls} />
               </div>
               {erro && <p className="font-body text-sm text-saida" role="alert">{erro}</p>}
-              <button type="submit" disabled={enviando} className="w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm uppercase tracking-wider py-3 rounded-button transition-colors disabled:opacity-50">
+              <button type="submit" disabled={enviando} className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50">
                 {enviando ? 'Enviando…' : 'Quero uma senha nova'}
               </button>
             </form>
@@ -104,7 +104,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
                   ? wa(resposta.suporte, `Oi! Esqueci a senha do RÉGUA. Meu e-mail de cadastro é ${valor}.`)
                   : wa(resposta.contatoBarbearia!.telefone, 'Oi! Esqueci minha senha de agendamento. Pode me mandar o link de senha nova?')}
                 target="_blank" rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs uppercase tracking-wider py-3 rounded-button"
+                className="font-semibold w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button"
               >
                 <MessageCircle size={14} /> Chamar no WhatsApp
               </a>

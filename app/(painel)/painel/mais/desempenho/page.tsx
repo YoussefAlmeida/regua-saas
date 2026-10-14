@@ -94,7 +94,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           <ChevronLeft size={20} />
         </Link>
         <div>
-          <h1 className="font-ui text-xl uppercase tracking-widest text-fg">{sessao.papel === 'dono' ? prof.nome : 'Meu desempenho'}</h1>
+          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{sessao.papel === 'dono' ? prof.nome : 'Meu desempenho'}</h1>
           {sessao.papel === 'dono' && <p className="font-body text-xs text-fg-muted">Desempenho do barbeiro</p>}
         </div>
       </div>
@@ -151,7 +151,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
 
       {top.length > 0 && (
         <section className="space-y-2">
-          <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Mais feitos em {nomeMes}</h2>
+          <h2 className="font-semibold font-ui text-sm text-fg-muted">Mais feitos em {nomeMes}</h2>
           <ul className="bg-surface border border-line rounded-card divide-y divide-line">
             {top.map(([nome, qtd]) => (
               <li key={nome} className="flex items-center justify-between px-4 py-3">

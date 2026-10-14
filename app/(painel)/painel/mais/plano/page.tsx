@@ -35,7 +35,7 @@ export default async function PlanoPage() {
     <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Plano</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Plano</h1>
       </div>
 
       {/* Situação agora */}
@@ -43,21 +43,21 @@ export default async function PlanoPage() {
         <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Seu plano</p>
         {plano.emTeste ? (
           <>
-            <p className="font-display text-3xl uppercase text-amber">Teste grátis</p>
+            <p className="font-display text-3xl text-amber">Teste grátis</p>
             <p className="font-body text-sm text-fg">
               {plano.diasTeste <= 1 ? 'Acaba hoje.' : `Faltam ${plano.diasTeste} dias.`} Tudo liberado até lá.
             </p>
           </>
         ) : plano.somenteLeitura ? (
           <>
-            <p className="font-display text-3xl uppercase text-saida">{plano.nome}</p>
+            <p className="font-display text-3xl text-saida">{plano.nome}</p>
             <p className="font-body text-sm text-fg">
               Seus dados estão guardados e dá pra ver tudo, mas agendar, lançar no caixa e a página de agendamento ficam parados até {plano.nome === 'Pagamento atrasado' ? 'o pagamento ser confirmado' : 'escolher um plano'}.
             </p>
           </>
         ) : (
           <>
-            <p className="font-display text-3xl uppercase text-entrada">{plano.nome}</p>
+            <p className="font-display text-3xl text-entrada">{plano.nome}</p>
             <p className="font-body text-sm text-fg-muted">
               {formatBRL(LISTA_PLANOS.find(p => p.id === plano.plano)?.preco ?? 0)} por mês
               {barbearia?.plano_ciclo_fim && ` · pago até ${data(barbearia.plano_ciclo_fim)}`}
@@ -76,7 +76,7 @@ export default async function PlanoPage() {
             </div>
             <div className="flex items-center gap-3">
               <a href={wa(`Oi! Quero pagar o plano ${agendado.nome} (${formatBRL(agendado.preco)}/mês) pra ${nome}.`)} target="_blank" rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 bg-amber text-accent-fg font-ui text-[11px] uppercase tracking-wider py-2.5 rounded-button">
+                className="font-semibold flex-1 flex items-center justify-center gap-2 bg-amber text-accent-fg font-ui text-[11px] py-2.5 rounded-button">
                 <MessageCircle size={13} /> Pagar o {agendado.nome}
               </a>
               <CancelarMudanca className="text-amber hover:underline shrink-0" />
@@ -108,7 +108,7 @@ export default async function PlanoPage() {
 
       {/* Planos */}
       <section className="space-y-3">
-        <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Planos</h2>
+        <h2 className="font-semibold font-ui text-sm text-fg-muted">Planos</h2>
         {LISTA_PLANOS.map(p => {
           const atual = !plano.emTeste && !plano.somenteLeitura && plano.plano === p.id
           const recomendado = !atual && p.id === ideal
@@ -118,9 +118,9 @@ export default async function PlanoPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-ui text-lg uppercase tracking-wider text-fg">{p.nome}</p>
-                    {atual && <span className="px-2 py-0.5 rounded-full border border-entrada/40 text-entrada font-ui text-[10px] uppercase tracking-wider">Seu plano</span>}
-                    {recomendado && <span className="px-2 py-0.5 rounded-full bg-amber text-accent-fg font-ui text-[10px] uppercase tracking-wider">Ideal pra você</span>}
+                    <p className="font-semibold font-ui text-lg text-fg">{p.nome}</p>
+                    {atual && <span className="font-semibold px-2 py-0.5 rounded-full border border-entrada/40 text-entrada font-ui text-[10px]">Seu plano</span>}
+                    {recomendado && <span className="font-semibold px-2 py-0.5 rounded-full bg-amber text-accent-fg font-ui text-[10px]">Ideal pra você</span>}
                   </div>
                   <p className="font-body text-xs text-fg-muted">{p.resumo}</p>
                 </div>
@@ -142,7 +142,7 @@ export default async function PlanoPage() {
                 ) : (
                   <Link
                     href={`/painel/mais/plano/mudar?para=${p.id}`}
-                    className="w-full flex items-center justify-center gap-2 font-ui text-xs uppercase tracking-wider py-3 rounded-button border border-line text-fg hover:border-amber/50 transition-colors"
+                    className="font-semibold w-full flex items-center justify-center gap-2 font-ui text-sm py-3 rounded-button border border-line text-fg hover:border-amber/50 transition-colors"
                   >
                     <ArrowDown size={14} /> Mudar pro {p.nome}
                   </Link>
@@ -154,7 +154,7 @@ export default async function PlanoPage() {
                   href={wa(`Oi! Quero o plano ${p.nome} (${formatBRL(p.preco)}/mês) pra ${nome}.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full flex items-center justify-center gap-2 font-ui text-xs uppercase tracking-wider py-3 rounded-button transition-colors ${
+                  className={`font-semibold w-full flex items-center justify-center gap-2 font-ui text-sm py-3 rounded-button transition-colors ${
                     recomendado ? 'bg-amber hover:bg-accent-press text-accent-fg' : 'border border-line text-fg hover:border-amber/50'}`}
                 >
                   <MessageCircle size={14} /> Quero o {p.nome}

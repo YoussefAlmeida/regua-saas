@@ -166,13 +166,13 @@ export default function HorariosClient({
     avisar('Horário liberado.', 'sucesso')
   }
 
-  const inputCls = 'bg-surface-alt border border-line rounded-button px-2.5 py-2 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-xs uppercase tracking-wider text-fg-muted block mb-1'
+  const inputCls = 'bg-surface border border-line rounded-button px-2.5 py-2 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber'
+  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   if (profissionais.length === 0) {
     return (
       <div className="px-4 py-16 max-w-lg mx-auto text-center space-y-3">
-        <p className="font-ui text-sm uppercase tracking-wider text-fg-muted">Nenhum barbeiro ativo</p>
+        <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum barbeiro ativo</p>
         {souDono && <Link href="/painel/mais/barbeiros" className="text-amber font-body text-sm hover:underline">Convidar barbeiro</Link>}
       </div>
     )
@@ -182,7 +182,7 @@ export default function HorariosClient({
     <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">{souDono ? 'Horários da equipe' : 'Meu horário'}</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souDono ? 'Horários da equipe' : 'Meu horário'}</h1>
       </div>
 
       {/* Escolha do barbeiro (só dono) */}
@@ -192,7 +192,7 @@ export default function HorariosClient({
             <button
               key={p.id}
               onClick={() => setProfId(p.id)}
-              className={`shrink-0 px-4 py-2 rounded-full border font-ui text-xs uppercase tracking-wider transition-colors ${
+              className={`font-semibold shrink-0 px-4 py-2 rounded-full border font-ui text-xs transition-colors ${
                 p.id === profId ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'
               }`}
             >
@@ -203,17 +203,17 @@ export default function HorariosClient({
       )}
 
       {carregando ? (
-        <p className="font-ui text-sm text-fg-muted uppercase tracking-wider animate-pulse text-center py-12">Carregando…</p>
+        <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse text-center py-12">Carregando…</p>
       ) : (
         <>
           {/* ── Semana de trabalho ───────────────────────── */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
-              <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Semana de trabalho</h2>
+              <h2 className="font-semibold font-ui text-sm text-fg-muted">Semana de trabalho</h2>
               <button
                 onClick={salvarSemana}
                 disabled={salvandoSemana}
-                className="flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button transition-colors disabled:opacity-50"
+                className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors disabled:opacity-50"
               >
                 <Check size={13} /> {salvandoSemana ? 'Salvando…' : 'Salvar'}
               </button>
@@ -290,7 +290,7 @@ export default function HorariosClient({
 
           {/* ── Bloqueios ───────────────────────────────── */}
           <section className="space-y-3">
-            <h2 className="font-ui text-sm uppercase tracking-wider text-fg-muted">Bloquear horário</h2>
+            <h2 className="font-semibold font-ui text-sm text-fg-muted">Bloquear horário</h2>
             <p className="font-body text-xs text-fg-muted -mt-1">Médico, folga, compromisso. Some da página de agendamento na hora.</p>
 
             <form onSubmit={bloquear} className="bg-surface rounded-card border border-line p-4 space-y-3">
@@ -300,7 +300,7 @@ export default function HorariosClient({
                     key={String(o.v)}
                     type="button"
                     onClick={() => setForm(f => ({ ...f, diaInteiro: o.v }))}
-                    className={`flex-1 py-2 rounded-button border font-ui text-xs uppercase tracking-wider transition-colors ${form.diaInteiro === o.v ? 'border-amber text-amber bg-amber/5' : 'border-line text-fg-muted'}`}
+                    className={`font-semibold flex-1 py-2 rounded-button border font-ui text-xs transition-colors ${form.diaInteiro === o.v ? 'border-amber text-amber bg-amber/5' : 'border-line text-fg-muted'}`}
                   >
                     {o.t}
                   </button>
@@ -360,7 +360,7 @@ export default function HorariosClient({
               <button
                 type="submit"
                 disabled={salvandoBloq}
-                className="w-full flex items-center justify-center gap-2 bg-surface-alt border border-line hover:border-amber/40 text-fg font-ui text-xs uppercase tracking-wider py-2.5 rounded-button transition-colors disabled:opacity-50"
+                className="font-semibold w-full flex items-center justify-center gap-2 bg-surface-alt border border-line hover:border-amber/40 text-fg font-ui text-sm py-2.5 rounded-button transition-colors disabled:opacity-50"
               >
                 <Plus size={13} /> {salvandoBloq ? 'Bloqueando…' : 'Bloquear'}
               </button>

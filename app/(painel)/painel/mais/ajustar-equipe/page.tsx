@@ -24,7 +24,7 @@ export default async function AjustarEquipePage() {
     <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Quem fica na agenda</h1>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Quem fica na agenda</h1>
       </div>
 
       {agenda.excedente === 0 ? (
@@ -32,7 +32,7 @@ export default async function AjustarEquipePage() {
           <p className="font-body text-sm text-fg">
             Tudo certo: sua agenda cabe no plano {plano.nome}{agenda.max !== null ? ` (até ${agenda.max})` : ''}.
           </p>
-          <Link href="/painel/hoje" className="inline-block bg-amber text-accent-fg font-ui text-xs uppercase tracking-wider px-4 py-2 rounded-button">
+          <Link href="/painel/hoje" className="font-semibold inline-block bg-amber text-accent-fg font-ui text-xs px-4 py-2 rounded-button">
             Voltar pro painel
           </Link>
         </div>

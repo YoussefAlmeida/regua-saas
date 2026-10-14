@@ -151,12 +151,12 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
         {/* Cabeçalho */}
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="font-display text-3xl uppercase tracking-wide text-fg break-words">{b.nome}</h1>
+            <h1 className="font-display text-3xl text-fg break-words">{b.nome}</h1>
             <a href={`${site}/${b.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 font-mono text-xs text-amber hover:underline">
               /{b.slug} <ExternalLink size={11} />
             </a>
           </div>
-          <span className={`shrink-0 px-3 py-1 rounded-full border font-ui text-xs uppercase tracking-wider ${st.cor}`}>
+          <span className={`font-semibold shrink-0 px-3 py-1 rounded-full border font-ui text-xs ${st.cor}`}>
             {b.status === 'ativo' ? `Pagando · ${PLANOS_ADMIN[b.plano as PlanoPago]?.nome ?? b.plano}` : st.rotulo}
           </span>
         </div>
@@ -232,13 +232,13 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           <div className="flex flex-wrap gap-2">
             {b.telefone && (
               <a href={wa(b.telefone, `Oi, ${dono?.nome?.split(' ')[0] ?? ''}! Aqui é do RÉGUA. Tudo certo com o sistema?`)} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-entrada/40 text-entrada font-ui text-xs uppercase tracking-wider hover:bg-entrada/10">
+                className="font-semibold inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-entrada/40 text-entrada font-ui text-xs hover:bg-entrada/10">
                 <MessageCircle size={13} /> WhatsApp
               </a>
             )}
             {dono && <LinkNovaSenha endpoint={`/api/admin/barbearias/${b.id}/nova-senha-dono`} nome={dono.nome} />}
             {dono?.email && (
-              <a href={`mailto:${dono.email}`} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-line text-fg-muted font-ui text-xs uppercase tracking-wider hover:text-fg">
+              <a href={`mailto:${dono.email}`} className="font-semibold inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-line text-fg-muted font-ui text-xs hover:text-fg">
                 <Mail size={13} /> E-mail
               </a>
             )}

@@ -53,7 +53,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const filtradas = lista.filter(b =>
     (!s || b.status === s) && (!termo || b.nome.toLowerCase().includes(termo) || b.slug.includes(termo)))
 
-  const chip = (ativo: boolean) => `shrink-0 px-3 py-1.5 rounded-full border font-ui text-[11px] uppercase tracking-wider ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
+  const chip = (ativo: boolean) => `font-semibold shrink-0 px-3 py-1.5 rounded-full border font-ui text-[11px] ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
   const filtroUrl = (st: string) => `/admin?${new URLSearchParams({ ...(q ? { q } : {}), ...(st ? { s: st } : {}) })}`
 
   return (
@@ -61,7 +61,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl text-amber tracking-widest uppercase">Régua Admin</h1>
+            <h1 className="font-display text-3xl text-amber">Régua Admin</h1>
             <p className="font-body text-xs text-fg-muted">{lista.length} barbearia{lista.length !== 1 ? 's' : ''} · {novas7} nova{novas7 !== 1 ? 's' : ''} nos últimos 7 dias</p>
           </div>
           <SairAdmin />
@@ -143,12 +143,12 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
                   <Link href={`/admin/${b.id}${b.erros ? '?aba=erros' : ''}`} className="flex items-center gap-3 px-4 py-3.5 hover:bg-surface-alt transition-colors">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="font-ui text-sm uppercase tracking-wider text-fg truncate">{b.nome}</p>
-                        <span className={`px-2 py-0.5 rounded-full border font-ui text-[10px] uppercase tracking-wider ${st.cor}`}>
+                        <p className="font-semibold font-ui text-sm text-fg truncate">{b.nome}</p>
+                        <span className={`font-semibold px-2 py-0.5 rounded-full border font-ui text-[10px] ${st.cor}`}>
                           {b.status === 'ativo' ? PLANOS_ADMIN[b.plano as PlanoPago]?.nome ?? st.rotulo : st.rotulo}
                         </span>
                         {b.erros > 0 && (
-                          <span className="px-2 py-0.5 rounded-full bg-saida text-bg font-ui text-[10px] uppercase tracking-wider">
+                          <span className="font-semibold px-2 py-0.5 rounded-full bg-saida text-bg font-ui text-[10px]">
                             {b.erros} erro{b.erros > 1 ? 's' : ''}
                           </span>
                         )}
