@@ -5,53 +5,12 @@ import {
 } from 'lucide-react'
 import FaqLanding from './_components/faq-landing'
 import { formatBRL } from '@/lib/utils'
+import { LISTA_PLANOS } from '@/lib/planos'
 
-const PLANOS = [
-  {
-    id: 'cadeira',
-    label: 'Cadeira',
-    desc: 'Profissional solo',
-    preco: 39.99,
-    destaque: false,
-    funcionalidades: [
-      'Agenda online',
-      'Link de agendamento público',
-      'Lembrete WhatsApp automático',
-      'Controle financeiro básico',
-      '1 profissional',
-      'Relatórios do mês',
-    ],
-  },
-  {
-    id: 'barbearia',
-    label: 'Barbearia',
-    desc: 'Para equipes',
-    preco: 79.99,
-    destaque: true,
-    funcionalidades: [
-      'Tudo do Cadeira',
-      'Até 5 profissionais',
-      'Gestão de equipe completa',
-      'Despesas fixas',
-      'Relatórios por barbeiro',
-      'Suporte prioritário',
-    ],
-  },
-  {
-    id: 'rede',
-    label: 'Rede',
-    desc: 'Redes e franquias',
-    preco: 129.99,
-    destaque: false,
-    funcionalidades: [
-      'Tudo do Barbearia',
-      'Profissionais ilimitados',
-      'Múltiplas unidades (em breve)',
-      'Onboarding dedicado',
-      'Suporte VIP',
-    ],
-  },
-]
+// Planos vêm de lib/planos.ts (mesma tabela do painel e do admin)
+const PLANOS = LISTA_PLANOS.map(p => ({
+  id: p.id, label: p.nome, desc: p.resumo, preco: p.preco, destaque: !!p.destaque, funcionalidades: p.itens,
+}))
 
 const FUNCIONALIDADES = [
   {

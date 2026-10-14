@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
+import { situacaoPlano } from '@/lib/planos'
 import AgendamentoPublico from './agendamento-publico'
 
 interface Props {
@@ -31,7 +32,8 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
     if (data) clienteLogado = { nome: data.nome }
   }
 
-  const aceitando = dados.barbearia.status !== 'leitura'
+  // Teste vencido ou suspensa: a página fica no ar, mas pausa o agendamento
+  const aceitando = !situacaoPlano(dados.barbearia).somenteLeitura
 
   return (
     <AgendamentoPublico

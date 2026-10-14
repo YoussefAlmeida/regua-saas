@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import { ChevronLeft, ShieldCheck } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { planoDaBarbearia } from '@/lib/plano-servidor'
+import RecursoBloqueado from '@/components/recurso-bloqueado'
 import { descreverAuditoria, type LinhaAuditoria } from '@/lib/descrever-auditoria'
 
 /* Histórico (log de auditoria) — "quem lançou, quem apagou, quem mudou valor".
@@ -12,6 +14,22 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
   const sessao = await getSessao()
   if (!sessao) redirect('/entrar')
   if (sessao.papel !== 'dono') redirect('/painel/mais')
+
+  const plano = await planoDaBarbearia(sessao.barbearia_id)
+  if (!plano.recursos.historico) {
+    return (
+      <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
+        <div className="flex items-center gap-3">
+          <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
+          <h1 className="font-ui text-xl uppercase tracking-widest text-fg">Histórico</h1>
+        </div>
+        <RecursoBloqueado
+          titulo="Quem lançou, quem apagou, quem mudou valor"
+          texto="O Histórico mostra tudo que cada pessoa fez no caixa e na agenda. Faz parte do plano Barbearia, feito pra quem tem equipe."
+        />
+      </div>
+    )
+  }
 
   const filtro = (await searchParams).f === 'dinheiro' ? 'dinheiro' : 'tudo'
 

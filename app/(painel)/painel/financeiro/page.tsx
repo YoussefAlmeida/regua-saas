@@ -3,6 +3,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { limitesDoMes, mesVizinho } from '@/lib/periodo'
 import { CAMPOS_MOV } from '@/lib/financeiro'
+import { planoDaBarbearia } from '@/lib/plano-servidor'
 import FinanceiroClient, { type Movimentacao } from './financeiro-client'
 
 
@@ -12,6 +13,7 @@ export default async function FinanceiroPage() {
   if (sessao.papel !== 'dono') redirect('/painel/hoje')
 
   const db = criarClienteServico()
+  const plano = await planoDaBarbearia(sessao.barbearia_id)
   const mesAtual = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }).slice(0, 7)
   const atual = limitesDoMes(mesAtual)
   const anterior = limitesDoMes(mesVizinho(mesAtual, -1))
@@ -38,6 +40,7 @@ export default async function FinanceiroPage() {
       categoriasIniciais={categorias ?? []}
       profissionais={profissionais ?? []}
       mesInicial={mesAtual}
+      podeDespesasFixas={plano.recursos.despesasFixas}
     />
   )
 }

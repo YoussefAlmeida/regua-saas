@@ -6,6 +6,8 @@ import { COOKIE_SESSION, getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
+import AvisoPlano from '@/components/aviso-plano'
+import { planoDaBarbearia } from '@/lib/plano-servidor'
 
 export const metadata: Metadata = { robots: { index: false, follow: false } }
 
@@ -32,11 +34,10 @@ export default async function PainelLayout({ children }: { children: React.React
   // Cliente não tem painel — vai pros agendamentos dele
   if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
 
-  const { data: usuario } = await db
-    .from('usuarios')
-    .select('nome')
-    .eq('id', usuarioId)
-    .single()
+  const [{ data: usuario }, plano] = await Promise.all([
+    db.from('usuarios').select('nome').eq('id', usuarioId).single(),
+    planoDaBarbearia(barbearia_id),
+  ])
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
@@ -50,6 +51,8 @@ export default async function PainelLayout({ children }: { children: React.React
           <span className="font-ui text-xs text-fg-muted uppercase tracking-wider">{papel}</span>
         </div>
       </header>
+
+      <AvisoPlano plano={plano} souDono={papel === 'dono'} />
 
       {/* Conteúdo */}
       <main className="flex-1 pb-20 overflow-y-auto">{children}</main>

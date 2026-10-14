@@ -4,6 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
+import { bloqueioSomenteLeitura } from '@/lib/conta'
 
 const SchemaPatch = z.object({
   descricao: z.string().min(1).max(200).optional(),
@@ -17,6 +18,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!sessao || sessao.papel !== 'dono') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
+  const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (leitura) return leitura
 
   const { id } = await params
   const body = await req.json().catch(() => null)
@@ -41,6 +44,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (!sessao || sessao.papel !== 'dono') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
+  const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
+  if (leitura) return leitura
 
   const { id } = await params
   const db = criarClienteServico()

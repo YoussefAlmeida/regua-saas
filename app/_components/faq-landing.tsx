@@ -17,12 +17,12 @@ const PERGUNTAS = [
     r: 'Sim. Sem fidelidade, sem multa. Cancela a qualquer momento e seus dados ficam disponíveis por 30 dias.',
   },
   {
-    q: 'Como funciona o trial de 14 dias?',
-    r: 'Você usa tudo sem limite durante 14 dias. Não pedimos cartão de crédito para começar. Só cobra se decidir continuar.',
+    q: 'Como funciona o teste de 14 dias?',
+    r: 'Você usa tudo, sem limite, por 14 dias. Não pedimos cartão. Se acabar sem escolher plano, a conta fica só leitura: você vê tudo e não perde nada, mas agenda e caixa pausam até escolher um plano.',
   },
   {
-    q: 'E se eu tiver mais de 5 barbeiros?',
-    r: 'O plano Rede suporta equipes ilimitadas. Fale com a gente pelo WhatsApp e ajustamos o que precisar.',
+    q: 'Qual plano é o meu?',
+    r: 'Depende de quantos profissionais aparecem na agenda: 1 é o Cadeira, até 3 é o Barbearia, mais de 3 é o Rede. Se você é o dono e também corta, você conta; se só administra, não.',
   },
 ]
 

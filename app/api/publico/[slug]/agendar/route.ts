@@ -5,6 +5,7 @@ import { gravarCookieSessao } from '@/lib/auth'
 import { horariosLivres, dataHoraLocal } from '@/lib/disponibilidade'
 import { SchemaAcesso, resolverCliente } from '@/lib/conta-cliente'
 import { registrarAuditoria } from '@/lib/auditoria'
+import { situacaoPlano } from '@/lib/planos'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
 
@@ -25,12 +26,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   const { data: barbearia } = await db
     .from('barbearias')
-    .select('id, nome, status, horario_funcionamento, dias_fechados')
+    .select('id, nome, status, plano, trial_fim, horario_funcionamento, dias_fechados')
     .eq('slug', slug)
     .single()
 
   if (!barbearia) return NextResponse.json({ erro: 'Barbearia não encontrada' }, { status: 404 })
-  if (barbearia.status === 'cancelado' || barbearia.status === 'leitura') {
+  if (situacaoPlano(barbearia).somenteLeitura) {
     return NextResponse.json({ erro: 'Essa barbearia não está aceitando agendamentos online no momento' }, { status: 410 })
   }
 

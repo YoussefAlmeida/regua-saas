@@ -5,6 +5,7 @@ import { Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil, TrendingU
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { pedirSenha } from '@/components/confirmar-senha'
 import { mesVizinho } from '@/lib/periodo'
+import RecursoBloqueado from '@/components/recurso-bloqueado'
 
 export interface Movimentacao {
   id: string
@@ -55,7 +56,9 @@ export default function FinanceiroClient({
   categoriasIniciais,
   profissionais,
   mesInicial,
+  podeDespesasFixas = true,
 }: {
+  podeDespesasFixas?: boolean
   movimentacoesIniciais: Movimentacao[]
   anteriorInicial: { tipo: string; valor: number }[]
   despesasFixasIniciais: DespesaFixa[]
@@ -462,7 +465,13 @@ export default function FinanceiroClient({
             )}
 
             {/* ── FIXAS ── */}
-            {tab === 'fixas' && (
+            {tab === 'fixas' && !podeDespesasFixas && (
+              <RecursoBloqueado
+                titulo="Despesas fixas automáticas"
+                texto="Cadastre aluguel, energia e internet uma vez e elas entram sozinhas no caixa todo mês. Faz parte do plano Barbearia. No seu plano, lance as saídas pelo botão Saída."
+              />
+            )}
+            {tab === 'fixas' && podeDespesasFixas && (
               <div className="space-y-4">
                 <div className="bg-surface border border-line rounded-card p-4">
                   <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Custo fixo por mês</p>

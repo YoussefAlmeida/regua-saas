@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { exigirVagaProfissional } from '@/lib/plano-servidor'
 import { falhaInterna } from '@/lib/erros'
 
 /* "Sou eu que corto" — o dono também aparece como barbeiro na agenda
@@ -16,8 +17,13 @@ export async function POST() {
     .eq('usuario_id', sessao.usuario_id)
     .maybeSingle()
 
+  if (existente?.ativo) return NextResponse.json({ id: existente.id })
+
+  const semVaga = await exigirVagaProfissional(sessao.barbearia_id)
+  if (semVaga) return semVaga
+
   if (existente) {
-    if (!existente.ativo) await db.from('profissionais').update({ ativo: true }).eq('id', existente.id)
+    await db.from('profissionais').update({ ativo: true }).eq('id', existente.id)
     return NextResponse.json({ id: existente.id })
   }
 
