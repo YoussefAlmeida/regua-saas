@@ -43,7 +43,7 @@ export default async function AjustarEquipePage() {
             <strong>{agenda.profissionais.length}</strong>. Desligue {agenda.excedente === 1 ? '1 pessoa' : `${agenda.excedente} pessoas`} pra continuar.
           </p>
           <p className="font-body text-xs text-fg-muted">
-            Quem sai da agenda continua na equipe, com conta e histórico. Os horários marcados dele são cancelados e a gente mostra quem avisar.
+            Quem sai da agenda continua na equipe e atende os horários que já estão marcados. Só não entra horário novo.
           </p>
         </div>
       )}

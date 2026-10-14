@@ -2,21 +2,20 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, MinusCircle, CalendarX } from 'lucide-react'
+import { Check, MinusCircle, CalendarCheck } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
-import { pedirSenha } from '@/components/confirmar-senha'
 import { formatBRL } from '@/lib/utils'
 
 interface Pessoa { id: string; nome: string; souEu: boolean; futuros: number }
 
 const PASSOS = ['O que muda', 'Quem fica', 'Confirmar'] as const
 
-/* Assistente: o que você perde → quem fica na agenda → resumo e senha */
-export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
+/* Assistente do pedido de plano menor: o que muda → quem fica → confirmar.
+   É só um pedido: a troca acontece quando o pagamento é confirmado. */
+export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
   de: { nome: string; preco: number }
   para: { id: string; nome: string; preco: number; max: number | null }
-  em: string
-  imediato: boolean
+  pagoAte: string | null
   perde: string[]
   pessoas: Pessoa[]
 }) {
@@ -26,9 +25,9 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
   const [ficam, setFicam] = useState<string[]>(() => pessoas.slice(0, para.max ?? pessoas.length).map(p => p.id))
   const [enviando, setEnviando] = useState(false)
 
-  const quando = new Date(em).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: 'long' })
+  const ate = pagoAte ? new Date(pagoAte).toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: 'long' }) : null
   const saem = pessoas.filter(p => !ficam.includes(p.id))
-  const horariosCancelados = saem.reduce((s, p) => s + p.futuros, 0)
+  const mantidos = saem.reduce((s, p) => s + p.futuros, 0)
   const passos = precisaEscolher ? PASSOS : PASSOS.filter(p => p !== 'Quem fica')
   const etapa = passos[passo]
 
@@ -39,24 +38,21 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
   }
 
   async function confirmar() {
-    const senha = await pedirSenha(`Mudar pro ${para.nome}`, imediato ? 'A mudança vale agora.' : `A mudança vale em ${quando}. Dá pra desistir até lá.`)
-    if (!senha) return
     setEnviando(true)
     const res = await fetch('/api/painel/plano/mudanca', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ para: para.id, manter: ficam, senha }),
+      body: JSON.stringify({ para: para.id, manter: ficam }),
     }).catch(() => null)
     setEnviando(false)
     if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
-    avisar(imediato ? `Pronto, você está no ${para.nome}.` : `Agendado: você muda pro ${para.nome} em ${quando}.`, 'sucesso')
+    avisar(`Pedido feito. Quando pagar o ${para.nome}, a troca acontece.`, 'sucesso')
     router.push('/painel/mais/plano')
     router.refresh()
   }
 
   return (
     <div className="space-y-5">
-      {/* Passos */}
       <ol className="flex gap-2">
         {passos.map((p, i) => (
           <li key={p} className={`flex-1 h-1 rounded-full ${i <= passo ? 'bg-amber' : 'bg-surface-alt'}`} aria-label={p} />
@@ -71,7 +67,7 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
               De <strong>{de.nome}</strong> ({formatBRL(de.preco)}) pra <strong>{para.nome}</strong> ({formatBRL(para.preco)}) por mês.
             </p>
             <p className="font-body text-sm text-fg-muted">
-              {imediato ? 'Vale agora.' : <>Você já pagou este mês, então tudo continua igual até <strong className="text-fg">{quando}</strong>.</>}
+              A troca acontece quando você pagar o {para.nome}.{ate && <> Até lá (seu mês vai até <strong className="text-fg">{ate}</strong>), tudo continua igual.</>}
             </p>
           </div>
           {(perde.length > 0 || precisaEscolher) && (
@@ -99,7 +95,7 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
       {etapa === 'Quem fica' && (
         <section className="space-y-3">
           <p className="font-body text-sm text-fg">
-            O {para.nome} vai até <strong>{para.max}</strong> na agenda. Escolha quem continua atendendo
+            O {para.nome} vai até <strong>{para.max}</strong> na agenda. Escolha quem continua recebendo horário novo
             <span className="text-fg-muted"> ({ficam.length} de {para.max})</span>.
           </p>
           <ul className="bg-surface border border-line rounded-card divide-y divide-line">
@@ -118,7 +114,7 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
                         {p.nome}{p.souEu && <span className="normal-case text-fg-muted"> (você)</span>}
                       </span>
                       <span className="block font-body text-xs text-fg-muted">
-                        {p.futuros ? `${p.futuros} horário${p.futuros > 1 ? 's' : ''} marcado${p.futuros > 1 ? 's' : ''} depois de ${quando}` : 'Nada marcado depois da troca'}
+                        {p.futuros ? `${p.futuros} horário${p.futuros > 1 ? 's' : ''} marcado${p.futuros > 1 ? 's' : ''}` : 'Nada marcado'}
                       </span>
                     </span>
                   </button>
@@ -127,7 +123,8 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
             })}
           </ul>
           <p className="font-body text-xs text-fg-muted">
-            Quem sai continua na equipe, com conta e histórico, só não aparece pros clientes. Dá pra trocar depois em Equipe.
+            Quem sai não perde nada: atende os horários que já estão marcados e continua na equipe, só não recebe horário novo.
+            Depois dá pra trocar em Equipe: desliga um e liga o outro.
           </p>
         </section>
       )}
@@ -135,7 +132,7 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
       {etapa === 'Confirmar' && (
         <section className="space-y-3">
           <div className="bg-surface border border-line rounded-card p-4 space-y-2 font-body text-sm text-fg">
-            <p>Plano <strong>{para.nome}</strong> a partir de <strong>{imediato ? 'agora' : quando}</strong>, por {formatBRL(para.preco)}/mês.</p>
+            <p>Pedido: plano <strong>{para.nome}</strong> por {formatBRL(para.preco)}/mês.</p>
             {precisaEscolher && (
               <>
                 <p>Ficam na agenda: <strong>{pessoas.filter(p => ficam.includes(p.id)).map(p => p.nome).join(', ') || 'ninguém'}</strong>.</p>
@@ -143,18 +140,15 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
               </>
             )}
           </div>
-          {horariosCancelados > 0 && (
-            <div className="flex gap-2 bg-saida/5 border border-saida/30 rounded-card p-4">
-              <CalendarX size={16} className="text-saida shrink-0 mt-0.5" />
-              <p className="font-body text-sm text-fg">
-                {horariosCancelados} horário{horariosCancelados > 1 ? 's' : ''} marcado{horariosCancelados > 1 ? 's' : ''} depois da troca
-                {horariosCancelados > 1 ? ' serão cancelados' : ' será cancelado'}. No dia, a gente mostra a lista com o WhatsApp de cada cliente pra você remarcar.
-              </p>
-            </div>
-          )}
-          {!imediato && (
-            <p className="font-body text-xs text-fg-muted">Mudou de ideia? Dá pra cancelar a mudança em Mais → Plano até {quando}.</p>
-          )}
+          <div className="flex gap-2 bg-entrada/5 border border-entrada/30 rounded-card p-4">
+            <CalendarCheck size={16} className="text-entrada shrink-0 mt-0.5" />
+            <p className="font-body text-sm text-fg">
+              {mantidos > 0
+                ? `Os ${mantidos} horário${mantidos > 1 ? 's' : ''} já marcado${mantidos > 1 ? 's' : ''} de quem sai continua${mantidos > 1 ? 'm' : ''} valendo.`
+                : 'Nenhum horário marcado é cancelado.'}{' '}
+              A troca só acontece quando o pagamento do {para.nome} for confirmado. Até lá, dá pra desistir em Mais → Plano.
+            </p>
+          </div>
         </section>
       )}
 
@@ -175,7 +169,7 @@ export default function MudarPlano({ de, para, em, imediato, perde, pessoas }: {
         ) : (
           <button onClick={confirmar} disabled={enviando}
             className="flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs uppercase tracking-wider py-3 rounded-button disabled:opacity-40">
-            {enviando ? 'Salvando…' : imediato ? `Mudar pro ${para.nome}` : `Agendar pra ${quando}`}
+            {enviando ? 'Salvando…' : `Pedir o ${para.nome}`}
           </button>
         )}
       </div>

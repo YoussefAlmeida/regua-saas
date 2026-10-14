@@ -9,7 +9,7 @@ import { formatBRL } from '@/lib/utils'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
-interface Profissional { id: string; nome: string; foto_url: string | null }
+interface Profissional { id: string; nome: string; foto_url: string | null; ativo: boolean }
 interface Bloqueio { id: string; profissional_id: string; inicio: string; fim: string; motivo: string | null }
 interface Servico { id: string; nome: string; preco: number; duracao_min: number; cor: string }
 export interface Agendamento {
@@ -68,7 +68,7 @@ export default function AgendaClient({
 
   // Formulário novo agendamento
   const [novoForm, setNovoForm] = useState({
-    profissional_id: profissionaisIniciais[0]?.id ?? '',
+    profissional_id: profissionaisIniciais.find(p => p.ativo)?.id ?? '',
     servico_id: '',
     inicio: '',
     cliente_nome: '',
@@ -155,7 +155,7 @@ export default function AgendaClient({
     setAgendamentos(prev => [...prev, json].sort((a, b) => a.inicio.localeCompare(b.inicio)))
     setModalNovo(false)
     avisar(`Agendado às ${formatarHora(json.inicio)}.`, 'sucesso')
-    setNovoForm({ profissional_id: profissionaisIniciais[0]?.id ?? '', servico_id: '', inicio: '', cliente_nome: '', cliente_whatsapp: '', observacao: '' })
+    setNovoForm({ profissional_id: profissionaisIniciais.find(p => p.ativo)?.id ?? '', servico_id: '', inicio: '', cliente_nome: '', cliente_whatsapp: '', observacao: '' })
   }
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
@@ -222,6 +222,7 @@ export default function AgendaClient({
                 }`}
               >
                 {p.nome}
+                {!p.ativo && <span className="normal-case text-[10px] text-fg-muted">(fora)</span>}
                 {total > 0 && (
                   <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono ${i === tabProfissional ? 'bg-amber text-accent-fg' : 'bg-surface-alt text-fg-muted'}`}>
                     {total}
@@ -246,12 +247,16 @@ export default function AgendaClient({
         ) : linha.length === 0 ? (
           <div className="text-center py-16">
             <p className="font-ui text-sm text-fg-muted uppercase tracking-wider mb-2">Dia livre</p>
-            <button
-              onClick={() => setModalNovo(true)}
-              className="text-amber font-body text-sm hover:underline"
-            >
-              Adicionar agendamento
-            </button>
+            {profAtual?.ativo === false ? (
+              <p className="font-body text-sm text-fg-muted">Fora da agenda: só os horários que já estavam marcados.</p>
+            ) : (
+              <button
+                onClick={() => setModalNovo(true)}
+                className="text-amber font-body text-sm hover:underline"
+              >
+                Adicionar agendamento
+              </button>
+            )}
           </div>
         ) : (
           linha.map(entrada => {
@@ -429,7 +434,7 @@ export default function AgendaClient({
                   onChange={e => setNovoForm(f => ({ ...f, profissional_id: e.target.value }))}
                   className={inputCls}
                 >
-                  {profissionais.map(p => (
+                  {profissionais.filter(p => p.ativo).map(p => (
                     <option key={p.id} value={p.id}>{p.nome}</option>
                   ))}
                 </select>

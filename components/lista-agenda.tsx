@@ -3,8 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { avisar, erroDaResposta } from '@/components/aviso'
-import { pedirSenha } from '@/components/confirmar-senha'
-import AvisarCancelados, { type Cancelado } from '@/components/avisar-cancelados'
 
 export interface PessoaAgenda {
   alvo: string        // 'eu' ou id do usuário barbeiro
@@ -15,49 +13,34 @@ export interface PessoaAgenda {
 
 /* ================================================================
    Quem aparece na agenda — um liga/desliga por pessoa.
-   Desligar: some da página de agendamento e os horários futuros
-   são cancelados (com senha, se houver algum). A conta e o
-   histórico continuam. Ligar respeita o limite do plano.
+   Desligar: some da página de agendamento e não entra horário novo.
+   O que já estava marcado continua e ele atende normal. A conta e
+   o histórico continuam. Ligar respeita o limite do plano.
    ================================================================ */
 export default function ListaAgenda({ pessoas, max }: { pessoas: PessoaAgenda[]; max: number | null }) {
   const router = useRouter()
   const [lista, setLista] = useState(pessoas)
   const [ocupado, setOcupado] = useState<string | null>(null)
-  const [cancelados, setCancelados] = useState<Cancelado[] | null>(null)
 
   const naAgenda = lista.filter(p => p.naAgenda).length
   const cheio = max !== null && naAgenda >= max
 
   async function alternar(p: PessoaAgenda) {
     const ligar = !p.naAgenda
-    let senha: string | null = null
-
-    if (!ligar) {
-      setOcupado(p.alvo)
-      const prev = await fetch(`/api/painel/na-agenda?alvo=${p.alvo}`).then(r => r.ok ? r.json() : { futuros: 0 }).catch(() => ({ futuros: 0 }))
-      setOcupado(null)
-      if (prev.futuros > 0) {
-        senha = await pedirSenha(
-          p.souEu ? 'Sair da agenda' : `Tirar ${p.nome} da agenda`,
-          `${p.souEu ? 'Você tem' : `${p.nome} tem`} ${prev.futuros} horário${prev.futuros > 1 ? 's' : ''} marcado${prev.futuros > 1 ? 's' : ''} pela frente. Eles serão cancelados e a gente te mostra quem avisar.`,
-        )
-        if (!senha) return
-      }
-    }
-
     setOcupado(p.alvo)
     const res = await fetch('/api/painel/na-agenda', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ alvo: p.alvo, naAgenda: ligar, senha }),
+      body: JSON.stringify({ alvo: p.alvo, naAgenda: ligar }),
     }).catch(() => null)
     setOcupado(null)
     if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
     const json = await res.json()
 
     setLista(prev => prev.map(x => x.alvo === p.alvo ? { ...x, naAgenda: ligar } : x))
-    if (json.cancelados?.length) setCancelados(json.cancelados)
-    else avisar(ligar ? `${p.souEu ? 'Você está' : `${p.nome} está`} na agenda.` : `${p.souEu ? 'Você saiu' : `${p.nome} saiu`} da agenda.`, 'sucesso')
+    const quem = p.souEu ? 'Você' : p.nome
+    if (ligar) avisar(`${quem} está na agenda.`, 'sucesso')
+    else avisar(`${quem} saiu da agenda.${json.mantidos ? ` ${json.mantidos === 1 ? 'O horário já marcado continua' : `Os ${json.mantidos} horários já marcados continuam`}.` : ''}`, 'sucesso')
     router.refresh()
   }
 
@@ -82,7 +65,7 @@ export default function ListaAgenda({ pessoas, max }: { pessoas: PessoaAgenda[];
                   {p.nome}{p.souEu && <span className="normal-case"> (você)</span>}
                 </p>
                 <p className="font-body text-xs text-fg-muted">
-                  {p.naAgenda ? 'Aparece pros clientes' : travado ? 'Sem vaga no plano' : 'Fora da agenda'}
+                  {p.naAgenda ? 'Aparece pros clientes' : travado ? 'Fora da agenda · sem vaga no plano' : 'Fora da agenda · só o que já está marcado'}
                 </p>
               </div>
               <button
@@ -99,7 +82,6 @@ export default function ListaAgenda({ pessoas, max }: { pessoas: PessoaAgenda[];
           )
         })}
       </ul>
-      {cancelados && <AvisarCancelados lista={cancelados} onFechar={() => setCancelados(null)} />}
     </>
   )
 }

@@ -4,29 +4,20 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirVagaProfissional } from '@/lib/plano-servidor'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
-import { tirarDaAgenda } from '@/lib/agenda-saida'
+import { desligarDaAgenda } from '@/lib/agenda-saida'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
-import { exigirSenha } from '@/lib/reautenticar'
 
 /* ================================================================
    Ativar / desativar alguém NA AGENDA (só o dono)
    - Desativado continua com conta e histórico; não aparece pros
-     clientes e não recebe agendamento. Volta com um toque.
+     clientes e não recebe horário novo. O que já estava marcado
+     continua e ele atende normal. Volta com um toque.
    - Ativar respeita o limite de profissionais do plano.
-   - Desativar quem tem horário marcado pede a senha (cancela tudo).
    alvo = 'eu' (o dono) ou o id de usuário do barbeiro
    ================================================================ */
 
 const Alvo = z.union([z.literal('eu'), z.string().uuid()])
-
-async function futurosDe(profissional_id: string) {
-  const { count } = await criarClienteServico().from('agendamentos')
-    .select('id', { count: 'exact', head: true })
-    .eq('profissional_id', profissional_id).in('status', ['agendado', 'confirmado'])
-    .gt('inicio', new Date().toISOString())
-  return count ?? 0
-}
 
 async function acharAlvo(barbearia_id: string, dono_id: string, alvo: string) {
   const db = criarClienteServico()
@@ -41,24 +32,11 @@ async function acharAlvo(barbearia_id: string, dono_id: string, alvo: string) {
   return { u, prof }
 }
 
-/** Prévia: quantos horários futuros cairiam ao desativar */
-export async function GET(req: NextRequest) {
-  const sessao = await getSessao()
-  if (!sessao || sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
-  const alvo = Alvo.safeParse(req.nextUrl.searchParams.get('alvo'))
-  if (!alvo.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
-
-  const a = await acharAlvo(sessao.barbearia_id, sessao.usuario_id, alvo.data)
-  if (!a?.prof) return NextResponse.json({ futuros: 0 })
-  return NextResponse.json({ futuros: await futurosDe(a.prof.id) })
-}
-
 export async function POST(req: NextRequest) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
 
-  const body = await req.json().catch(() => null)
-  const parse = z.object({ alvo: Alvo, naAgenda: z.boolean() }).safeParse(body)
+  const parse = z.object({ alvo: Alvo, naAgenda: z.boolean() }).safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
   const { alvo, naAgenda } = parse.data
 
@@ -83,14 +61,10 @@ export async function POST(req: NextRequest) {
     if (error) return falhaInterna('na-agenda/ativar', error, 'Não deu pra colocar na agenda')
   }
 
-  let cancelados: unknown[] = []
+  let mantidos = 0
   if (!naAgenda) {
-    if (!prof?.ativo) return NextResponse.json({ ok: true, cancelados })
-    if (await futurosDe(prof.id) > 0) {
-      const negado = await exigirSenha(sessao, body?.senha, req)
-      if (negado) return negado
-    }
-    cancelados = await tirarDaAgenda(prof.id)
+    if (!prof?.ativo) return NextResponse.json({ ok: true, mantidos })
+    mantidos = await desligarDaAgenda(prof.id)
   }
 
   await registrarAuditoria({
@@ -99,9 +73,9 @@ export async function POST(req: NextRequest) {
     acao: naAgenda ? 'ativar_agenda' : 'desativar_agenda',
     tabela: 'profissionais',
     registro_id: prof?.id ?? null,
-    depois: { quem: u.nome, agendamentos_cancelados: cancelados.length },
+    depois: { quem: u.nome, ...(naAgenda ? {} : { horarios_mantidos: mantidos }) },
     req,
   })
 
-  return NextResponse.json({ ok: true, cancelados })
+  return NextResponse.json({ ok: true, mantidos })
 }

@@ -3,15 +3,12 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
 import { situacaoPlano } from '@/lib/planos'
-import { aplicarMudanca, UM_MES } from '@/lib/mudanca-plano'
 
 /* ================================================================
    Cron diário (06h na Bahia) — seções 6.1 Módulo 4 e 6.1.3
    1. Lança as despesas fixas que vencem hoje
    2. Trial vencido → modo somente leitura
    3. Lembrete de fim de trial 3 dias antes
-   4. Mudança pra plano menor que chegou no dia (fim do mês pago)
-      e virada do ciclo das contas ativas
    ================================================================ */
 
 function hojeNaBahia(): { iso: string; dia: number; inicioMes: string } {
@@ -103,35 +100,6 @@ async function avisarFimTrial(db: ReturnType<typeof criarClienteServico>) {
   return avisos
 }
 
-async function mudancasDePlano(db: ReturnType<typeof criarClienteServico>) {
-  const agora = new Date()
-  const { data: devidas, error } = await db.from('barbearias')
-    .select('id').eq('status', 'ativo')
-    .not('plano_agendado', 'is', null).lte('plano_agendado_em', agora.toISOString())
-  if (error) return { aplicadas: 0, ciclos: 0, erro: true }
-
-  let aplicadas = 0
-  for (const b of devidas ?? []) {
-    try {
-      if ((await aplicarMudanca(b.id)).ok) aplicadas++
-    } catch (e) {
-      await registrarErro('cron: mudança de plano', e, { barbearia_id: b.id, usuario_id: null })
-    }
-  }
-
-  // Mês pago que venceu: abre o próximo (quem não paga, o suporte suspende)
-  const { data: vencidos } = await db.from('barbearias')
-    .select('id, plano_ciclo_fim').eq('status', 'ativo').lte('plano_ciclo_fim', agora.toISOString())
-  let ciclos = 0
-  for (const b of vencidos ?? []) {
-    let fim = new Date(b.plano_ciclo_fim)
-    while (fim <= agora) fim = UM_MES(fim)
-    const { error: e } = await db.from('barbearias').update({ plano_ciclo_fim: fim.toISOString() }).eq('id', b.id)
-    if (!e) ciclos++
-  }
-  return { aplicadas, ciclos, erro: false }
-}
-
 export async function GET(req: NextRequest) {
   if (req.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
     return new NextResponse('Unauthorized', { status: 401 })
@@ -142,13 +110,9 @@ export async function GET(req: NextRequest) {
   const despesas = await lancarDespesasFixas(db)
   const trials_vencidos = await vencerTrials(db)
   const avisos_trial = await avisarFimTrial(db)
-  // Antes de virar o ciclo, pra mudança que vence hoje não escapar
-  const planos = await mudancasDePlano(db)
 
   return NextResponse.json({
-    ok: !despesas.erro && !planos.erro,
-    mudancas_plano: planos.aplicadas,
-    ciclos_renovados: planos.ciclos,
+    ok: !despesas.erro,
     despesas_lancadas: despesas.lancadas,
     trials_vencidos,
     avisos_trial,

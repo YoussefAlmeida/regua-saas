@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { adminLogado, registrarAcaoAdmin, PLANOS_ADMIN } from '@/lib/admin'
-import { UM_MES } from '@/lib/mudanca-plano'
+import { UM_MES, aplicarMudanca } from '@/lib/mudanca-plano'
 
 const Schema = z.discriminatedUnion('acao', [
   z.object({ acao: z.literal('estender_teste'), dias: z.number().int().min(1).max(90) }),
@@ -17,7 +17,7 @@ const DIA = 86_400_000
 async function carregar(id: string) {
   const { data } = await criarClienteServico()
     .from('barbearias')
-    .select('id, nome, slug, plano, status, trial_fim, plano_ciclo_fim')
+    .select('id, nome, slug, plano, status, trial_fim, plano_ciclo_fim, plano_agendado')
     .eq('id', id)
     .maybeSingle()
   return data
@@ -44,13 +44,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       break
     }
     case 'ativar_plano': {
-      // Abre o mês pago se não há um correndo; a escolha do admin vale
-      // por cima de qualquer mudança que o dono tinha agendado
+      // = pagamento confirmado. Plano só muda quando paga:
+      // - renovou o mesmo plano em dia: soma um mês ao que já tinha
+      // - trocou de plano (subiu ou desceu): valor cheio, o mês novo começa hoje
       const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
+      const renovacao = b.status === 'ativo' && b.plano === a.plano && fim !== null && fim.getTime() > Date.now()
+      // Era o plano que o dono pediu: tira da agenda quem ele não escolheu
+      if (b.plano_agendado === a.plano) await aplicarMudanca(id)
       mudanca = {
         status: 'ativo', plano: a.plano,
         plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
-        ...(!fim || fim.getTime() <= Date.now() ? { plano_ciclo_fim: UM_MES(new Date()).toISOString() } : {}),
+        plano_ciclo_fim: UM_MES(renovacao ? fim! : new Date()).toISOString(),
       }
       break
     }

@@ -23,7 +23,7 @@ const dataHora = (iso: string | null) => iso
 
 const ACAO_TEXTO: Record<string, string> = {
   estender_teste: 'Estendeu o teste',
-  ativar_plano: 'Ativou plano',
+  ativar_plano: 'Registrou pagamento',
   suspender: 'Suspendeu (só leitura)',
   cancelar: 'Cancelou',
   reativar: 'Reativou',
@@ -165,12 +165,16 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           Cadastrada em {data(b.criado_em)}
           {b.status === 'trial' && <> · teste {diasTeste > 0 ? `acaba em ${diasTeste} dia${diasTeste > 1 ? 's' : ''} (${data(b.trial_fim)})` : `acabou em ${data(b.trial_fim)}`}</>}
           {b.status === 'ativo' && <> · {formatBRL(PLANOS_ADMIN[b.plano as PlanoPago]?.preco ?? 0)}/mês</>}
-          {b.status === 'ativo' && ciclo?.plano_ciclo_fim && <> · pago até {data(ciclo.plano_ciclo_fim)}</>}
+          {b.status === 'ativo' && ciclo?.plano_ciclo_fim && (
+            new Date(ciclo.plano_ciclo_fim).getTime() > Date.now()
+              ? <> · pago até {data(ciclo.plano_ciclo_fim)}</>
+              : <span className="text-saida"> · pagamento venceu em {data(ciclo.plano_ciclo_fim)}</span>
+          )}
         </p>
         {ciclo?.plano_agendado && (
           <p className="font-body text-sm text-amber">
             O dono pediu pra mudar pro {PLANOS_ADMIN[ciclo.plano_agendado as PlanoPago]?.nome ?? ciclo.plano_agendado} em {data(ciclo.plano_agendado_em)}.
-            Cobre o valor novo a partir daí.
+            A troca acontece quando você registrar o pagamento desse plano.
           </p>
         )}
 
@@ -254,7 +258,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
         </section>
 
         {/* Ações */}
-        <AcoesBarbearia barbearia={{ id: b.id, nome: b.nome, slug: b.slug, status: b.status, plano: b.plano }} />
+        <AcoesBarbearia barbearia={{ id: b.id, nome: b.nome, slug: b.slug, status: b.status, plano: b.plano }} pedido={ciclo?.plano_agendado ?? null} />
 
         {/* Histórico do admin */}
         {(log ?? []).length > 0 && (
