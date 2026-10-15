@@ -102,7 +102,8 @@ export async function POST(req: NextRequest) {
   const { count: bloqueado } = await db
     .from('bloqueios_agenda')
     .select('id', { count: 'exact', head: true })
-    .eq('profissional_id', profissional_id)
+    .eq('barbearia_id', sessao.barbearia_id)
+    .or(`profissional_id.eq.${profissional_id},profissional_id.is.null`)
     .lt('inicio', fimDate.toISOString())
     .gt('fim', inicioDate.toISOString())
   if (bloqueado) {
