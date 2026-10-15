@@ -62,14 +62,20 @@ export async function GET(req: NextRequest) {
       linkCancelar: barbearia?.slug ? `${urlDoSite()}/${barbearia.slug}/meus-agendamentos` : undefined,
     })
 
+    // Reserva antes de mandar: se o agendador chamar duas vezes juntas,
+    // só uma consegue marcar e só ela envia
+    const { data: reservado } = await db
+      .from('agendamentos')
+      .update({ lembrete_cliente_enviado: true })
+      .eq('id', ag.id)
+      .eq('lembrete_cliente_enviado', false)
+      .select('id')
+    if (!reservado?.length) continue
+
     const ok = await enviarTexto(cliente.whatsapp, texto)
-    if (ok) {
-      await db
-        .from('agendamentos')
-        .update({ lembrete_cliente_enviado: true })
-        .eq('id', ag.id)
-      enviados++
-    }
+    if (ok) enviados++
+    // Não saiu: solta a reserva pra a próxima rodada tentar de novo
+    else await db.from('agendamentos').update({ lembrete_cliente_enviado: false }).eq('id', ag.id)
   }
 
   return NextResponse.json({ ok: true, lembretes_enviados: enviados })

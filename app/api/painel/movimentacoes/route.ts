@@ -7,6 +7,7 @@ import { bloqueioSomenteLeitura } from '@/lib/conta'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { limitesDoMes } from '@/lib/periodo'
 import { falhaInterna } from '@/lib/erros'
+import { todasAsLinhas } from '@/lib/paginar'
 
 const SchemaPost = z.object({
   tipo: z.enum(['entrada', 'saida']),
@@ -24,21 +25,19 @@ export async function GET(req: NextRequest) {
   }
 
   const mes = req.nextUrl.searchParams.get('mes') // 'YYYY-MM'
+  if (!mes || !/^\d{4}-\d{2}$/.test(mes)) return NextResponse.json({ erro: 'Informe o mês' }, { status: 400 })
   const db = criarClienteServico()
+  const { de: inicio, ate: fim } = limitesDoMes(mes)
 
-  let query = db
+  const { data, error } = await todasAsLinhas((de, ate) => db
     .from('movimentacoes')
     .select(CAMPOS_MOV)
     .eq('barbearia_id', sessao.barbearia_id)
+    .gte('data', inicio).lt('data', fim)
     .order('data', { ascending: false })
     .order('criado_em', { ascending: false })
-
-  if (mes && /^\d{4}-\d{2}$/.test(mes)) {
-    const { de, ate } = limitesDoMes(mes)
-    query = query.gte('data', de).lt('data', ate)
-  }
-
-  const { data, error } = await query
+    .order('id')
+    .range(de, ate))
   if (error) return falhaInterna('painel/movimentacoes', error, 'Erro ao buscar movimentações')
   return NextResponse.json(data)
 }

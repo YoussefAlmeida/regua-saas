@@ -6,6 +6,7 @@ import { exigirSenha } from '@/lib/reautenticar'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { limitesDoMes } from '@/lib/periodo'
 import { falhaInterna } from '@/lib/erros'
+import { todasAsLinhas } from '@/lib/paginar'
 
 /* Exporta o extrato em CSV (abre direto no Excel/Planilhas em português:
    separador ";" e vírgula decimal). Relatório completo pede a senha. */
@@ -35,18 +36,17 @@ export async function POST(req: NextRequest) {
   const negado = await exigirSenha(sessao, parse.data.senha, req)
   if (negado) return negado
 
-  const { de, ate } = limitesDoMes(parse.data.mes)
-  let q = criarClienteServico()
-    .from('movimentacoes')
-    .select('data, tipo, descricao, valor, origem, agendamento_id, recorrente_id, categoria:categorias_fin(nome), profissional:profissionais(nome)')
-    .eq('barbearia_id', sessao.barbearia_id)
-    .gte('data', de)
-    .lt('data', ate)
-    .order('data')
-    .order('criado_em')
-  if (parse.data.profissional_id) q = q.eq('profissional_id', parse.data.profissional_id)
-
-  const { data, error } = await q
+  const { de: inicio, ate: fim } = limitesDoMes(parse.data.mes)
+  const { data, error } = await todasAsLinhas((de, ate) => {
+    let q = criarClienteServico()
+      .from('movimentacoes')
+      .select('id, data, tipo, descricao, valor, origem, agendamento_id, recorrente_id, categoria:categorias_fin(nome), profissional:profissionais(nome)')
+      .eq('barbearia_id', sessao.barbearia_id)
+      .gte('data', inicio)
+      .lt('data', fim)
+    if (parse.data.profissional_id) q = q.eq('profissional_id', parse.data.profissional_id)
+    return q.order('data').order('criado_em').order('id').range(de, ate)
+  })
   if (error) return falhaInterna('painel/exportar', error, 'Erro ao gerar o arquivo')
 
   const linhas = [['Data', 'Tipo', 'Descrição', 'Categoria', 'Barbeiro', 'Origem', 'Valor (R$)'].join(';')]

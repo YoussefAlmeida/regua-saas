@@ -37,6 +37,11 @@ export async function POST() {
     .select('id')
     .single()
 
+  if (error?.code === '23505') {
+    // Clique duplo: o outro clique já criou (o banco só aceita um por usuário)
+    const { data: criado } = await db.from('profissionais').select('id').eq('usuario_id', sessao.usuario_id).maybeSingle()
+    if (criado) return renovarSessao(NextResponse.json({ id: criado.id }), sessao)
+  }
   if (error) return falhaInterna('painel/onboarding/eu-corto', error, 'Não deu pra te colocar na agenda')
   return renovarSessao(NextResponse.json({ id: data.id }, { status: 201 }), sessao)
 }

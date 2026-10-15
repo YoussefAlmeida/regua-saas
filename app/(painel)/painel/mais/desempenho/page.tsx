@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { ChevronLeft } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { todasAsLinhas } from '@/lib/paginar'
 
 /* "Meu desempenho" — Módulo 5
    Só o próprio número: atendimentos feitos e valor gerado. Sem comparar
@@ -42,13 +43,14 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   const seteDias = inicioLocalUTC(y, m, d - 6)
   const desde = new Date(Math.min(semana.getTime(), mes.getTime(), seteDias.getTime()))
 
-  const { data: ags } = await db
+  const { data: ags } = await todasAsLinhas((de, ate) => db
     .from('agendamentos')
-    .select('inicio, status, valor_servico, servico:servicos!servico_id(nome)')
+    .select('id, inicio, status, valor_servico, servico:servicos!servico_id(nome)')
     .eq('profissional_id', profissional_id)
     .in('status', ['concluido', 'faltou'])
     .gte('inicio', desde.toISOString())
     .lt('inicio', inicioLocalUTC(y, m, d + 1).toISOString())
+    .order('id').range(de, ate))
 
   const feitos = (ags ?? []).filter(a => a.status === 'concluido')
   const soma = (de: Date) => {

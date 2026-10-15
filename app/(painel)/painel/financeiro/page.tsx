@@ -5,6 +5,7 @@ import { limitesDoMes, mesVizinho } from '@/lib/periodo'
 import { CAMPOS_MOV } from '@/lib/financeiro'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 import FinanceiroClient, { type Movimentacao } from './financeiro-client'
+import { todasAsLinhas } from '@/lib/paginar'
 
 
 export default async function FinanceiroPage() {
@@ -19,11 +20,12 @@ export default async function FinanceiroPage() {
   const anterior = limitesDoMes(mesVizinho(mesAtual, -1))
 
   const [{ data: movs }, { data: movsAnt }, { data: fixas }, { data: categorias }, { data: profissionais }] = await Promise.all([
-    db.from('movimentacoes').select(CAMPOS_MOV)
+    todasAsLinhas((de, ate) => db.from('movimentacoes').select(CAMPOS_MOV)
       .eq('barbearia_id', sessao.barbearia_id).gte('data', atual.de).lt('data', atual.ate)
-      .order('data', { ascending: false }).order('criado_em', { ascending: false }),
-    db.from('movimentacoes').select('tipo, valor')
-      .eq('barbearia_id', sessao.barbearia_id).gte('data', anterior.de).lt('data', anterior.ate),
+      .order('data', { ascending: false }).order('criado_em', { ascending: false }).order('id').range(de, ate)),
+    todasAsLinhas((de, ate) => db.from('movimentacoes').select('tipo, valor')
+      .eq('barbearia_id', sessao.barbearia_id).gte('data', anterior.de).lt('data', anterior.ate)
+      .order('id').range(de, ate)),
     db.from('despesas_fixas').select('id, descricao, valor, dia_vencimento, ativa')
       .eq('barbearia_id', sessao.barbearia_id).order('dia_vencimento'),
     db.from('categorias_fin').select('id, nome, tipo, cor, padrao')

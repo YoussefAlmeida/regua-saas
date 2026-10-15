@@ -12,6 +12,7 @@ import Avisos from '@/components/aviso'
 import ListaErros, { type ErroSistema } from '../lista-erros'
 import { descreverAuditoria, type LinhaAuditoria } from '@/lib/descrever-auditoria'
 import { CheckCircle2, AlertTriangle, Info } from 'lucide-react'
+import { todasAsLinhas } from '@/lib/paginar'
 
 const DIA = 86_400_000
 const data = (iso: string | null) => iso
@@ -60,7 +61,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
     db.from('usuarios').select('nome, email, whatsapp, papel, status, ativo, ultimo_acesso').eq('barbearia_id', id).in('papel', ['dono', 'barbeiro']).order('papel'),
     db.from('usuarios').select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('papel', 'cliente'),
     db.from('servicos').select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('ativo', true),
-    db.from('agendamentos').select('status, valor_servico, criado_por, cliente_id').eq('barbearia_id', id).gte('inicio', trintaDias),
+    todasAsLinhas((de, ate) => db.from('agendamentos').select('id, status, valor_servico, criado_por, cliente_id').eq('barbearia_id', id).gte('inicio', trintaDias).order('id').range(de, ate)),
     db.from('admin_log').select('acao, detalhe, criado_em').eq('barbearia_id', id).order('criado_em', { ascending: false }).limit(20),
     db.from('erros_sistema').select('id, onde, codigo, mensagem, detalhe, resolvido, criado_em, barbearia_id').eq('barbearia_id', id).order('criado_em', { ascending: false }).limit(60),
     db.from('profissionais').select('id', { count: 'exact', head: true }).eq('barbearia_id', id).eq('ativo', true),
