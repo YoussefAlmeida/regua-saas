@@ -23,6 +23,7 @@ export default async function HojePage() {
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .eq('barbearia_id', barbearia_id)
+    .neq('status', 'cancelado')
     .gte('inicio', inicio_gte)
     .lt('inicio', inicio_lt)
     .order('inicio')

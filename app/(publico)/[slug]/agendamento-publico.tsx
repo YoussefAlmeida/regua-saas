@@ -205,12 +205,19 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 )}
               </div>
             </div>
-            <Link
-              href={`/${barbearia.slug}/meus-agendamentos`}
-              className="shrink-0 flex items-center gap-1.5 font-ui text-sm font-semibold text-fg hover:text-amber mt-1.5 py-1"
-            >
-              <CalendarCheck size={15} /> Meus horários
-            </Link>
+            <div className="shrink-0 flex flex-col items-end mt-1.5">
+              <Link
+                href={`/${barbearia.slug}/meus-agendamentos`}
+                className="flex items-center gap-1.5 font-ui text-sm font-semibold text-fg hover:text-amber py-1"
+              >
+                <CalendarCheck size={15} /> Meus horários
+              </Link>
+              {logado && (
+                <button onClick={sair} className="flex items-center gap-1.5 font-ui text-sm text-fg-muted hover:text-saida py-1">
+                  <LogOut size={14} /> Sair
+                </button>
+              )}
+            </div>
           </div>
 
           {etapa !== 'sucesso' && aceitando && (

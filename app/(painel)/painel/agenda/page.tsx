@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
+import { limitesDoDia } from '@/lib/disponibilidade'
 import AgendaClient, { type Agendamento } from './agenda-client'
 
 export default async function AgendaPage() {
@@ -32,8 +33,9 @@ export default async function AgendaPage() {
         servico:servicos!servico_id(nome, duracao_min, cor)
       `)
       .eq('barbearia_id', barbearia_id)
-      .gte('inicio', `${hoje}T03:00:00.000Z`)
-      .lt('inicio', `${hoje}T27:00:00.000Z`)
+      .neq('status', 'cancelado')
+      .gte('inicio', limitesDoDia(hoje).gte)
+      .lt('inicio', limitesDoDia(hoje).lt)
       .order('inicio'),
   ])
 

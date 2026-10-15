@@ -26,7 +26,7 @@ export interface Agendamento {
 
 const STATUS_CONFIG: Record<Status, { label: string; cor: string; fundo: string }> = {
   agendado:   { label: 'Agendado',   cor: 'text-amber',   fundo: 'bg-amber/10 border-amber/30' },
-  confirmado: { label: 'Confirmado', cor: 'text-entrada',  fundo: 'bg-entrada/10 border-entrada/30' },
+  confirmado: { label: 'Agendado',   cor: 'text-amber',   fundo: 'bg-amber/10 border-amber/30' },
   concluido:  { label: 'Concluído',  cor: 'text-entrada',  fundo: 'bg-entrada/5 border-entrada/20' },
   cancelado:  { label: 'Cancelado',  cor: 'text-saida',    fundo: 'bg-saida/10 border-saida/30' },
   faltou:     { label: 'Faltou',     cor: 'text-fg-muted', fundo: 'bg-surface-alt border-line' },
@@ -118,7 +118,8 @@ export default function AgendaClient({
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
 
     const json = await res.json()
-    setAgendamentos(prev => prev.map(a => a.id === id ? json : a))
+    // Cancelado sai da agenda
+    setAgendamentos(prev => status === 'cancelado' ? prev.filter(a => a.id !== id) : prev.map(a => a.id === id ? json : a))
     setSelecionado(null)
     avisar(mensagemStatus(status, json.entrada, json.valor_servico), 'sucesso')
   }
@@ -356,39 +357,30 @@ export default function AgendaClient({
             />
 
             {/* Ações por status */}
-            {selecionado.status === 'agendado' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => atualizarStatus(selecionado.id, 'confirmado')}
-                  disabled={salvandoStatus}
-                  className="font-semibold flex-1 flex items-center justify-center gap-2 bg-entrada/10 hover:bg-entrada/20 border border-entrada/30 text-entrada font-ui text-sm py-2.5 rounded-button transition-colors"
-                >
-                  <Check size={13} /> Confirmar
-                </button>
+            {(selecionado.status === 'agendado' || selecionado.status === 'confirmado') && (
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => atualizarStatus(selecionado.id, 'concluido')}
+                    disabled={salvandoStatus}
+                    className="font-semibold flex-1 flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
+                  >
+                    <Check size={15} /> Concluir atendimento
+                  </button>
+                  <button
+                    onClick={() => atualizarStatus(selecionado.id, 'faltou')}
+                    disabled={salvandoStatus}
+                    className="font-semibold px-4 border border-line text-fg-muted hover:text-fg font-ui text-sm py-3 rounded-button transition-colors"
+                  >
+                    Faltou
+                  </button>
+                </div>
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'cancelado')}
                   disabled={salvandoStatus}
-                  className="font-semibold flex-1 bg-saida/10 hover:bg-saida/20 border border-saida/30 text-saida font-ui text-sm py-2.5 rounded-button transition-colors"
+                  className="font-semibold w-full text-saida font-ui text-sm py-2.5 rounded-button hover:bg-saida/5 transition-colors"
                 >
-                  Cancelar
-                </button>
-              </div>
-            )}
-            {selecionado.status === 'confirmado' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => atualizarStatus(selecionado.id, 'concluido')}
-                  disabled={salvandoStatus}
-                  className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
-                >
-                  Concluir atendimento
-                </button>
-                <button
-                  onClick={() => atualizarStatus(selecionado.id, 'faltou')}
-                  disabled={salvandoStatus}
-                  className="font-semibold px-4 bg-surface-alt border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button transition-colors"
-                >
-                  Faltou
+                  Cancelar horário
                 </button>
               </div>
             )}

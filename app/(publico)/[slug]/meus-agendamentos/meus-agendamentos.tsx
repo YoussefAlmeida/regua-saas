@@ -138,13 +138,13 @@ export default function MeusAgendamentos({
           </Link>
           <div className="flex-1 min-w-0">
             <p className="font-display text-xl text-amber leading-tight line-clamp-2 break-words">{barbearia.nome}</p>
-            <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted">Meus horários</p>
+            <p className="font-ui text-sm font-semibold text-fg-muted">Meus horários</p>
+            {nome && (
+              <button onClick={sair} className="mt-1 flex items-center gap-1.5 font-ui text-sm text-fg-muted hover:text-saida py-1">
+                <LogOut size={14} /> Sair
+              </button>
+            )}
           </div>
-          {nome && (
-            <button onClick={sair} className="flex items-center gap-1 font-ui text-[11px] uppercase tracking-wider text-fg-muted hover:text-fg">
-              <LogOut size={13} /> Sair
-            </button>
-          )}
         </div>
       </header>
 
