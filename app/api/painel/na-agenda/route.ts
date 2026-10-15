@@ -58,7 +58,8 @@ export async function POST(req: NextRequest) {
     const { error } = prof
       ? await db.from('profissionais').update({ ativo: true }).eq('id', prof.id)
       : await db.from('profissionais').insert({ barbearia_id: sessao.barbearia_id, usuario_id: u.id, nome: u.nome })
-    if (error) return falhaInterna('na-agenda/ativar', error, 'Não deu pra colocar na agenda')
+    // 23505 = clique duplo, o outro clique já colocou na agenda
+    if (error && error.code !== '23505') return falhaInterna('na-agenda/ativar', error, 'Não deu pra colocar na agenda')
   }
 
   let mantidos = 0

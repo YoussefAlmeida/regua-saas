@@ -3,11 +3,13 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoFimTrial } from '@/lib/whatsapp'
 import { registrarErro } from '@/lib/erros'
 import { cronAutorizado } from '@/lib/segredo'
+import { todasAsLinhas } from '@/lib/paginar'
 import { situacaoPlano, CARENCIA_DIAS } from '@/lib/planos'
 
 /* ================================================================
    Cron diário (06h na Bahia) — seções 6.1 Módulo 4 e 6.1.3
-   1. Lança as despesas fixas que vencem hoje
+   1. Lança as despesas fixas que já venceram no mês e ainda não saíram
+      (se o cron falhou num dia, o próximo recupera)
    2. Trial vencido → modo somente leitura
    3. Lembrete de fim de trial 3 dias antes
    4. Aviso de vencimento do plano pago (3 dias antes e 1 dia depois)
@@ -24,52 +26,59 @@ function hojeNaBahia(): { iso: string; dia: number; inicioMes: string } {
 async function lancarDespesasFixas(db: ReturnType<typeof criarClienteServico>) {
   const hoje = hojeNaBahia()
 
-  const { data: despesas, error } = await db
+  // Tudo que vence até hoje neste mês (não só hoje): dia perdido não some
+  const { data: despesas, error } = await todasAsLinhas((de, ate) => db
     .from('despesas_fixas')
-    .select('id, barbearia_id, descricao, valor, categoria_id, barbearia:barbearias!barbearia_id(status, plano, trial_fim, plano_ciclo_fim)')
+    .select('id, barbearia_id, descricao, valor, categoria_id, dia_vencimento, criado_em, barbearia:barbearias!barbearia_id(status, plano, trial_fim, plano_ciclo_fim)')
     .eq('ativa', true)
-    .eq('dia_vencimento', hoje.dia)
+    .lte('dia_vencimento', hoje.dia)
+    .order('id').range(de, ate))
 
   if (error || !despesas) return { lancadas: 0, erro: !!error }
+  if (!despesas.length) return { lancadas: 0, erro: false }
+
+  // O que já saiu este mês, numa consulta só
+  const { data: jaLancadas } = await todasAsLinhas((de, ate) => db
+    .from('movimentacoes')
+    .select('id, recorrente_id')
+    .not('recorrente_id', 'is', null)
+    .gte('data', hoje.inicioMes)
+    .order('id').range(de, ate))
+  const feitas = new Set((jaLancadas ?? []).map(m => m.recorrente_id))
+
+  // criado_por é obrigatório: o lançamento automático fica no nome do dono
+  const { data: donos } = await todasAsLinhas((de, ate) => db.from('usuarios').select('id, barbearia_id')
+    .eq('papel', 'dono').order('id').range(de, ate))
+  const donoDe = new Map((donos ?? []).map(u => [u.barbearia_id, u.id]))
 
   let lancadas = 0
   for (const d of despesas) {
+    if (feitas.has(d.id)) continue
     const barbearia = Array.isArray(d.barbearia) ? d.barbearia[0] : d.barbearia
     if (!barbearia) continue
     const p = situacaoPlano(barbearia)
     if (p.somenteLeitura || !p.recursos.despesasFixas) continue
-
-    // Idempotente: não lança duas vezes no mesmo mês se o cron rodar de novo
-    const { count } = await db
-      .from('movimentacoes')
-      .select('id', { count: 'exact', head: true })
-      .eq('recorrente_id', d.id)
-      .gte('data', hoje.inicioMes)
-    if (count) continue
-
-    // criado_por é obrigatório: o lançamento automático fica no nome do dono
-    const { data: dono } = await db
-      .from('usuarios')
-      .select('id')
-      .eq('barbearia_id', d.barbearia_id)
-      .eq('papel', 'dono')
-      .limit(1)
-      .maybeSingle()
+    const dono = donoDe.get(d.barbearia_id)
     if (!dono) continue
 
+    // Lança na data do vencimento (não na de hoje) pra o mês fechar certo
+    const data = `${hoje.inicioMes.slice(0, 8)}${String(d.dia_vencimento).padStart(2, '0')}`
+    // Cadastrada depois do vencimento deste mês: começa a lançar no mês que vem
+    if (new Date(d.criado_em).toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' }) > data) continue
     const { error: errIns } = await db.from('movimentacoes').insert({
       barbearia_id: d.barbearia_id,
       tipo: 'saida',
       descricao: d.descricao,
       valor: d.valor,
-      data: hoje.iso,
+      data,
       categoria_id: d.categoria_id,
       origem: 'automatica',
       recorrente_id: d.id,
-      criado_por: dono.id,
+      criado_por: dono,
     })
-    if (errIns) await registrarErro('cron: despesa fixa', errIns, { barbearia_id: d.barbearia_id, usuario_id: null, detalhe: { despesa: d.descricao } })
-    else lancadas++
+    // 23505 = o banco já tem esta despesa no mês (cron rodou duas vezes ao mesmo tempo)
+    if (!errIns) lancadas++
+    else if (errIns.code !== '23505') await registrarErro('cron: despesa fixa', errIns, { barbearia_id: d.barbearia_id, usuario_id: null, detalhe: { despesa: d.descricao } })
   }
 
   return { lancadas, erro: false }
