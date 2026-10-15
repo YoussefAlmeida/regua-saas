@@ -57,21 +57,33 @@ export default function HorariosClient({
     const h = loja[String(i)]
     return h && h.ativo !== false && h.inicio && h.fim ? h : null
   }
-  const [profId, setProfId] = useState(profissionais[0]?.id ?? '')
+  // Dono: "Barbearia" (vale pra todos) e, se ele corta, "Minha agenda". Barbeiro: só a dele.
+  const profId = profissionais[0]?.id ?? ''
+  const [aba, setAba] = useState<'barbearia' | 'minha'>(souDono ? 'barbearia' : 'minha')
+  const naBarbearia = aba === 'barbearia'
   const [carregando, setCarregando] = useState(true)
   const [proprio, setProprio] = useState(false)          // false = segue o horário da barbearia
   const [semana, setSemana] = useState<Dia[]>(semanaPadrao(loja))
   const [salvandoSemana, setSalvandoSemana] = useState(false)
 
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([])
-  const [form, setForm] = useState({ data: hojeBahia(), dataFim: '', diaInteiro: false, de: '12:00', ate: '13:00', motivo: '', todos: false })
+  const [form, setForm] = useState({ data: hojeBahia(), dataFim: '', diaInteiro: false, de: '12:00', ate: '13:00', motivo: '' })
   const [salvandoBloq, setSalvandoBloq] = useState(false)
   const [conflitos, setConflitos] = useState<Conflito[]>([])
 
-  const carregar = useCallback(async (id: string) => {
+  const carregar = useCallback(async (id: string, barbearia: boolean) => {
+    setConflitos([])
+    if (barbearia) {
+      // Só os bloqueios da barbearia toda
+      setCarregando(true)
+      const r = await fetch('/api/painel/bloqueios?barbearia=1').catch(() => null)
+      setCarregando(false)
+      if (!r?.ok) { avisar('Não deu pra carregar os bloqueios.', 'erro'); return }
+      setBloqueios(await r.json())
+      return
+    }
     if (!id) return
     setCarregando(true)
-    setConflitos([])
     const [rH, rB] = await Promise.all([
       fetch(`/api/painel/horarios?profissional_id=${id}`),
       fetch(`/api/painel/bloqueios?profissional_id=${id}`),
@@ -101,7 +113,7 @@ export default function HorariosClient({
     }))
   }, [loja])
 
-  useEffect(() => { carregar(profId) }, [profId, carregar])
+  useEffect(() => { carregar(profId, naBarbearia) }, [profId, naBarbearia, carregar])
 
   function mudarDia(i: number, patch: Partial<Dia>) {
     setSemana(s => s.map((d, idx) => idx === i ? { ...d, ...patch } : d))
@@ -149,7 +161,7 @@ export default function HorariosClient({
     const res = await fetch('/api/painel/bloqueios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form.todos
+      body: JSON.stringify(naBarbearia
         ? { todos: true, inicio, fim, motivo: form.motivo || undefined }
         : { profissional_id: profId, inicio, fim, motivo: form.motivo || undefined }),
     }).catch(() => null)
@@ -165,7 +177,7 @@ export default function HorariosClient({
 
     setBloqueios(b => [...b, json].sort((a, z) => a.inicio.localeCompare(z.inicio)))
     setForm(f => ({ ...f, motivo: '' }))
-    avisar(form.todos ? 'Barbearia bloqueada nesse horário para toda a equipe.' : 'Horário bloqueado. Ninguém consegue marcar nele.', 'sucesso')
+    avisar(naBarbearia ? 'Barbearia bloqueada nesse horário para toda a equipe.' : 'Horário bloqueado. Ninguém consegue marcar nele.', 'sucesso')
   }
 
   async function desbloquear(id: string) {
@@ -179,57 +191,8 @@ export default function HorariosClient({
   const inputCls = 'bg-surface border border-line rounded-button px-2.5 py-2 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber'
   const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
-  if (profissionais.length === 0) {
-    return (
-      <div className="px-4 py-16 max-w-lg mx-auto text-center space-y-3">
-        <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum barbeiro ativo</p>
-        {souDono && <Link href="/painel/mais/barbeiros" className="text-amber font-body text-sm hover:underline">Convidar barbeiro</Link>}
-      </div>
-    )
-  }
-
-  return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
-      <div className="flex items-center gap-3">
-        <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souDono ? 'Horários da equipe' : 'Meu horário'}</h1>
-      </div>
-
-      {/* Escolha do barbeiro (só dono) */}
-      {souDono && profissionais.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto -mx-4 px-4 pb-1">
-          {profissionais.map(p => (
-            <button
-              key={p.id}
-              onClick={() => setProfId(p.id)}
-              className={`font-semibold shrink-0 px-4 py-2 rounded-full border font-ui text-xs transition-colors ${
-                p.id === profId ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'
-              }`}
-            >
-              {p.nome}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {carregando ? (
-        <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse text-center py-12">Carregando…</p>
-      ) : (
-        <>
-          {/* ── Semana de trabalho ───────────────────────── */}
-          <section className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold font-ui text-sm text-fg-muted">Semana de trabalho</h2>
-              <button
-                onClick={salvarSemana}
-                disabled={salvandoSemana}
-                className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors disabled:opacity-50"
-              >
-                <Check size={13} /> {salvandoSemana ? 'Salvando…' : 'Salvar'}
-              </button>
-            </div>
-
-            {/* O que o dono definiu: o limite de todos */}
+  // O que o dono definiu: o limite de todos
+  const cardFuncionamento = (
             <div className="rounded-card border border-line bg-surface-alt/60 px-4 py-3">
               <div className="flex items-center justify-between gap-2">
                 <p className="font-ui text-sm font-semibold text-fg">Funcionamento da barbearia</p>
@@ -249,6 +212,65 @@ export default function HorariosClient({
                 })}
               </ul>
             </div>
+  )
+
+  if (!souDono && profissionais.length === 0) {
+    return (
+      <div className="px-4 py-16 max-w-lg mx-auto text-center space-y-3">
+        <p className="font-semibold font-ui text-sm text-fg-muted">Nenhum barbeiro ativo</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
+      <div className="flex items-center gap-3">
+        <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souDono ? 'Horários' : 'Meu horário'}</h1>
+      </div>
+
+      {/* Dono: o que vale pra barbearia toda x a agenda dele (se também corta) */}
+      {souDono && (
+        <div className="flex rounded-button border border-line overflow-hidden">
+          {([['barbearia', 'Barbearia'], ...(profissionais.length ? [['minha', 'Minha agenda']] : [])] as [typeof aba, string][]).map(([v, t]) => (
+            <button
+              key={v}
+              onClick={() => setAba(v)}
+              className={`flex-1 py-2.5 font-ui text-sm font-semibold transition-colors ${aba === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      )}
+      {souDono && naBarbearia && (
+        <p className="font-body text-sm text-fg-muted -mt-4">
+          Tudo aqui vale para a barbearia toda. Cada barbeiro monta o horário dele dentro do funcionamento.
+          {!profissionais.length && ' Se você também corta, ligue "Eu também atendo" em Mais → Equipe pra ter a sua agenda.'}
+        </p>
+      )}
+
+      {carregando ? (
+        <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse text-center py-12">Carregando…</p>
+      ) : (
+        <>
+          {naBarbearia && <section>{cardFuncionamento}</section>}
+
+          {/* ── Semana de trabalho ───────────────────────── */}
+          {!naBarbearia && (
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h2 className="font-semibold font-ui text-sm text-fg-muted">Semana de trabalho</h2>
+              <button
+                onClick={salvarSemana}
+                disabled={salvandoSemana}
+                className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors disabled:opacity-50"
+              >
+                <Check size={13} /> {salvandoSemana ? 'Salvando…' : 'Salvar'}
+              </button>
+            </div>
+
+            {cardFuncionamento}
 
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -331,35 +353,18 @@ export default function HorariosClient({
             )}
           </section>
 
+          )}
+
           {/* ── Bloqueios ───────────────────────────────── */}
           <section className="space-y-3">
-            <h2 className="font-semibold font-ui text-sm text-fg-muted">Bloquear horário</h2>
+            <h2 className="font-semibold font-ui text-sm text-fg-muted">{naBarbearia ? 'Bloquear a barbearia' : 'Bloquear minha agenda'}</h2>
             <p className="font-body text-xs text-fg-muted -mt-1">
-              {souDono ? 'Feriado, reforma, folga de alguém. Some da página de agendamento na hora.' : 'Médico, folga, compromisso. Some da página de agendamento na hora. Os bloqueios do dono valem pra você também.'}
+              {naBarbearia
+                ? 'Feriado, reforma, fechar mais cedo. Vale para toda a equipe e some da página de agendamento na hora. Só você pode liberar.'
+                : `Médico, folga, compromisso. Some da página de agendamento na hora.${souDono ? '' : ' Os bloqueios do dono valem pra você também.'}`}
             </p>
 
             <form onSubmit={bloquear} className="bg-surface rounded-card border border-line p-4 space-y-3">
-              {souDono && (
-                <div>
-                  <p className={labelCls}>Vale para</p>
-                  <div className="flex gap-2">
-                    {[
-                      { v: false, t: profissionais.find(p => p.id === profId)?.nome ?? 'Este barbeiro' },
-                      { v: true, t: 'Barbearia toda' },
-                    ].map(o => (
-                      <button
-                        key={String(o.v)}
-                        type="button"
-                        onClick={() => setForm(f => ({ ...f, todos: o.v }))}
-                        className={`font-semibold flex-1 py-2 rounded-button border font-ui text-xs transition-colors truncate px-2 ${form.todos === o.v ? 'border-amber text-amber bg-amber/5' : 'border-line text-fg-muted'}`}
-                      >
-                        {o.t}
-                      </button>
-                    ))}
-                  </div>
-                  {form.todos && <p className="font-body text-xs text-fg-muted mt-1.5">Ninguém da equipe atende nesse período, e só você pode liberar.</p>}
-                </div>
-              )}
               <div className="flex gap-2">
                 {[{ v: false, t: 'Algumas horas' }, { v: true, t: 'Dia inteiro' }].map(o => (
                   <button
