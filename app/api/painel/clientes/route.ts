@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { falhaInterna } from '@/lib/erros'
+import { todasAsLinhas } from '@/lib/paginar'
 
 export async function GET() {
   const sessao = await getSessao()
@@ -10,7 +11,7 @@ export async function GET() {
   }
 
   const db = criarClienteServico()
-  const { data, error } = await db
+  const { data, error } = await todasAsLinhas((de, ate) => db
     .from('usuarios')
     .select(`
       id, nome, whatsapp, criado_em,
@@ -20,6 +21,8 @@ export async function GET() {
     .eq('papel', 'cliente')
     .eq('ativo', true)
     .order('criado_em', { ascending: false })
+    .order('id')
+    .range(de, ate))
 
   if (error) return falhaInterna('painel/clientes', error, 'Erro ao buscar clientes')
   return NextResponse.json(data)

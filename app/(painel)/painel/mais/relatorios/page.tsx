@@ -6,6 +6,7 @@ import { formatBRL } from '@/lib/utils'
 import { limitesDoMes, mesVizinho } from '@/lib/periodo'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 import RecursoBloqueado from '@/components/recurso-bloqueado'
+import { todasAsLinhas } from '@/lib/paginar'
 
 export default async function RelatoriosPage() {
   const h = await headers()
@@ -23,18 +24,20 @@ export default async function RelatoriosPage() {
   const avancado = plano.recursos.relatoriosAvancados
 
   const [{ data: agMes }, { data: agMesAnt }] = await Promise.all([
-    db
+    todasAsLinhas((de, ate) => db
       .from('agendamentos')
       .select('id, valor_servico, status, criado_em, cliente_id, profissional_id, profissional:profissionais!profissional_id(nome)')
       .eq('barbearia_id', barbearia_id)
       .gte('inicio', `${inicioMes}${T}`)
-      .lt('inicio', `${fimMes}${T}`),
-    db
+      .lt('inicio', `${fimMes}${T}`)
+      .order('id').range(de, ate)),
+    todasAsLinhas((de, ate) => db
       .from('agendamentos')
       .select('id, status')
       .eq('barbearia_id', barbearia_id)
       .gte('inicio', `${inicioMesAnt}${T}`)
-      .lt('inicio', `${inicioMes}${T}`),
+      .lt('inicio', `${inicioMes}${T}`)
+      .order('id').range(de, ate)),
   ])
 
   const concluidos = (agMes ?? []).filter(a => a.status === 'concluido')
@@ -94,8 +97,10 @@ export default async function RelatoriosPage() {
           )}
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Receita</p>
+          {/* Só serviços concluídos; venda de produto e outras entradas ficam no Financeiro ("Entrou") */}
+          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Em serviços</p>
           <p className="font-mono text-2xl text-entrada">{formatBRL(totalReceita)}</p>
+          <Link href="/painel/financeiro" className="font-body text-xs text-fg-muted underline underline-offset-2 mt-1 inline-block">Caixa completo no Financeiro</Link>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Ticket médio</p>

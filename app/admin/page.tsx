@@ -6,6 +6,7 @@ import { adminLogado, PLANOS_ADMIN, STATUS_ADMIN, type PlanoPago } from '@/lib/a
 import { formatBRL } from '@/lib/utils'
 import SairAdmin from './sair'
 import SaudeSistema from './saude'
+import { todasAsLinhas } from '@/lib/paginar'
 
 const DIA = 86_400_000
 
@@ -26,10 +27,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
 
   const seteDias = new Date(Date.now() - 7 * DIA).toISOString()
   const [{ data: barbearias }, { data: usuarios }, { data: ags }, { data: errosAbertos }] = await Promise.all([
-    db.from('barbearias').select('id, nome, slug, plano, status, trial_fim, criado_em').order('criado_em', { ascending: false }),
-    db.from('usuarios').select('barbearia_id, papel, ultimo_acesso').in('papel', ['dono', 'barbeiro']),
-    db.from('agendamentos').select('barbearia_id').gte('inicio', trintaDias).neq('status', 'cancelado'),
-    db.from('erros_sistema').select('barbearia_id').eq('resolvido', false).gte('criado_em', seteDias),
+    todasAsLinhas((de, ate) => db.from('barbearias').select('id, nome, slug, plano, status, trial_fim, criado_em').order('criado_em', { ascending: false }).order('id').range(de, ate)),
+    todasAsLinhas((de, ate) => db.from('usuarios').select('id, barbearia_id, papel, ultimo_acesso').in('papel', ['dono', 'barbeiro']).order('id').range(de, ate)),
+    // Conta no banco (antes vinha linha a linha e o Supabase cortava em 1000)
+    db.rpc('admin_agendamentos_por_barbearia', { desde: trintaDias }),
+    todasAsLinhas((de, ate) => db.from('erros_sistema').select('id, barbearia_id').eq('resolvido', false).gte('criado_em', seteDias).order('id').range(de, ate)),
   ])
   const nErros = (errosAbertos ?? []).length
 
@@ -39,7 +41,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     return {
       ...b,
       ultimoAcesso: ultimo as string | null,
-      agendamentos30: (ags ?? []).filter(a => a.barbearia_id === b.id).length,
+      agendamentos30: Number((ags as { barbearia_id: string; total: number }[] | null)?.find(a => a.barbearia_id === b.id)?.total ?? 0),
       erros: (errosAbertos ?? []).filter(e => e.barbearia_id === b.id).length,
     }
   })

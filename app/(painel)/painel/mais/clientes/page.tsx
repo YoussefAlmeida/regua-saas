@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import ClientesClient from './clientes-client'
+import { todasAsLinhas } from '@/lib/paginar'
 
 export default async function ClientesPage() {
   const h = await headers()
@@ -11,7 +12,7 @@ export default async function ClientesPage() {
   const barbearia_id = h.get('x-barbearia-id')!
   const db = await criarClienteAutenticado()
 
-  const { data: clientes } = await db
+  const { data: clientes } = await todasAsLinhas((de, ate) => db
     .from('usuarios')
     .select(`
       id, nome, whatsapp, criado_em,
@@ -21,6 +22,8 @@ export default async function ClientesPage() {
     .eq('papel', 'cliente')
     .eq('ativo', true)
     .order('criado_em', { ascending: false })
+    .order('id')
+    .range(de, ate))
 
   return <ClientesClient clientesIniciais={clientes ?? []} />
 }
