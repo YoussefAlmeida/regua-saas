@@ -46,6 +46,12 @@ export async function POST(req: NextRequest) {
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
 
   const db = criarClienteServico()
+  // Categoria tem que ser de saída e desta barbearia
+  if (parse.data.categoria_id) {
+    const { data: cat } = await db.from('categorias_fin').select('tipo')
+      .eq('id', parse.data.categoria_id).eq('barbearia_id', sessao.barbearia_id).maybeSingle()
+    if (!cat || cat.tipo !== 'saida') return NextResponse.json({ erro: 'Categoria inválida' }, { status: 400 })
+  }
   const { data, error } = await db
     .from('despesas_fixas')
     .insert({ ...parse.data, barbearia_id: sessao.barbearia_id })

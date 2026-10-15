@@ -22,6 +22,9 @@ const SchemaPost = z.object({
 export async function GET(req: NextRequest) {
   const sessao = await getSessao()
   if (!sessao) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+  if (sessao.papel !== 'dono' && sessao.papel !== 'barbeiro') {
+    return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  }
 
   const data = req.nextUrl.searchParams.get('data')
   if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) {
@@ -34,7 +37,7 @@ export async function GET(req: NextRequest) {
   const inicio_lt  = new Date(Date.UTC(y, m - 1, d + 1, 3, 0, 0)).toISOString()
 
   const db = criarClienteServico()
-  const { data: agendamentos, error } = await db
+  let consulta = db
     .from('agendamentos')
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
@@ -47,6 +50,12 @@ export async function GET(req: NextRequest) {
     .gte('inicio', inicio_gte)
     .lt('inicio', inicio_lt)
     .order('inicio')
+  // Barbeiro recebe só a própria agenda (os clientes dos colegas não saem do servidor)
+  if (sessao.papel === 'barbeiro') {
+    if (!sessao.profissional_id) return NextResponse.json([])
+    consulta = consulta.eq('profissional_id', sessao.profissional_id)
+  }
+  const { data: agendamentos, error } = await consulta
 
   if (error) return falhaInterna('painel/agendamentos', error, 'Erro ao buscar agendamentos')
   return NextResponse.json(agendamentos)

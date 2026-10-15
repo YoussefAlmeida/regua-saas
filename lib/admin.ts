@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { timingSafeEqual, createHash } from 'node:crypto'
 import type { NextRequest } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { chaveDerivada } from '@/lib/sessao-chave'
 
 /* ================================================================
    Painel admin do RÉGUA (só o dono do SaaS)
@@ -13,7 +14,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 export const COOKIE_ADMIN = 'regua-admin'
 const DURACAO_S = 60 * 60 * 8
 
-const segredo = () => new TextEncoder().encode(`${process.env.SUPABASE_JWT_SECRET}:admin`)
+const segredo = () => chaveDerivada('admin')
 
 /** Compara a senha sem vazar tempo de resposta */
 export function senhaAdminConfere(senha: string): boolean {

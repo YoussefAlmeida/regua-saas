@@ -5,6 +5,17 @@
    aqui no app; o acesso ao banco usa um token curto feito no servidor
    (lib/supabase/server.ts). Sem dependências de Node: roda no middleware.
    ================================================================ */
-export const chaveSessao = () => new TextEncoder().encode(`${process.env.SUPABASE_JWT_SECRET}:sessao`)
+
+/** Segredo base. Sem a variável, para tudo em vez de assinar com "undefined" (forjável). */
+export function segredoBase(): string {
+  const s = process.env.SUPABASE_JWT_SECRET
+  if (!s) throw new Error('SUPABASE_JWT_SECRET não configurada')
+  return s
+}
+
+/** Chave própria pra cada uso (sessão, admin, nova senha...), derivada do segredo base */
+export const chaveDerivada = (uso: string) => new TextEncoder().encode(`${segredoBase()}:${uso}`)
+
+export const chaveSessao = () => chaveDerivada('sessao')
 
 export const OPCOES_SESSAO = { algorithms: ['HS256'], issuer: 'regua', audience: 'sessao' }

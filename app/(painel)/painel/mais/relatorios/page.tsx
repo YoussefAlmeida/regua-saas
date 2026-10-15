@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { formatBRL } from '@/lib/utils'
@@ -8,6 +9,8 @@ import RecursoBloqueado from '@/components/recurso-bloqueado'
 
 export default async function RelatoriosPage() {
   const h = await headers()
+  // Faturamento da barbearia é só do dono
+  if (h.get('x-papel') !== 'dono') redirect('/painel/mais')
   const barbearia_id = h.get('x-barbearia-id')!
   const db = await criarClienteAutenticado()
 

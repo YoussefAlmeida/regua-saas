@@ -150,3 +150,30 @@ export function planoParaProfissionais(n: number): PlanoPagoId {
   if (n <= 3) return 'barbearia'
   return 'rede'
 }
+
+/**
+ * Até quando fica pago depois de um pagamento confirmado.
+ * Mesmo plano, em dia ou dentro da carência: soma 1 mês ao vencimento
+ * (pagar atrasado na carência não ganha dias de graça).
+ * Plano diferente, ou atraso maior que a carência: 1 mês a partir de hoje.
+ */
+export function fimDoCicloAposPagamento(
+  b: { plano: string; status: string; plano_ciclo_fim: string | null },
+  plano: PlanoPagoId,
+  agora: Date = new Date(),
+): Date {
+  const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
+  const renovacao = b.status === 'ativo' && b.plano === plano && fim !== null
+    && fim.getTime() + CARENCIA_DIAS * 86_400_000 > agora.getTime()
+  const base = new Date(renovacao ? fim!.getTime() : agora.getTime())
+  base.setUTCMonth(base.getUTCMonth() + 1)
+  return base
+}
+
+/** Plano pelo valor pago (centavo exato); null = não é preço de nenhum plano */
+export function planoPeloValor(valor: unknown): PlanoPagoId | null {
+  const v = typeof valor === 'number' ? valor : Number(valor)
+  if (!Number.isFinite(v)) return null
+  const centavos = Math.round(v * 100)
+  return LISTA_PLANOS.find(p => Math.round(p.preco * 100) === centavos)?.id as PlanoPagoId ?? null
+}

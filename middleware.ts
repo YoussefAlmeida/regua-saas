@@ -35,6 +35,12 @@ export async function middleware(req: NextRequest) {
 
   try {
     const { payload } = await jwtVerify(token, chaveSessao(), OPCOES_SESSAO)
+    // Painel é só da equipe: cliente não lê nem mexe em nada daqui
+    // (antes um cliente logado pelo link conseguia listar e alterar agendamentos)
+    if (payload.papel === 'cliente' && (pathname.startsWith('/painel') || pathname.startsWith('/api/painel'))) {
+      if (pathname.startsWith('/api/')) return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+      return NextResponse.redirect(new URL('/', req.url))
+    }
     const headers = limpos
     headers.set('x-usuario-id', payload.sub!)
     headers.set('x-papel', payload.papel as string)

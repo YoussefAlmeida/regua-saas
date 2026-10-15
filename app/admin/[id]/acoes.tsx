@@ -31,6 +31,13 @@ export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
     setOcupado(false)
     if (!res) { setMsg({ t: 'Sem conexão.', erro: true }); return }
     if (res.status === 401) { router.replace('/admin/login'); return }
+    if (res.status === 409) {
+      const j = await res.clone().json().catch(() => ({}))
+      if (j.jaPago) {
+        if (confirm(`${j.erro} É um pagamento novo? OK registra mesmo assim.`)) await agir({ ...corpo, mesmoAssim: true }, sucesso)
+        return
+      }
+    }
     if (!res.ok) { setMsg({ t: (await res.json().catch(() => ({}))).erro ?? 'Erro', erro: true }); return }
     const json = await res.json().catch(() => ({}))
     setMsg(json.aviso ? { t: `${sucesso} ${json.aviso}`, erro: true } : { t: sucesso })

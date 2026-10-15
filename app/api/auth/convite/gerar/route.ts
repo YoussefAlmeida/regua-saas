@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SignJWT } from 'jose'
 import { getSessao } from '@/lib/auth'
+import { segredoBase } from '@/lib/sessao-chave'
 
-const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+const getSecret = () => new TextEncoder().encode(segredoBase())
 
 export async function POST(req: NextRequest) {
   const sessao = await getSessao()

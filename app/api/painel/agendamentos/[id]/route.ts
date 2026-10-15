@@ -5,15 +5,21 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna, registrarErro } from '@/lib/erros'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
+import { exigirSenha } from '@/lib/reautenticar'
+import { limitesDoDia } from '@/lib/disponibilidade'
 
 const SchemaPatch = z.object({
   status: z.enum(['agendado', 'confirmado', 'concluido', 'cancelado', 'faltou']),
-  cancelado_por: z.enum(['dono', 'barbeiro', 'cliente']).optional(),
+  senha: z.string().optional(),
 })
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+  // Status de atendimento é coisa da equipe; cliente só cancela o próprio em /api/cliente
+  if (sessao.papel !== 'dono' && sessao.papel !== 'barbeiro') {
+    return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  }
 
   const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
   if (leitura) return leitura
@@ -44,12 +50,31 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ erro: 'O agendamento já está com esse status' }, { status: 400 })
   }
 
+  // Desfazer "concluído" tira dinheiro do caixa. Se a entrada caiu hoje é correção
+  // de clique; entrada de outro dia só o dono, com a senha (igual no Financeiro).
+  if (statusAntes === 'concluido') {
+    const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
+    const { count: antigas } = await db
+      .from('movimentacoes')
+      .select('id', { count: 'exact', head: true })
+      .eq('agendamento_id', id)
+      .eq('origem', 'automatica')
+      .lt('criado_em', limitesDoDia(hoje).gte)
+    if (antigas) {
+      if (sessao.papel !== 'dono') {
+        return NextResponse.json({ erro: 'Esse atendimento entrou no caixa em outro dia. Peça pro dono desfazer.' }, { status: 403 })
+      }
+      const negado = await exigirSenha(sessao, parse.data.senha, req)
+      if (negado) return negado
+    }
+  }
+
   const update: Record<string, unknown> = {
     status: parse.data.status,
     atualizado_em: new Date().toISOString(),
   }
   if (parse.data.status === 'cancelado') {
-    update.cancelado_por = parse.data.cancelado_por ?? (sessao.papel === 'dono' ? 'dono' : 'barbeiro')
+    update.cancelado_por = sessao.papel
   }
 
   const { data, error } = await db

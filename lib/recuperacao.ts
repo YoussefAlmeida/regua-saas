@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import { createHash } from 'node:crypto'
 import { criarClienteServico } from '@/lib/supabase/server'
+import { chaveDerivada } from '@/lib/sessao-chave'
 
 /* ================================================================
    Link de nova senha — seção 6.1 Módulo 1 (recuperação de senha)
@@ -10,7 +11,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
      dono/admin gera pra mandar no WhatsApp
    ================================================================ */
 
-const segredo = () => new TextEncoder().encode(`${process.env.SUPABASE_JWT_SECRET}:nova-senha`)
+const segredo = () => chaveDerivada('nova-senha')
 const digital = (senhaHash: string) => createHash('sha256').update(senhaHash).digest('hex').slice(0, 24)
 
 export async function gerarTokenNovaSenha(usuario_id: string, validadeHoras: number): Promise<string | null> {
