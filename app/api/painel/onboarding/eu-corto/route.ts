@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server'
-import { getSessao } from '@/lib/auth'
+import { getSessao, renovarSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirVagaProfissional } from '@/lib/plano-servidor'
 import { falhaInterna } from '@/lib/erros'
@@ -20,14 +20,14 @@ export async function POST() {
     .eq('usuario_id', sessao.usuario_id)
     .maybeSingle()
 
-  if (existente?.ativo) return NextResponse.json({ id: existente.id })
+  if (existente?.ativo) return renovarSessao(NextResponse.json({ id: existente.id }), sessao)
 
   const semVaga = await exigirVagaProfissional(sessao.barbearia_id)
   if (semVaga) return semVaga
 
   if (existente) {
     await db.from('profissionais').update({ ativo: true }).eq('id', existente.id)
-    return NextResponse.json({ id: existente.id })
+    return renovarSessao(NextResponse.json({ id: existente.id }), sessao)
   }
 
   const { data: dono } = await db.from('usuarios').select('nome').eq('id', sessao.usuario_id).single()
@@ -38,7 +38,7 @@ export async function POST() {
     .single()
 
   if (error) return falhaInterna('painel/onboarding/eu-corto', error, 'Não deu pra te colocar na agenda')
-  return NextResponse.json({ id: data.id }, { status: 201 })
+  return renovarSessao(NextResponse.json({ id: data.id }, { status: 201 }), sessao)
 }
 
 /** "Parar de atender": o dono sai da agenda (com senha). Horários futuros dele são cancelados. */
