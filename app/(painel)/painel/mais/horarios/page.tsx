@@ -15,7 +15,8 @@ export default async function HorariosPage() {
     .eq('barbearia_id', sessao.barbearia_id)
     .eq('ativo', true)
     .order('nome')
-  if (sessao.papel === 'barbeiro') query = query.eq('id', sessao.profissional_id ?? '')
+  // Cada um cuida só da própria agenda; o dono, se também corta, da dele
+  query = query.eq('usuario_id', sessao.usuario_id)
 
   const [{ data: profissionais }, { data: barbearia }] = await Promise.all([
     query,

@@ -38,6 +38,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(data)
   }
 
+  // ?barbearia=1 → só os bloqueios da barbearia toda (tela do dono)
+  if (req.nextUrl.searchParams.get('barbearia') === '1') {
+    if (sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+    const { data, error } = await criarClienteServico()
+      .from('bloqueios_agenda')
+      .select('id, inicio, fim, motivo')
+      .eq('barbearia_id', sessao.barbearia_id)
+      .is('profissional_id', null)
+      .gte('fim', new Date().toISOString())
+      .order('inicio')
+      .limit(100)
+    if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao buscar bloqueios')
+    return NextResponse.json((data ?? []).map(b => ({ ...b, daBarbearia: true, travado: false })))
+  }
+
   const profissional_id = req.nextUrl.searchParams.get('profissional_id') ?? sessao.profissional_id
   if (!profissional_id || !(await podeMexerNaAgendaDe(sessao, profissional_id))) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
