@@ -6,8 +6,9 @@ import { hashSenha, COOKIE_SESSION } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { falhaInterna } from '@/lib/erros'
+import { segredoBase } from '@/lib/sessao-chave'
 
-const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+const getSecret = () => new TextEncoder().encode(segredoBase())
 
 const Schema = z.object({
   token: z.string(),

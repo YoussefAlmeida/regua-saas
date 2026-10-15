@@ -4,8 +4,9 @@ import { SignJWT } from 'jose'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { falhaInterna } from '@/lib/erros'
+import { segredoBase } from '@/lib/sessao-chave'
 
-const getSecret = () => new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!)
+const getSecret = () => new TextEncoder().encode(segredoBase())
 
 export async function GET() {
   const sessao = await getSessao()

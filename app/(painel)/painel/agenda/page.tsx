@@ -12,6 +12,22 @@ export default async function AgendaPage() {
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
 
+  let qHoje = db
+    .from('agendamentos')
+    .select(`
+      id, inicio, fim, status, valor_servico, observacao,
+      profissional:profissionais!profissional_id(id, nome),
+      cliente:usuarios!cliente_id(nome, whatsapp),
+      servico:servicos!servico_id(nome, duracao_min, cor)
+    `)
+    .eq('barbearia_id', barbearia_id)
+    .neq('status', 'cancelado')
+    .gte('inicio', limitesDoDia(hoje).gte)
+    .lt('inicio', limitesDoDia(hoje).lt)
+    .order('inicio')
+  // Barbeiro recebe só a própria agenda: os clientes dos colegas não chegam ao navegador
+  if (papel === 'barbeiro') qHoje = qHoje.eq('profissional_id', meuProfissionalId ?? '00000000-0000-0000-0000-000000000000')
+
   const [{ data: profissionais }, { data: servicos }, { data: agendamentosHoje }] = await Promise.all([
     db
       .from('profissionais')
@@ -24,19 +40,7 @@ export default async function AgendaPage() {
       .eq('barbearia_id', barbearia_id)
       .eq('ativo', true)
       .order('nome'),
-    db
-      .from('agendamentos')
-      .select(`
-        id, inicio, fim, status, valor_servico, observacao,
-        profissional:profissionais!profissional_id(id, nome),
-        cliente:usuarios!cliente_id(nome, whatsapp),
-        servico:servicos!servico_id(nome, duracao_min, cor)
-      `)
-      .eq('barbearia_id', barbearia_id)
-      .neq('status', 'cancelado')
-      .gte('inicio', limitesDoDia(hoje).gte)
-      .lt('inicio', limitesDoDia(hoje).lt)
-      .order('inicio'),
+    qHoje,
   ])
 
   // Fora da agenda mas com horário já marcado: continua aparecendo pra atender

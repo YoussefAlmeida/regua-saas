@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { mensagemStatus, statusAoDesfazer } from '@/lib/status-agendamento'
+import { pedirSenha } from '@/components/confirmar-senha'
 import { formatBRL } from '@/lib/utils'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
@@ -104,15 +105,25 @@ export default function AgendaClient({
 
   const [salvandoStatus, setSalvandoStatus] = useState(false)
 
-  async function atualizarStatus(id: string, status: Status) {
-    if (status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
+  async function atualizarStatus(id: string, status: Status, senha?: string) {
+    if (!senha && status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
     setSalvandoStatus(true)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, senha }),
     }).catch(() => null)
     setSalvandoStatus(false)
+
+    // Desfazer atendimento de outro dia tira dinheiro do caixa: pede a senha do dono
+    if (res?.status === 401) {
+      const json = await res.clone().json().catch(() => null)
+      if (json?.pedirSenha) {
+        const s = await pedirSenha('Desfazer atendimento já lançado', senha ? 'Senha incorreta. Tente de novo.' : 'A entrada é de outro dia e sai do caixa. Confirme com sua senha.')
+        if (s) await atualizarStatus(id, status, s)
+        return
+      }
+    }
 
     if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }

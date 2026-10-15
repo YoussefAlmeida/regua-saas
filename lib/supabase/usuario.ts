@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { SignJWT } from 'jose'
 import { redirect } from 'next/navigation'
 import { getSessao } from '@/lib/auth'
+import { segredoBase } from '@/lib/sessao-chave'
 
 /* ================================================================
    Cliente do Supabase com as regras de acesso (RLS) do usuário logado.
@@ -19,7 +20,7 @@ export async function criarClienteAutenticado() {
     .setAudience('authenticated')
     .setIssuedAt()
     .setExpirationTime('5m')
-    .sign(new TextEncoder().encode(process.env.SUPABASE_JWT_SECRET!))
+    .sign(new TextEncoder().encode(segredoBase()))
 
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
