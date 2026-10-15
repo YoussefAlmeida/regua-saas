@@ -13,13 +13,17 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   const db = criarClienteServico()
   const { data: bloq } = await db
     .from('bloqueios_agenda')
-    .select('id, profissional_id, inicio, fim, motivo')
+    .select('id, profissional_id, inicio, fim, motivo, criado_por')
     .eq('id', id)
     .eq('barbearia_id', sessao.barbearia_id)
     .maybeSingle()
 
   if (!bloq) return NextResponse.json({ erro: 'Bloqueio não encontrado' }, { status: 404 })
-  if (!(await podeMexerNaAgendaDe(sessao, bloq.profissional_id))) {
+  // O que o dono decidiu, só o dono desfaz
+  if (sessao.papel !== 'dono' && (bloq.profissional_id === null || bloq.criado_por !== sessao.usuario_id)) {
+    return NextResponse.json({ erro: 'Esse bloqueio foi feito pelo dono da barbearia. Só ele pode liberar.' }, { status: 403 })
+  }
+  if (bloq.profissional_id !== null && !(await podeMexerNaAgendaDe(sessao, bloq.profissional_id))) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
 

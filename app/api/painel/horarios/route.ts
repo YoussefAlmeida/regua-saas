@@ -5,6 +5,9 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { paraMin } from '@/lib/disponibilidade'
+import { HORARIO_PADRAO } from '@/lib/horario-padrao'
+
+const NOME_DIA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado']
 import { falhaInterna } from '@/lib/erros'
 
 const hora = z.string().regex(/^\d{2}:\d{2}$/)
@@ -52,8 +55,21 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
 
+  // O horário do barbeiro fica dentro do funcionamento que o dono definiu
+  const db = criarClienteServico()
+  const { data: b } = await db.from('barbearias').select('horario_funcionamento').eq('id', sessao.barbearia_id).single()
+  const loja = (b?.horario_funcionamento && Object.keys(b.horario_funcionamento).length
+    ? b.horario_funcionamento : HORARIO_PADRAO) as Record<string, { ativo?: boolean; inicio?: string; fim?: string }>
+
   const vistos = new Set<number>()
   for (const d of dias) {
+    const l = loja[String(d.dia_semana)]
+    if (!l || l.ativo === false || !l.inicio || !l.fim) {
+      return NextResponse.json({ erro: `A barbearia não abre ${d.dia_semana === 0 || d.dia_semana === 6 ? 'no' : 'na'} ${NOME_DIA[d.dia_semana]}. Esse dia fica de folga.` }, { status: 400 })
+    }
+    if (paraMin(d.inicio) < paraMin(l.inicio) || paraMin(d.fim) > paraMin(l.fim)) {
+      return NextResponse.json({ erro: `${NOME_DIA[d.dia_semana][0].toUpperCase()}${NOME_DIA[d.dia_semana].slice(1)}: a barbearia funciona das ${l.inicio} às ${l.fim}. Seu horário precisa caber nisso.` }, { status: 400 })
+    }
     if (vistos.has(d.dia_semana)) return NextResponse.json({ erro: 'Dia repetido' }, { status: 400 })
     vistos.add(d.dia_semana)
     if (paraMin(d.fim) <= paraMin(d.inicio)) {
@@ -71,7 +87,6 @@ export async function PUT(req: NextRequest) {
     }
   }
 
-  const db = criarClienteServico()
   const { data: antes } = await db
     .from('horarios_trabalho')
     .select('dia_semana, inicio, fim, intervalo_inicio, intervalo_fim')

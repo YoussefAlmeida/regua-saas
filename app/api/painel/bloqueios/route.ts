@@ -8,7 +8,9 @@ import { limitesDoDia } from '@/lib/disponibilidade'
 import { falhaInterna } from '@/lib/erros'
 
 const SchemaPost = z.object({
-  profissional_id: z.string().uuid(),
+  // vazio + todos=true: bloqueio da barbearia toda (só o dono)
+  profissional_id: z.string().uuid().optional(),
+  todos: z.boolean().optional(),
   inicio: z.string().datetime({ offset: true }),
   fim: z.string().datetime({ offset: true }),
   motivo: z.string().max(120).optional(),
@@ -41,16 +43,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
 
+  // Os do barbeiro + os da barbearia toda. "travado" = o barbeiro não pode remover (foi o dono)
   const { data, error } = await criarClienteServico()
     .from('bloqueios_agenda')
-    .select('id, inicio, fim, motivo')
-    .eq('profissional_id', profissional_id)
+    .select('id, inicio, fim, motivo, profissional_id, criado_por')
+    .eq('barbearia_id', sessao.barbearia_id)
+    .or(`profissional_id.eq.${profissional_id},profissional_id.is.null`)
     .gte('fim', new Date().toISOString())
     .order('inicio')
     .limit(100)
 
   if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao buscar bloqueios')
-  return NextResponse.json(data)
+  return NextResponse.json((data ?? []).map(b => ({
+    id: b.id, inicio: b.inicio, fim: b.fim, motivo: b.motivo,
+    daBarbearia: b.profissional_id === null,
+    travado: sessao.papel !== 'dono' && (b.profissional_id === null || b.criado_por !== sessao.usuario_id),
+  })))
 }
 
 export async function POST(req: NextRequest) {
@@ -59,9 +67,12 @@ export async function POST(req: NextRequest) {
 
   const parse = SchemaPost.safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
-  const { profissional_id, inicio, fim, motivo } = parse.data
+  const { profissional_id, todos, inicio, fim, motivo } = parse.data
+  const daBarbearia = !!todos
 
-  if (!(await podeMexerNaAgendaDe(sessao, profissional_id))) {
+  if (daBarbearia) {
+    if (sessao.papel !== 'dono') return NextResponse.json({ erro: 'Só o dono bloqueia a barbearia toda' }, { status: 403 })
+  } else if (!profissional_id || !(await podeMexerNaAgendaDe(sessao, profissional_id))) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
   if (new Date(fim) <= new Date(inicio)) {
@@ -74,14 +85,16 @@ export async function POST(req: NextRequest) {
   const db = criarClienteServico()
 
   // Nunca bloqueia por cima de cliente marcado sem avisar (Módulo 3)
-  const { data: conflitos } = await db
+  let qConf = db
     .from('agendamentos')
     .select('id, inicio, cliente:usuarios!cliente_id(nome, whatsapp), servico:servicos!servico_id(nome)')
-    .eq('profissional_id', profissional_id)
+    .eq('barbearia_id', sessao.barbearia_id)
     .in('status', ['agendado', 'confirmado'])
     .lt('inicio', fim)
     .gt('fim', inicio)
     .order('inicio')
+  if (!daBarbearia) qConf = qConf.eq('profissional_id', profissional_id!)
+  const { data: conflitos } = await qConf
 
   if (conflitos && conflitos.length > 0) {
     return NextResponse.json({
@@ -94,7 +107,7 @@ export async function POST(req: NextRequest) {
     .from('bloqueios_agenda')
     .insert({
       barbearia_id: sessao.barbearia_id,
-      profissional_id,
+      profissional_id: daBarbearia ? null : profissional_id,
       inicio,
       fim,
       motivo: motivo?.trim() || null,
@@ -103,7 +116,9 @@ export async function POST(req: NextRequest) {
     .select('id, inicio, fim, motivo')
     .single()
 
-  if (error) return falhaInterna('painel/bloqueios', error, 'Erro ao bloquear horário')
+  if (error) return falhaInterna('painel/bloqueios', error, daBarbearia
+    ? 'Não deu pra bloquear a barbearia toda. Rode a atualização do banco indicada na Saúde do sistema.'
+    : 'Erro ao bloquear horário')
 
   await registrarAuditoria({
     barbearia_id: sessao.barbearia_id,
@@ -115,5 +130,5 @@ export async function POST(req: NextRequest) {
     req,
   })
 
-  return NextResponse.json(data, { status: 201 })
+  return NextResponse.json({ ...data, daBarbearia, travado: false }, { status: 201 })
 }

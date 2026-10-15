@@ -150,6 +150,9 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
       {/* Horários de funcionamento */}
       <section className="space-y-3">
         <h2 className="font-semibold font-ui text-sm text-fg-muted">Horários de funcionamento</h2>
+        <p className="font-body text-xs text-fg-muted">
+          Vale pra toda a barbearia. Cada barbeiro monta o horário dele dentro deste, em Mais → Horários.
+        </p>
 
         <div className="bg-surface rounded-card border border-line overflow-hidden">
           {DIAS.map((dia, idx) => {

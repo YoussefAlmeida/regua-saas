@@ -10,7 +10,7 @@ import { formatBRL } from '@/lib/utils'
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
 interface Profissional { id: string; nome: string; foto_url: string | null; ativo: boolean }
-interface Bloqueio { id: string; profissional_id: string; inicio: string; fim: string; motivo: string | null }
+interface Bloqueio { id: string; profissional_id: string | null; inicio: string; fim: string; motivo: string | null }
 interface Servico { id: string; nome: string; preco: number; duracao_min: number; cor: string }
 export interface Agendamento {
   id: string
@@ -161,7 +161,8 @@ export default function AgendaClient({
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
   const profAtual = profissionais[tabProfissional]
   const agsProfAtual = agendamentos.filter(a => a.profissional?.id === profAtual?.id)
-  const bloqsProfAtual = bloqueios.filter(b => b.profissional_id === profAtual?.id)
+  // Bloqueios do barbeiro + os da barbearia toda (sem profissional)
+  const bloqsProfAtual = bloqueios.filter(b => b.profissional_id === profAtual?.id || b.profissional_id === null)
   // Linha do tempo do barbeiro: agendamentos e bloqueios na ordem do relógio
   const linha: ({ tipo: 'ag'; item: Agendamento } | { tipo: 'bloq'; item: Bloqueio })[] = [
     ...agsProfAtual.map(item => ({ tipo: 'ag' as const, item })),
@@ -269,7 +270,7 @@ export default function AgendaClient({
                   <Lock size={14} className="text-fg-muted shrink-0" />
                   <div className="min-w-0">
                     <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">
-                      Bloqueado · {diaTodo ? 'dia inteiro' : `${formatarHora(b.inicio)} – ${formatarHora(b.fim)}`}
+                      {b.profissional_id === null ? 'Barbearia fechada' : 'Bloqueado'} · {diaTodo ? 'dia inteiro' : `${formatarHora(b.inicio)} – ${formatarHora(b.fim)}`}
                     </p>
                     {b.motivo && <p className="font-body text-xs text-fg-muted truncate">{b.motivo}</p>}
                   </div>

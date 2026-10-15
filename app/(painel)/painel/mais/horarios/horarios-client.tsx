@@ -4,17 +4,19 @@ import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, Lock, Trash2, Plus, Check, AlertTriangle } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
+import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
 interface Profissional { id: string; nome: string }
 interface Dia { ativo: boolean; inicio: string; fim: string; almoco: boolean; intervalo_inicio: string; intervalo_fim: string }
-interface Bloqueio { id: string; inicio: string; fim: string; motivo: string | null }
+interface Bloqueio { id: string; inicio: string; fim: string; motivo: string | null; daBarbearia?: boolean; travado?: boolean }
+type HorarioLoja = Record<string, { ativo?: boolean; inicio?: string; fim?: string; intervalo_inicio?: string; intervalo_fim?: string }>
 interface Conflito { id: string; inicio: string; cliente: { nome: string } | { nome: string }[] | null }
 
 const hojeBahia = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
 
-function semanaPadrao(hb: Record<string, { ativo?: boolean; inicio?: string; fim?: string }>): Dia[] {
+function semanaPadrao(hb: HorarioLoja): Dia[] {
   return DIAS.map((_, i) => {
     const h = hb[String(i)]
     return {
@@ -46,17 +48,23 @@ export default function HorariosClient({
   souDono,
 }: {
   profissionais: Profissional[]
-  horarioBarbearia: Record<string, { ativo?: boolean; inicio?: string; fim?: string }>
+  horarioBarbearia: HorarioLoja
   souDono: boolean
 }) {
+  // O que o dono definiu (sem nada salvo, o padrão que a barbearia já usa)
+  const loja: HorarioLoja = Object.keys(horarioBarbearia).length ? horarioBarbearia : HORARIO_PADRAO
+  const abre = (i: number) => {
+    const h = loja[String(i)]
+    return h && h.ativo !== false && h.inicio && h.fim ? h : null
+  }
   const [profId, setProfId] = useState(profissionais[0]?.id ?? '')
   const [carregando, setCarregando] = useState(true)
   const [proprio, setProprio] = useState(false)          // false = segue o horário da barbearia
-  const [semana, setSemana] = useState<Dia[]>(semanaPadrao(horarioBarbearia))
+  const [semana, setSemana] = useState<Dia[]>(semanaPadrao(loja))
   const [salvandoSemana, setSalvandoSemana] = useState(false)
 
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([])
-  const [form, setForm] = useState({ data: hojeBahia(), dataFim: '', diaInteiro: false, de: '12:00', ate: '13:00', motivo: '' })
+  const [form, setForm] = useState({ data: hojeBahia(), dataFim: '', diaInteiro: false, de: '12:00', ate: '13:00', motivo: '', todos: false })
   const [salvandoBloq, setSalvandoBloq] = useState(false)
   const [conflitos, setConflitos] = useState<Conflito[]>([])
 
@@ -76,7 +84,7 @@ export default function HorariosClient({
 
     if (horarios.length === 0) {
       setProprio(false)
-      setSemana(semanaPadrao(horarioBarbearia))
+      setSemana(semanaPadrao(loja))
       return
     }
     setProprio(true)
@@ -91,7 +99,7 @@ export default function HorariosClient({
         intervalo_fim: h?.intervalo_fim?.slice(0, 5) ?? '13:00',
       }
     }))
-  }, [horarioBarbearia])
+  }, [loja])
 
   useEffect(() => { carregar(profId) }, [profId, carregar])
 
@@ -102,7 +110,7 @@ export default function HorariosClient({
   async function salvarSemana() {
     setSalvandoSemana(true)
     const dias = proprio
-      ? semana.flatMap((d, i) => d.ativo ? [{
+      ? semana.flatMap((d, i) => d.ativo && abre(i) ? [{
           dia_semana: i,
           inicio: d.inicio,
           fim: d.fim,
@@ -141,7 +149,9 @@ export default function HorariosClient({
     const res = await fetch('/api/painel/bloqueios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profissional_id: profId, inicio, fim, motivo: form.motivo || undefined }),
+      body: JSON.stringify(form.todos
+        ? { todos: true, inicio, fim, motivo: form.motivo || undefined }
+        : { profissional_id: profId, inicio, fim, motivo: form.motivo || undefined }),
     }).catch(() => null)
     setSalvandoBloq(false)
 
@@ -155,7 +165,7 @@ export default function HorariosClient({
 
     setBloqueios(b => [...b, json].sort((a, z) => a.inicio.localeCompare(z.inicio)))
     setForm(f => ({ ...f, motivo: '' }))
-    avisar('Horário bloqueado. Ninguém consegue marcar nele.', 'sucesso')
+    avisar(form.todos ? 'Barbearia bloqueada nesse horário para toda a equipe.' : 'Horário bloqueado. Ninguém consegue marcar nele.', 'sucesso')
   }
 
   async function desbloquear(id: string) {
@@ -219,18 +229,39 @@ export default function HorariosClient({
               </button>
             </div>
 
+            {/* O que o dono definiu: o limite de todos */}
+            <div className="rounded-card border border-line bg-surface-alt/60 px-4 py-3">
+              <div className="flex items-center justify-between gap-2">
+                <p className="font-ui text-sm font-semibold text-fg">Funcionamento da barbearia</p>
+                {souDono
+                  ? <Link href="/painel/mais/configuracoes" className="font-body text-xs font-semibold text-amber hover:underline">Alterar</Link>
+                  : <span className="flex items-center gap-1 font-body text-xs text-fg-muted"><Lock size={11} /> Definido pelo dono</span>}
+              </div>
+              <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-0.5">
+                {DIAS.map((nome, i) => {
+                  const h = abre(i)
+                  return (
+                    <li key={nome} className="flex justify-between font-body text-xs">
+                      <span className="text-fg-muted">{nome.slice(0, 3)}</span>
+                      <span className={`font-mono ${h ? 'text-fg' : 'text-fg-muted'}`}>{h ? `${h.inicio}–${h.fim}` : 'Fechada'}</span>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+
             <div className="grid grid-cols-2 gap-2">
               {[
-                { v: false, t: 'Igual à barbearia', d: 'Segue o horário de funcionamento' },
-                { v: true, t: 'Horário próprio', d: 'Dias, horário e almoço dele' },
+                { v: false, t: 'Igual à barbearia', d: 'Atende em todo o funcionamento' },
+                { v: true, t: 'Horário próprio', d: 'Dentro do funcionamento da barbearia' },
               ].map(o => (
                 <button
                   key={String(o.v)}
                   onClick={() => setProprio(o.v)}
                   className={`text-left rounded-card border px-3 py-3 transition-colors ${proprio === o.v ? 'border-amber bg-amber/5' : 'border-line bg-surface'}`}
                 >
-                  <p className={`font-ui text-xs uppercase tracking-wider ${proprio === o.v ? 'text-amber' : 'text-fg'}`}>{o.t}</p>
-                  <p className="font-body text-[11px] text-fg-muted mt-0.5">{o.d}</p>
+                  <p className={`font-ui text-sm font-semibold ${proprio === o.v ? 'text-amber' : 'text-fg'}`}>{o.t}</p>
+                  <p className="font-body text-xs text-fg-muted mt-0.5">{o.d}</p>
                 </button>
               ))}
             </div>
@@ -238,7 +269,16 @@ export default function HorariosClient({
             {proprio && (
               <div className="bg-surface rounded-card border border-line divide-y divide-line">
                 {semana.map((d, i) => {
-                  const barbeariaFechada = horarioBarbearia[String(i)]?.ativo === false
+                  const h = abre(i)
+                  if (!h) {
+                    return (
+                      <div key={i} className="px-4 py-3 flex items-center gap-3 opacity-60">
+                        <Lock size={14} className="text-fg-muted shrink-0 ml-2.5 mr-2.5" />
+                        <span className="font-ui text-sm font-semibold w-12 shrink-0 text-fg-muted">{DIAS[i].slice(0, 3)}</span>
+                        <span className="font-body text-xs text-fg-muted">Barbearia fechada</span>
+                      </div>
+                    )
+                  }
                   return (
                     <div key={i} className="px-4 py-3 space-y-2">
                       <div className="flex items-center gap-3">
@@ -252,12 +292,12 @@ export default function HorariosClient({
                         >
                           <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${d.ativo ? 'translate-x-4' : 'translate-x-0.5'}`} />
                         </button>
-                        <span className={`font-ui text-xs uppercase tracking-wider w-16 shrink-0 ${d.ativo ? 'text-fg' : 'text-fg-muted'}`}>{DIAS[i].slice(0, 3)}</span>
+                        <span className={`font-ui text-sm font-semibold w-12 shrink-0 ${d.ativo ? 'text-fg' : 'text-fg-muted'}`}>{DIAS[i].slice(0, 3)}</span>
                         {d.ativo ? (
                           <div className="flex items-center gap-1.5 flex-1 min-w-0">
-                            <input type="time" value={d.inicio} onChange={e => mudarDia(i, { inicio: e.target.value })} className={`${inputCls} py-1 text-xs w-[5.5rem]`} />
+                            <input type="time" min={h.inicio} max={h.fim} value={d.inicio} onChange={e => mudarDia(i, { inicio: e.target.value })} className={`${inputCls} py-1 text-xs w-[5.5rem]`} />
                             <span className="text-fg-muted text-xs">–</span>
-                            <input type="time" value={d.fim} onChange={e => mudarDia(i, { fim: e.target.value })} className={`${inputCls} py-1 text-xs w-[5.5rem]`} />
+                            <input type="time" min={h.inicio} max={h.fim} value={d.fim} onChange={e => mudarDia(i, { fim: e.target.value })} className={`${inputCls} py-1 text-xs w-[5.5rem]`} />
                           </div>
                         ) : (
                           <span className="font-body text-xs text-fg-muted">Folga</span>
@@ -278,8 +318,11 @@ export default function HorariosClient({
                           )}
                         </div>
                       )}
-                      {d.ativo && barbeariaFechada && (
-                        <p className="pl-12 font-body text-[11px] text-amber">A barbearia fecha nesse dia — ninguém consegue marcar.</p>
+                      {d.ativo && (d.inicio < h.inicio! || d.fim > h.fim!) && (
+                        <p className="pl-12 font-body text-xs text-saida">A barbearia funciona das {h.inicio} às {h.fim}. Ajuste dentro desse horário.</p>
+                      )}
+                      {d.ativo && !(d.inicio < h.inicio! || d.fim > h.fim!) && (
+                        <p className="pl-12 font-body text-xs text-fg-muted">Barbearia: {h.inicio}–{h.fim}{h.intervalo_inicio && h.intervalo_fim ? ` · fecha ${h.intervalo_inicio}–${h.intervalo_fim}` : ''}</p>
                       )}
                     </div>
                   )
@@ -291,9 +334,32 @@ export default function HorariosClient({
           {/* ── Bloqueios ───────────────────────────────── */}
           <section className="space-y-3">
             <h2 className="font-semibold font-ui text-sm text-fg-muted">Bloquear horário</h2>
-            <p className="font-body text-xs text-fg-muted -mt-1">Médico, folga, compromisso. Some da página de agendamento na hora.</p>
+            <p className="font-body text-xs text-fg-muted -mt-1">
+              {souDono ? 'Feriado, reforma, folga de alguém. Some da página de agendamento na hora.' : 'Médico, folga, compromisso. Some da página de agendamento na hora. Os bloqueios do dono valem pra você também.'}
+            </p>
 
             <form onSubmit={bloquear} className="bg-surface rounded-card border border-line p-4 space-y-3">
+              {souDono && (
+                <div>
+                  <p className={labelCls}>Vale para</p>
+                  <div className="flex gap-2">
+                    {[
+                      { v: false, t: profissionais.find(p => p.id === profId)?.nome ?? 'Este barbeiro' },
+                      { v: true, t: 'Barbearia toda' },
+                    ].map(o => (
+                      <button
+                        key={String(o.v)}
+                        type="button"
+                        onClick={() => setForm(f => ({ ...f, todos: o.v }))}
+                        className={`font-semibold flex-1 py-2 rounded-button border font-ui text-xs transition-colors truncate px-2 ${form.todos === o.v ? 'border-amber text-amber bg-amber/5' : 'border-line text-fg-muted'}`}
+                      >
+                        {o.t}
+                      </button>
+                    ))}
+                  </div>
+                  {form.todos && <p className="font-body text-xs text-fg-muted mt-1.5">Ninguém da equipe atende nesse período, e só você pode liberar.</p>}
+                </div>
+              )}
               <div className="flex gap-2">
                 {[{ v: false, t: 'Algumas horas' }, { v: true, t: 'Dia inteiro' }].map(o => (
                   <button
@@ -338,7 +404,7 @@ export default function HorariosClient({
 
               {conflitos.length > 0 && (
                 <div className="bg-saida/5 border border-saida/30 rounded-button p-3 space-y-2">
-                  <p className="flex items-center gap-1.5 font-ui text-xs uppercase tracking-wider text-saida">
+                  <p className="flex items-center gap-1.5 font-ui text-sm font-semibold text-saida">
                     <AlertTriangle size={12} /> Tem cliente marcado nesse horário
                   </p>
                   <ul className="space-y-1">
@@ -373,11 +439,17 @@ export default function HorariosClient({
                     <Lock size={14} className="text-fg-muted shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-body text-sm text-fg first-letter:uppercase">{fmtBloqueio(b)}</p>
-                      {b.motivo && <p className="font-body text-xs text-fg-muted truncate">{b.motivo}</p>}
+                      <p className="font-body text-xs text-fg-muted truncate">
+                        {[b.daBarbearia ? 'Barbearia toda' : null, b.travado ? 'definido pelo dono' : null, b.motivo].filter(Boolean).join(' · ')}
+                      </p>
                     </div>
-                    <button onClick={() => desbloquear(b.id)} className="p-2 text-fg-muted hover:text-saida transition-colors" aria-label="Liberar horário">
-                      <Trash2 size={14} />
-                    </button>
+                    {b.travado ? (
+                      <span className="p-2 text-fg-muted" title="Só o dono pode liberar"><Lock size={14} /></span>
+                    ) : (
+                      <button onClick={() => desbloquear(b.id)} className="p-2 text-fg-muted hover:text-saida transition-colors" aria-label="Liberar horário">
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </li>
                 ))}
               </ul>

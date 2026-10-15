@@ -5,12 +5,14 @@ import { HORARIO_PADRAO } from '@/lib/horario-padrao'
    Disponibilidade de horário — uma regra só, usada em todo lugar
    (página pública, criação de agendamento, tela de horários).
 
-   Ordem de quem vence (seção 6.1 Módulo 2):
+   Quem manda é o dono; o barbeiro monta a agenda dentro disso:
    1. Dia fechado da barbearia (feriado)          → ninguém agenda
    2. Dia da semana fechado na barbearia          → ninguém agenda
-   3. Horário próprio do barbeiro naquele dia     → usa o dele
-      (sem horário próprio → usa o da barbearia)
-   4. Tira agendamentos, bloqueios e horário que já passou
+   3. Horário próprio do barbeiro naquele dia     → só o pedaço que cabe
+      no funcionamento da barbearia (sem horário próprio → o da barbearia)
+   4. Almoço da barbearia e almoço do barbeiro valem os dois
+   5. Tira agendamentos, bloqueios do barbeiro, bloqueios da barbearia
+      toda (feitos pelo dono) e horário que já passou
 
    Desempenho: busca tudo do período em 3 consultas paralelas e
    calcula os dias em memória (antes eram até 7 consultas em fila
@@ -43,7 +45,8 @@ interface HorarioTrabalho {
   intervalo_fim: string | null
 }
 
-interface Expediente { inicio: string; fim: string; intervalo_inicio?: string; intervalo_fim?: string }
+interface Pausa { a: number; b: number }   // minutos do dia
+interface Expediente { inicio: number; fim: number; pausas: Pausa[] }
 interface Ocupado { a: number; b: number }
 
 export const paraMin = (t: string) => {
@@ -74,6 +77,7 @@ export function somarDias(data: string, n: number): string {
 /** Busca, em paralelo, o que o cálculo precisa pro período [de, ate) */
 async function carregarPeriodo(
   db: SupabaseClient,
+  barbearia_id: string,
   profissional_id: string,
   gte: string,
   lt: string,
@@ -93,9 +97,11 @@ async function carregarPeriodo(
       .select('dia_semana, inicio, fim, intervalo_inicio, intervalo_fim')
       .eq('profissional_id', profissional_id),
     qAg,
+    // Do barbeiro + os da barbearia toda (profissional_id vazio)
     db.from('bloqueios_agenda')
       .select('inicio, fim')
-      .eq('profissional_id', profissional_id)
+      .eq('barbearia_id', barbearia_id)
+      .or(`profissional_id.eq.${profissional_id},profissional_id.is.null`)
       .lt('inicio', lt)
       .gt('fim', gte),
   ])
@@ -109,50 +115,42 @@ async function carregarPeriodo(
   }
 }
 
-/** Expediente do barbeiro no dia, já com a hierarquia aplicada; null = fechado */
-function expediente(barbearia: BarbeariaHorario, horarios: HorarioTrabalho[], data: string): Expediente | null {
-  if ((barbearia.dias_fechados ?? []).includes(data)) return null
+const pausa = (ini?: string | null, fim?: string | null): Pausa[] =>
+  ini && fim && paraMin(fim) > paraMin(ini) ? [{ a: paraMin(ini), b: paraMin(fim) }] : []
 
-  const dia = diaDaSemana(data)
-  // Barbearia que nunca salvou horário usa o padrão (o mesmo que aparece em Configurações)
+/** Funcionamento da barbearia no dia (o que o dono definiu); null = fechada */
+export function funcionamentoDoDia(barbearia: BarbeariaHorario, data: string): Expediente | null {
+  if ((barbearia.dias_fechados ?? []).includes(data)) return null
   const hf = barbearia.horario_funcionamento && Object.keys(barbearia.horario_funcionamento).length
     ? barbearia.horario_funcionamento : HORARIO_PADRAO
-  const hBarbearia = hf[String(dia)]
-  if (hBarbearia && hBarbearia.ativo === false) return null
+  const h = hf[String(diaDaSemana(data))]
+  if (!h || h.ativo === false || !h.inicio || !h.fim) return null
+  return { inicio: paraMin(h.inicio), fim: paraMin(h.fim), pausas: pausa(h.intervalo_inicio, h.intervalo_fim) }
+}
 
-  if (horarios.length > 0) {
-    // Barbeiro configurou a semana: dia que ficou de fora é folga
-    const proprio = horarios.find(h => h.dia_semana === dia)
-    if (!proprio) return null
-    return {
-      inicio: proprio.inicio.slice(0, 5),
-      fim: proprio.fim.slice(0, 5),
-      intervalo_inicio: proprio.intervalo_inicio?.slice(0, 5) ?? undefined,
-      intervalo_fim: proprio.intervalo_fim?.slice(0, 5) ?? undefined,
-    }
-  }
+/** Expediente do barbeiro no dia: o horário dele, recortado pelo da barbearia; null = não atende */
+function expediente(barbearia: BarbeariaHorario, horarios: HorarioTrabalho[], data: string): Expediente | null {
+  const loja = funcionamentoDoDia(barbearia, data)
+  if (!loja) return null
+  if (horarios.length === 0) return loja
 
-  if (hBarbearia?.ativo && hBarbearia.inicio && hBarbearia.fim) {
-    return {
-      inicio: hBarbearia.inicio,
-      fim: hBarbearia.fim,
-      intervalo_inicio: hBarbearia.intervalo_inicio,
-      intervalo_fim: hBarbearia.intervalo_fim,
-    }
+  // Barbeiro configurou a semana: dia que ficou de fora é folga
+  const proprio = horarios.find(h => h.dia_semana === diaDaSemana(data))
+  if (!proprio) return null
+  const inicio = Math.max(loja.inicio, paraMin(proprio.inicio.slice(0, 5)))
+  const fim = Math.min(loja.fim, paraMin(proprio.fim.slice(0, 5)))
+  if (fim <= inicio) return null
+  return {
+    inicio, fim,
+    pausas: [...loja.pausas, ...pausa(proprio.intervalo_inicio?.slice(0, 5), proprio.intervalo_fim?.slice(0, 5))],
   }
-  return null
 }
 
 function slotsDoDia(exp: Expediente | null, ocupados: Ocupado[], data: string, duracao_min: number, agora: number): string[] {
   if (!exp) return []
-  const ini = paraMin(exp.inicio)
-  const fim = paraMin(exp.fim)
-  const iIni = exp.intervalo_inicio ? paraMin(exp.intervalo_inicio) : null
-  const iFim = exp.intervalo_fim ? paraMin(exp.intervalo_fim) : null
-
   const livres: string[] = []
-  for (let t = ini; t + duracao_min <= fim; t += PASSO_MIN) {
-    if (iIni !== null && iFim !== null && t < iFim && t + duracao_min > iIni) continue
+  for (let t = exp.inicio; t + duracao_min <= exp.fim; t += PASSO_MIN) {
+    if (exp.pausas.some(p => t < p.b && t + duracao_min > p.a)) continue
     const h = paraHora(t)
     const a = new Date(`${data}T${h}:00${FUSO}`).getTime()
     const b = a + duracao_min * 60_000
@@ -173,7 +171,7 @@ export async function horariosLivres(
   ignorarAgendamentoId?: string,
 ): Promise<string[]> {
   const { gte, lt } = limitesDoDia(data)
-  const { horarios, ocupados } = await carregarPeriodo(db, profissional_id, gte, lt, ignorarAgendamentoId)
+  const { horarios, ocupados } = await carregarPeriodo(db, barbearia.id, profissional_id, gte, lt, ignorarAgendamentoId)
   return slotsDoDia(expediente(barbearia, horarios, data), ocupados, data, duracao_min, Date.now())
 }
 
@@ -188,7 +186,7 @@ export async function horariosLivresPeriodo(
 ): Promise<Record<string, string[]>> {
   const gte = limitesDoDia(de).gte
   const lt = new Date(new Date(gte).getTime() + dias * DIA_MS).toISOString()
-  const { horarios, ocupados } = await carregarPeriodo(db, profissional_id, gte, lt)
+  const { horarios, ocupados } = await carregarPeriodo(db, barbearia.id, profissional_id, gte, lt)
   const agora = Date.now()
 
   const resultado: Record<string, string[]> = {}
