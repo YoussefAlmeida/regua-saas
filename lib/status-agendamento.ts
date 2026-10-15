@@ -22,7 +22,7 @@ export function mensagemStatus(
 
 /** Pra onde volta o status quando o usuário toca em "Desfazer" */
 export function statusAoDesfazer(status: StatusAgendamento): StatusAgendamento | null {
-  if (status === 'concluido' || status === 'faltou') return 'confirmado'
+  if (status === 'concluido' || status === 'faltou') return 'agendado'
   if (status === 'cancelado') return 'agendado'
   return null
 }

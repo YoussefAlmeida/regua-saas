@@ -24,13 +24,13 @@ interface Agendamento {
 interface Movimentacao { id: string; tipo: 'entrada' | 'saida'; valor: number; origem: string }
 
 const STATUS_LABEL: Record<Status, string> = {
-  agendado: 'Agendado', confirmado: 'Confirmado', concluido: 'Concluído',
+  agendado: 'Agendado', confirmado: 'Agendado', concluido: 'Concluído',
   cancelado: 'Cancelado', faltou: 'Faltou',
 }
 // Etiqueta discreta de situação (o cartão fica branco)
 const STATUS_COR: Record<Status, string> = {
   agendado: 'text-fg-muted bg-surface-alt',
-  confirmado: 'text-info bg-info/10',
+  confirmado: 'text-fg-muted bg-surface-alt',
   concluido: 'text-entrada bg-entrada/10',
   cancelado: 'text-saida bg-saida/10',
   faltou: 'text-fg-muted bg-surface-alt',
@@ -59,12 +59,10 @@ export default function HojeClient({
   const [esquecidos, setEsquecidos] = useState<Agendamento[]>(esquecidosIniciais)
   const [atualizando, setAtualizando] = useState<string | null>(null)
 
-  const ativos   = ags.filter(a => !['cancelado', 'faltou'].includes(a.status))
   const concluidos = ags.filter(a => a.status === 'concluido')
   const pendentes  = ags.filter(a => ['agendado', 'confirmado'].includes(a.status))
 
   const faturadoReal = concluidos.reduce((s, a) => s + a.valor_servico, 0)
-  const faturadoPrev = ativos.reduce((s, a) => s + a.valor_servico, 0)
 
   // Entradas manuais do dia (além das automáticas)
   const entradasManuais = movimentacoesHoje.filter(m => m.tipo === 'entrada' && m.origem === 'manual')
@@ -89,7 +87,8 @@ export default function HojeClient({
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
 
     const json = await res.json()
-    setAgs(prev => prev.map(a => a.id === id ? { ...a, ...json } : a))
+    // Cancelado sai da agenda do dia
+    setAgs(prev => status === 'cancelado' ? prev.filter(a => a.id !== id) : prev.map(a => a.id === id ? { ...a, ...json } : a))
     setEsquecidos(prev => prev.filter(a => a.id !== id))
     avisar(mensagemStatus(status, json.entrada, json.valor_servico), 'sucesso')
   }
@@ -172,15 +171,10 @@ export default function HojeClient({
         </Link>
       ) : (
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-surface border border-line rounded-card p-4">
+        <div className="col-span-2 bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Faturado hoje</p>
-          <p className="font-mono text-xl text-entrada whitespace-nowrap">{formatBRL((faturadoReal + entradasManuais))}</p>
-          <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} concluído{concluidos.length !== 1 ? 's' : ''}</p>
-        </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Previsto</p>
-          <p className="font-mono text-xl text-amber whitespace-nowrap">{formatBRL(faturadoPrev)}</p>
-          <p className="font-body text-xs text-fg-muted mt-0.5">{pendentes.length} pendente{pendentes.length !== 1 ? 's' : ''}</p>
+          <p className="font-mono text-[32px] leading-tight text-entrada whitespace-nowrap">{formatBRL((faturadoReal + entradasManuais))}</p>
+          <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} concluído{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
         </div>
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
@@ -207,15 +201,6 @@ export default function HojeClient({
               <p className="font-semibold font-ui text-sm text-fg">{proximo.cliente?.nome ?? '—'}</p>
               <p className="font-body text-xs text-fg-muted">{proximo.servico?.nome} · {hora(proximo.inicio)} · {proximo.profissional?.nome}</p>
             </div>
-            {proximo.status === 'agendado' && (
-              <button
-                onClick={() => atualizarStatus(proximo.id, 'confirmado')}
-                disabled={atualizando === proximo.id}
-                className="font-semibold flex items-center gap-1 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-xs px-3 py-1.5 rounded-button transition-colors hover:bg-entrada/20"
-              >
-                <Check size={12} /> Confirmar
-              </button>
-            )}
           </div>
         </div>
       )}
@@ -253,14 +238,21 @@ export default function HojeClient({
                   </div>
 
                   {/* Ações rápidas */}
-                  {ag.status === 'agendado' && (
+                  {(ag.status === 'agendado' || ag.status === 'confirmado') && (
                     <div className="flex gap-2 mt-3 ml-16">
                       <button
-                        onClick={() => atualizarStatus(ag.id, 'confirmado')}
+                        onClick={() => atualizarStatus(ag.id, 'concluido')}
                         disabled={isAtivo}
-                        className="font-semibold flex-1 flex items-center justify-center gap-1.5 bg-fg text-bg font-ui text-sm py-2.5 rounded-button transition-colors hover:bg-fg/85"
+                        className="font-semibold flex-1 flex items-center justify-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
                       >
-                        <Check size={14} /> Confirmar
+                        <Check size={14} /> Concluir
+                      </button>
+                      <button
+                        onClick={() => atualizarStatus(ag.id, 'faltou')}
+                        disabled={isAtivo}
+                        className="font-semibold px-4 border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button hover:text-fg"
+                      >
+                        Faltou
                       </button>
                       <button
                         onClick={() => atualizarStatus(ag.id, 'cancelado')}
@@ -279,30 +271,12 @@ export default function HojeClient({
                   )}
                   {(ag.status === 'concluido' || ag.status === 'faltou') && (
                     <button
-                      onClick={() => atualizarStatus(ag.id, 'confirmado')}
+                      onClick={() => atualizarStatus(ag.id, 'agendado')}
                       disabled={isAtivo}
                       className="mt-2 ml-16 flex items-center gap-1 font-body text-xs font-semibold text-fg-muted hover:text-fg py-1"
                     >
                       <Undo2 size={13} /> Desfazer
                     </button>
-                  )}
-                  {ag.status === 'confirmado' && (
-                    <div className="flex gap-2 mt-3 ml-16">
-                      <button
-                        onClick={() => atualizarStatus(ag.id, 'concluido')}
-                        disabled={isAtivo}
-                        className="font-semibold flex-1 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-2.5 rounded-button transition-colors"
-                      >
-                        Concluir
-                      </button>
-                      <button
-                        onClick={() => atualizarStatus(ag.id, 'faltou')}
-                        disabled={isAtivo}
-                        className="font-semibold px-4 border border-line text-fg-muted font-ui text-sm py-2.5 rounded-button hover:text-fg"
-                      >
-                        Faltou
-                      </button>
-                    </div>
                   )}
                 </div>
               )
