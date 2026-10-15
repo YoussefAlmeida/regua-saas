@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
@@ -67,6 +67,18 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   const dias = useMemo(proximosDias, [])
   const ordem: Etapa[] = soUmBarbeiro ? ['servico', 'horario', 'dados'] : ['servico', 'barbeiro', 'horario', 'dados']
   const passo = ordem.indexOf(etapa)
+
+  // Voltou pra página (ex.: trocou de app): recarrega os horários, porque
+  // algum pode ter sido cancelado e ficado livre nesse meio tempo
+  useEffect(() => {
+    function aoVoltar() {
+      if (document.visibilityState === 'visible' && etapa === 'horario' && profissional && servico) {
+        carregarAgenda(profissional, servico, data)
+      }
+    }
+    document.addEventListener('visibilitychange', aoVoltar)
+    return () => document.removeEventListener('visibilitychange', aoVoltar)
+  })
 
   function voltar() {
     setErro('')

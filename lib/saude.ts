@@ -24,7 +24,7 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
   const semFuncao = !!error
   const info = (data ?? {}) as {
     tabelas?: string[]; colunas_usuarios?: string[]; colunas_barbearias?: string[]; indices_usuarios?: string[]
-    gatilho_categorias?: boolean; bucket_fotos?: boolean; banco_trancado?: boolean; entrada_unica?: boolean; status_agendamento?: boolean; bloqueio_barbearia?: boolean
+    gatilho_categorias?: boolean; bucket_fotos?: boolean; banco_trancado?: boolean; entrada_unica?: boolean; status_agendamento?: boolean; bloqueio_barbearia?: boolean; cancelado_libera?: boolean
   }
 
   // Sem a função, testa direto o que dá pra testar
@@ -91,6 +91,11 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
       nome: 'Bloqueio da barbearia toda (dono)',
       ok: !!info.bloqueio_barbearia, grave: false,
       oQueFazer: migration('20261015030000_bloqueio_barbearia.sql'),
+    })
+    itens.push({
+      nome: 'Horário cancelado volta a ficar livre',
+      ok: !!info.cancelado_libera, grave: true,
+      oQueFazer: migration('20261015040000_horario_cancelado_livre.sql'),
     })
   }
   itens.push({
