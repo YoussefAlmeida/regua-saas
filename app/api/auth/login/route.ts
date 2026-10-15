@@ -57,19 +57,15 @@ export async function POST(req: NextRequest) {
     const { data } = await db.from('usuarios').select(CAMPOS).eq('email', identificador).eq('papel', 'dono').limit(1)
     candidatas = (data ?? []) as unknown as Conta[]
   } else {
-    // O mesmo WhatsApp pode ser barbeiro numa barbearia e cliente em outras
-    const { data } = await db.from('usuarios').select(CAMPOS).eq('whatsapp', identificador).in('papel', ['barbeiro', 'cliente'])
+    // Tela "Entrar" = só barbeiro. Cliente entra só pelo link da barbearia (com slug).
+    const papel = d.tipo === 'cliente' ? 'cliente' : 'barbeiro'
+    const { data } = await db.from('usuarios').select(CAMPOS).eq('whatsapp', identificador).eq('papel', papel)
     candidatas = ((data ?? []) as unknown as Conta[]).filter(c => c.senha_definida !== false)
-    const slugDe = (c: Conta) => (Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia)?.slug
-    if (d.slug) {
-      // Na página de uma barbearia, vale a conta de cliente dela
-      const daqui = candidatas.filter(c => c.papel === 'cliente' && slugDe(c) === d.slug)
-      if (daqui.length) candidatas = daqui
+    if (papel === 'cliente') {
+      const slugDe = (c: Conta) => (Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia)?.slug
+      candidatas = d.slug ? candidatas.filter(c => slugDe(c) === d.slug) : []
     }
-    // Barbeiro primeiro; depois a conta de cliente usada por último
-    candidatas.sort((a, b) =>
-      (a.papel === 'barbeiro' ? -1 : 0) - (b.papel === 'barbeiro' ? -1 : 0)
-      || (b.ultimo_acesso ?? '').localeCompare(a.ultimo_acesso ?? ''))
+    candidatas.sort((a, b) => (b.ultimo_acesso ?? '').localeCompare(a.ultimo_acesso ?? ''))
     candidatas = candidatas.slice(0, 5)
   }
 
@@ -82,6 +78,20 @@ export async function POST(req: NextRequest) {
 
   // Senha confere antes de qualquer outra mensagem — nunca revela se a conta existe
   if (!usuario) {
+    // Cliente tentando pela tela de barbeiro: só avisa se a senha bater com a conta de cliente
+    if (d.tipo === 'barbeiro') {
+      const { data: clientes } = await db.from('usuarios').select(CAMPOS)
+        .eq('whatsapp', identificador).eq('papel', 'cliente').eq('senha_definida', true).limit(5)
+      for (const c of (clientes ?? []) as unknown as Conta[]) {
+        if (await verificarSenha(d.senha, c.senha_hash).catch(() => false)) {
+          const b = Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia
+          return NextResponse.json({
+            erro: 'Essa é uma conta de cliente. Cliente entra pelo link da barbearia, em "Meus horários".',
+            linkCliente: b ? `/${b.slug}/meus-agendamentos` : null,
+          }, { status: 403 })
+        }
+      }
+    }
     await registrarFalha(identificador, ip)
     return NextResponse.json({ erro: ERRO_GENERICO }, { status: 401 })
   }
@@ -94,9 +104,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Sua conta está esperando o dono aprovar. Avisa ele!' }, { status: 403 })
   }
 
-  // Busca profissional_id se for barbeiro
+  // Quem atende tem agenda própria: barbeiro, e também o dono que corta ("Sou eu que corto")
   let profissional_id: string | undefined
-  if (usuario.papel === 'barbeiro') {
+  if (usuario.papel === 'barbeiro' || usuario.papel === 'dono') {
     const { data: prof } = await db
       .from('profissionais')
       .select('id')

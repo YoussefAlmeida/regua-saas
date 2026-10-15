@@ -106,3 +106,13 @@ export function slugify(str: string): string {
     .replace(/-+/g, '-')
     .trim()
 }
+
+/** Regrava o cookie com a agenda própria atual (dono que passou a cortar ou parou) */
+export async function renovarSessao(res: NextResponse, sessao: SessaoUsuario): Promise<NextResponse> {
+  const { data: prof } = await criarClienteServico()
+    .from('profissionais').select('id').eq('usuario_id', sessao.usuario_id).eq('ativo', true).maybeSingle()
+  const { profissional_id: _antigo, ...resto } = sessao
+  void _antigo
+  gravarCookieSessao(res, await criarToken({ ...resto, ...(prof ? { profissional_id: prof.id } : {}) }))
+  return res
+}

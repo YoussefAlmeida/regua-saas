@@ -14,6 +14,7 @@ export default function EntrarPage() {
   const [senha, setSenha] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
+  const [linkCliente, setLinkCliente] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -35,6 +36,7 @@ export default function EntrarPage() {
       const json = await res.json().catch(() => ({}))
       if (!res.ok) {
         setErro((json as { erro?: string }).erro || 'Erro ao entrar')
+        setLinkCliente((json as { linkCliente?: string | null }).linkCliente ?? null)
         return
       }
 
@@ -60,7 +62,7 @@ export default function EntrarPage() {
         <div className="flex rounded-button border border-line overflow-hidden mb-6">
           <button
             type="button"
-            onClick={() => { setTipo('dono'); setCredencial(''); setErro('') }}
+            onClick={() => { setTipo('dono'); setCredencial(''); setErro(''); setLinkCliente(null) }}
             className={`font-semibold flex-1 py-2.5 font-ui text-sm transition-colors ${
               tipo === 'dono' ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'
             }`}
@@ -69,12 +71,12 @@ export default function EntrarPage() {
           </button>
           <button
             type="button"
-            onClick={() => { setTipo('barbeiro'); setCredencial(''); setErro('') }}
+            onClick={() => { setTipo('barbeiro'); setCredencial(''); setErro(''); setLinkCliente(null) }}
             className={`font-semibold flex-1 py-2.5 font-ui text-sm transition-colors ${
               tipo === 'barbeiro' ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'
             }`}
           >
-            Barbeiro ou cliente
+            Sou barbeiro
           </button>
         </div>
 
@@ -106,7 +108,10 @@ export default function EntrarPage() {
           </div>
 
           {erro && (
-            <p className="font-body text-sm text-saida">{erro}</p>
+            <p className="font-body text-sm text-saida" role="alert">
+              {erro}{' '}
+              {linkCliente && <Link href={linkCliente} className="underline font-semibold">Ir para Meus horários</Link>}
+            </p>
           )}
 
           <button
@@ -122,6 +127,12 @@ export default function EntrarPage() {
           <Link href={`/recuperar-senha${tipo === 'dono' ? '?t=dono' : ''}`} className="font-body text-xs text-fg-muted hover:text-amber">
             Esqueci minha senha
           </Link>
+        </p>
+
+        <p className="text-center font-body text-xs text-fg-muted mt-5 leading-relaxed">
+          {tipo === 'dono'
+            ? 'Dono que também corta entra aqui, com o e-mail. Você vê a barbearia toda e a sua agenda.'
+            : 'Dono entra na aba "Sou dono", mesmo que também corte. Cliente entra pelo link da barbearia.'}
         </p>
 
         {tipo === 'dono' && (

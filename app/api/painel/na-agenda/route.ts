@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { getSessao } from '@/lib/auth'
+import { getSessao, renovarSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirVagaProfissional } from '@/lib/plano-servidor'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
@@ -77,5 +77,7 @@ export async function POST(req: NextRequest) {
     req,
   })
 
-  return NextResponse.json({ ok: true, mantidos })
+  const res = NextResponse.json({ ok: true, mantidos })
+  // O dono ligou/desligou a própria agenda: a sessão acompanha
+  return alvo === 'eu' ? renovarSessao(res, sessao) : res
 }
