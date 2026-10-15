@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Check, Copy, MessageCircle, Scissors, UserPlus, ExternalLink, ChevronRight, Plus, X } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
+import { lerValorBRL } from '@/lib/dinheiro'
 
 /* Primeiro uso do dono — seção 6.1.2
    1. Quem corta  2. Serviços  3. Link pronto  4. Agendamento de teste */
@@ -71,7 +72,7 @@ export default function ComecarClient({
 
   async function salvarServico() {
     if (!rascunho) return
-    const preco = Number(rascunho.preco.replace(',', '.'))
+    const preco = lerValorBRL(rascunho.preco)
     if (!rascunho.nome.trim() || isNaN(preco) || preco < 0) { avisar('Confere nome e preço.', 'erro'); return }
     setOcupado(true)
     const res = await fetch('/api/painel/servicos', {

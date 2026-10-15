@@ -6,7 +6,7 @@ import { pagamentoConfirmado } from '@/lib/mudanca-plano'
 
 const Schema = z.discriminatedUnion('acao', [
   z.object({ acao: z.literal('estender_teste'), dias: z.number().int().min(1).max(90) }),
-  z.object({ acao: z.literal('ativar_plano'), plano: z.enum(['cadeira', 'barbearia', 'rede']) }),
+  z.object({ acao: z.literal('ativar_plano'), plano: z.enum(['cadeira', 'barbearia', 'rede']), mesmoAssim: z.boolean().optional() }),
   z.object({ acao: z.literal('suspender') }),   // só leitura: vê os dados, não lança nada
   z.object({ acao: z.literal('cancelar') }),    // sai do ar: página pública e lançamentos bloqueados
   z.object({ acao: z.literal('reativar') }),
@@ -43,10 +43,24 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       mudanca = { trial_fim: new Date(base + a.dias * DIA).toISOString(), status: 'trial', plano: 'trial' }
       break
     }
-    case 'ativar_plano':
+    case 'ativar_plano': {
+      // O botão não sabe qual pagamento é: se já entrou um nos últimos 3 dias
+      // (aqui ou pelo Asaas), pergunta antes de somar mais um mês
+      if (!a.mesmoAssim) {
+        const { data: recente } = await criarClienteServico().from('admin_log')
+          .select('acao, criado_em').eq('barbearia_id', id).in('acao', ['ativar_plano', 'pagamento_asaas'])
+          .gte('criado_em', new Date(Date.now() - 3 * DIA).toISOString())
+          .order('criado_em', { ascending: false }).limit(1).maybeSingle()
+        if (recente) {
+          const quando = new Date(recente.criado_em).toLocaleString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+          const quem = recente.acao === 'pagamento_asaas' ? 'pelo Asaas' : 'aqui no admin'
+          return NextResponse.json({ erro: `Já entrou um pagamento ${quem} em ${quando}.`, jaPago: true }, { status: 409 })
+        }
+      }
       // = pagamento confirmado (mesma regra do Asaas)
       mudanca = await pagamentoConfirmado(b, a.plano)
       break
+    }
     case 'suspender':
       mudanca = { status: 'leitura' }
       break

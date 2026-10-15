@@ -1,7 +1,7 @@
 import { criarClienteServico } from '@/lib/supabase/server'
 import { desligarDaAgenda } from '@/lib/agenda-saida'
 import { registrarAuditoria } from '@/lib/auditoria'
-import { PLANOS, type PlanoPagoId } from '@/lib/planos'
+import { PLANOS, fimDoCicloAposPagamento, type PlanoPagoId } from '@/lib/planos'
 
 /* ================================================================
    Mudança de plano — só vale quando o pagamento é confirmado.
@@ -19,13 +19,6 @@ export interface AvisoMudanca {
   saiu: string[]
 }
 
-/** Mais um mês a partir de uma data */
-export const UM_MES = (de: Date) => {
-  const d = new Date(de)
-  d.setUTCMonth(d.getUTCMonth() + 1)
-  return d
-}
-
 export interface BarbeariaPagamento {
   id: string
   plano: string
@@ -36,18 +29,16 @@ export interface BarbeariaPagamento {
 
 /**
  * Pagamento confirmado (admin ou Asaas) — o que muda na barbearia.
- * Mesmo plano em dia: soma 1 mês ao que já tinha. Plano diferente
- * (subiu ou desceu): valor cheio, vale na hora e o mês começa hoje.
+ * Mesmo plano em dia (ou na carência): soma 1 mês ao vencimento. Plano
+ * diferente (subiu ou desceu): valor cheio, vale na hora e o mês começa hoje.
  * Se era o plano que o dono pediu, tira da agenda quem ele não escolheu.
  */
 export async function pagamentoConfirmado(b: BarbeariaPagamento, plano: PlanoPagoId): Promise<Record<string, unknown>> {
-  const fim = b.plano_ciclo_fim ? new Date(b.plano_ciclo_fim) : null
-  const renovacao = b.status === 'ativo' && b.plano === plano && fim !== null && fim.getTime() > Date.now()
   if (b.plano_agendado === plano) await aplicarMudanca(b.id)
   return {
     status: 'ativo', plano,
     plano_agendado: null, plano_agendado_em: null, plano_agendado_manter: null,
-    plano_ciclo_fim: UM_MES(renovacao ? fim! : new Date()).toISOString(),
+    plano_ciclo_fim: fimDoCicloAposPagamento(b, plano).toISOString(),
   }
 }
 

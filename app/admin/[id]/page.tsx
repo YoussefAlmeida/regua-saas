@@ -28,6 +28,11 @@ const ACAO_TEXTO: Record<string, string> = {
   cancelar: 'Cancelou',
   reativar: 'Reativou',
   link_nova_senha: 'Gerou link de senha nova pro dono',
+  pagamento_asaas: 'Pagamento confirmado pelo Asaas',
+  estorno_asaas: 'Estorno/chargeback no Asaas — conferir',
+  pagamento_atrasado_asaas: 'Asaas: pagamento atrasado',
+  cobranca_apagada_asaas: 'Asaas: cobrança apagada',
+  assinatura_cancelada_asaas: 'Asaas: assinatura cancelada',
 }
 
 type Aba = 'geral' | 'config' | 'erros' | 'atividade' | 'agenda'

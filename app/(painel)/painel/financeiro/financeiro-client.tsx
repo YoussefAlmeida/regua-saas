@@ -6,6 +6,7 @@ import { avisar, erroDaResposta } from '@/components/aviso'
 import { pedirSenha } from '@/components/confirmar-senha'
 import { mesVizinho } from '@/lib/periodo'
 import RecursoBloqueado from '@/components/recurso-bloqueado'
+import { lerValorBRL } from '@/lib/dinheiro'
 
 export interface Movimentacao {
   id: string
@@ -166,7 +167,7 @@ export default function FinanceiroClient({
 
   async function salvarNovo(e: React.FormEvent) {
     e.preventDefault()
-    const valor = Number(novo.valor.replace(',', '.'))
+    const valor = lerValorBRL(novo.valor)
     if (!valor || valor <= 0) { avisar('Coloca um valor maior que zero.', 'erro'); return }
     const cat = categorias.find(c => c.id === novo.categoria_id)
     const descricao = novo.descricao.trim() || cat?.nome || (novo.tipo === 'entrada' ? 'Entrada' : 'Saída')
@@ -193,7 +194,7 @@ export default function FinanceiroClient({
 
   async function salvarEdicao() {
     if (!aberto || !edit) return
-    const valor = Number(edit.valor.replace(',', '.'))
+    const valor = lerValorBRL(edit.valor)
     if (!valor || valor <= 0) { avisar('Valor inválido.', 'erro'); return }
     const senha = await pedirSenha('Editar lançamento', 'Mexer em dinheiro já lançado pede sua senha.')
     if (!senha) return
@@ -254,7 +255,7 @@ export default function FinanceiroClient({
 
   async function salvarFixa(e: React.FormEvent) {
     e.preventDefault()
-    const valor = Number(fixaForm.valor.replace(',', '.'))
+    const valor = lerValorBRL(fixaForm.valor)
     const dia = parseInt(fixaForm.dia_vencimento)
     if (!valor || valor <= 0) { avisar('Valor inválido.', 'erro'); return }
     if (!dia || dia < 1 || dia > 28) { avisar('Dia do vencimento: de 1 a 28.', 'erro'); return }
