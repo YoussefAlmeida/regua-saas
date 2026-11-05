@@ -10,7 +10,7 @@
 <title>Dentista em Feira de Santana | Vamos Sorrir Odontologia</title>
 <meta name="description" content="Dentista em Feira de Santana com todas as especialidades num só lugar. Atendimento acolhedor, sala de esterilização visitável e plano de tratamento explicado com clareza. Agende pelo WhatsApp.">
 <link rel="canonical" href="https://[SEU-DOMINIO]/">
-<meta name="theme-color" content="#1E5BD8">
+<meta name="theme-color" content="#C4161C">
 
 <!-- Open Graph / redes sociais -->
 <meta property="og:type" content="website">
@@ -22,7 +22,7 @@
 <meta property="og:image" content="https://[SEU-DOMINIO]/img/og-image.jpg"><!-- 1200x630 -->
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231E5BD8' d='M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23C4161C' d='M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z'/%3E%3C/svg%3E">
 
 <!-- Fonte -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -75,25 +75,27 @@
    1. VARIÁVEIS — troque as cores da marca aqui
    ============================================================ */
 :root{
-  --azul:#1E5BD8;          /* azul principal (cor oficial da rede) */
-  --azul-hover:#1749B0;
-  --marinho:#0B1F4D;       /* rodapé e faixas de CTA */
-  --marinho-2:#132B66;
-  --gelo:#EAF2FF;          /* fundos de seção */
-  --gelo-2:#F5F9FF;
+  /* Paleta oficial Vamos Sorrir (fachadas e artes da rede) */
+  --primaria:#C4161C;      /* vermelho da marca: botões, links, destaques */
+  --primaria-hover:#A10F15;
+  --escura:#5C0A0E;        /* vinho profundo: rodapé e faixa de CTA */
+  --escura-2:#7A0F14;
+  --laranja:#F7931E;       /* laranja das artes: ícones de apoio, ondas, botão do formulário */
+  --amarelo:#FFC72C;       /* amarelo da fachada: marca-texto e detalhes */
+  --creme:#FFF4DC;         /* fundo de seção (amarelo bem suave) */
+  --creme-2:#FFFAF0;
   --branco:#FFFFFF;
-  --texto:#0F1B3D;
-  --texto-2:#4A5878;
-  --borda:#DCE6F7;
-  --laranja:#FFA26B;       /* acento quente: só no botão do formulário final */
+  --texto:#2A1512;
+  --texto-2:#6E5149;
+  --borda:#F1DFC2;
   --whats:#25D366;
   --whats-escuro:#0F7A40;
-  --estrela:#F5B300;
+  --estrela:#FFB400;
 
   --raio:22px;
   --raio-sm:14px;
-  --sombra:0 12px 34px -14px rgba(30,91,216,.28);
-  --sombra-forte:0 22px 50px -18px rgba(30,91,216,.38);
+  --sombra:0 12px 34px -14px rgba(196,22,28,.22);
+  --sombra-forte:0 22px 50px -18px rgba(196,22,28,.32);
   --container:1180px;
   --nav-h:68px;
   --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -112,47 +114,47 @@ h1,h2,h3,h4{line-height:1.15;margin:0 0 .5em;letter-spacing:-.02em}
 p{margin:0 0 1em}
 .container{width:100%;max-width:var(--container);margin:0 auto;padding:0 20px}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-:focus-visible{outline:3px solid var(--azul);outline-offset:3px;border-radius:8px}
+:focus-visible{outline:3px solid var(--primaria);outline-offset:3px;border-radius:8px}
 
 .ic{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .ic-sm{width:18px;height:18px}
 
 section{padding:72px 0}
-.bg-gelo{background:var(--gelo)}
-.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);background:var(--gelo);padding:6px 14px;border-radius:99px;margin-bottom:14px}
+.bg-gelo{background:var(--creme)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primaria);background:var(--creme);padding:6px 14px;border-radius:99px;margin-bottom:14px}
 .bg-gelo .eyebrow{background:#fff}
 .sec-head{max-width:640px;margin:0 auto 40px;text-align:center}
 .sec-head h2{font-size:clamp(1.7rem,4.6vw,2.5rem);font-weight:800}
 .sec-head p{color:var(--texto-2);font-size:1.05rem}
-.destaque{color:var(--azul)}
+.destaque{color:var(--primaria)}
 
 /* Botões */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:99px;font-weight:700;font-size:1rem;border:2px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s,color .2s;white-space:nowrap}
 .btn:hover{transform:translateY(-2px)}
-.btn-primario{background:var(--azul);color:#fff;box-shadow:0 12px 26px -10px rgba(30,91,216,.6)}
-.btn-primario:hover{background:var(--azul-hover)}
-.btn-secundario{background:#fff;color:var(--azul);border-color:var(--borda)}
-.btn-secundario:hover{border-color:var(--azul)}
+.btn-primario{background:var(--primaria);color:#fff;box-shadow:0 12px 26px -10px rgba(196,22,28,.6)}
+.btn-primario:hover{background:var(--primaria-hover)}
+.btn-secundario{background:#fff;color:var(--primaria);border-color:var(--borda)}
+.btn-secundario:hover{border-color:var(--primaria)}
 .btn-whats{background:var(--whats-escuro);color:#fff}
 .btn-whats:hover{background:#0B6634}
-.btn-laranja{background:var(--laranja);color:var(--marinho)}
-.btn-laranja:hover{background:#FF8F4F}
-.btn-claro{background:#fff;color:var(--marinho)}
+.btn-laranja{background:var(--laranja);color:var(--escura)}
+.btn-laranja:hover{background:#FFA53D}
+.btn-claro{background:#fff;color:var(--escura)}
 .btn-bloco{width:100%}
-.link-mais{display:inline-flex;align-items:center;gap:6px;color:var(--azul);font-weight:700;font-size:.95rem}
+.link-mais{display:inline-flex;align-items:center;gap:6px;color:var(--primaria);font-weight:700;font-size:.95rem}
 .link-mais .ic{transition:transform .2s}
 .link-mais:hover .ic{transform:translateX(4px)}
 
 /* Placeholders de foto: se a imagem não existir, aparece o rótulo */
-.ph{position:relative;overflow:hidden;background:linear-gradient(135deg,#EAF2FF 0%,#D3E2FF 100%);border-radius:var(--raio)}
-.ph::before{content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;color:#5B76AE;font-size:.85rem;font-weight:600}
+.ph{position:relative;overflow:hidden;background:linear-gradient(135deg,#FFF4DC 0%,#FFE3B0 100%);border-radius:var(--raio)}
+.ph::before{content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;color:#9A6A4A;font-size:.85rem;font-weight:600}
 .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
 .moldura{border:6px solid #fff;box-shadow:var(--sombra)}
 
 /* Card base */
-.card{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(220,230,247,.7);transition:transform .25s,box-shadow .25s}
+.card{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(241,223,194,.7);transition:transform .25s,box-shadow .25s}
 .card:hover{transform:translateY(-6px);box-shadow:var(--sombra-forte)}
-.ic-box{width:52px;height:52px;border-radius:16px;background:var(--gelo);color:var(--azul);display:grid;place-items:center}
+.ic-box{width:52px;height:52px;border-radius:16px;background:var(--creme);color:var(--primaria);display:grid;place-items:center}
 .ic-box .ic{width:26px;height:26px}
 
 /* Animação ao rolar */
@@ -163,41 +165,41 @@ section{padding:72px 0}
 /* ============================================================
    3. NAVBAR
    ============================================================ */
-.nav{position:fixed;inset:0 0 auto;z-index:50;height:var(--nav-h);background:rgba(255,255,255,.82);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(220,230,247,.6);transition:box-shadow .3s}
-.nav.scrolled{box-shadow:0 8px 24px -16px rgba(11,31,77,.35)}
+.nav{position:fixed;inset:0 0 auto;z-index:50;height:var(--nav-h);background:rgba(255,255,255,.82);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(241,223,194,.6);transition:box-shadow .3s}
+.nav.scrolled{box-shadow:0 8px 24px -16px rgba(92,10,14,.35)}
 .nav .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;color:var(--marinho)}
-.logo-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--azul),#4F86F0);display:grid;place-items:center;color:#fff}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;color:var(--escura)}
+.logo-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primaria),#F7931E);display:grid;place-items:center;color:#fff}
 .logo-mark .ic{width:22px;height:22px}
 .logo small{display:block;font-size:.7rem;font-weight:600;color:var(--texto-2);letter-spacing:0}
 .nav-links{display:none;gap:28px;font-weight:600;font-size:.95rem;color:var(--texto-2)}
-.nav-links a:hover{color:var(--azul)}
+.nav-links a:hover{color:var(--primaria)}
 .nav-cta{display:none;min-height:44px;padding:0 22px}
-.nav-toggle{width:44px;height:44px;border-radius:12px;border:1px solid var(--borda);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--marinho)}
-.nav-menu{position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;padding:12px 20px 24px;box-shadow:0 20px 30px -20px rgba(11,31,77,.35);display:none;flex-direction:column;gap:4px}
+.nav-toggle{width:44px;height:44px;border-radius:12px;border:1px solid var(--borda);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--escura)}
+.nav-menu{position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;padding:12px 20px 24px;box-shadow:0 20px 30px -20px rgba(92,10,14,.35);display:none;flex-direction:column;gap:4px}
 .nav-menu.open{display:flex}
-.nav-menu a{padding:14px 4px;font-weight:600;border-bottom:1px solid var(--gelo)}
+.nav-menu a{padding:14px 4px;font-weight:600;border-bottom:1px solid var(--creme)}
 .nav-menu .btn{margin-top:12px;border-bottom:0}
 
 /* ============================================================
    4. HERO
    ============================================================ */
-.hero{position:relative;padding:calc(var(--nav-h) + 28px) 0 48px;overflow:hidden;background:var(--gelo-2)}
+.hero{position:relative;padding:calc(var(--nav-h) + 28px) 0 48px;overflow:hidden;background:var(--creme-2)}
 .hero-bg{position:absolute;inset:0;z-index:0}
 .hero-bg img{width:100%;height:100%;object-fit:cover;filter:blur(10px) saturate(.9);transform:scale(1.08);opacity:.55}
-.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(245,249,255,.9) 0%,rgba(245,249,255,.75) 50%,rgba(255,255,255,.95) 100%)}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,250,240,.9) 0%,rgba(255,250,240,.75) 50%,rgba(255,255,255,.95) 100%)}
 .hero-inner{position:relative;z-index:1;display:grid;grid-template-areas:"titulo" "visual" "corpo";gap:8px}
 .hero-titulo{grid-area:titulo}
 .hero-visual{grid-area:visual}
 .hero-corpo{grid-area:corpo}
 .hero h1{font-size:clamp(2.1rem,8.4vw,4rem);font-weight:800;margin-bottom:0;letter-spacing:-.035em}
 .hero h1 .destaque{position:relative;white-space:nowrap}
-.hero h1 .destaque::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.16em;background:rgba(30,91,216,.16);border-radius:4px;z-index:-1}
+.hero h1 .destaque::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.22em;background:var(--amarelo);opacity:.7;border-radius:4px;z-index:-1}
 .hero-sub{font-size:1.08rem;color:var(--texto-2);max-width:520px;margin-bottom:24px}
 .hero-botoes{display:flex;flex-direction:column;gap:12px}
 .prova{display:flex;align-items:center;gap:14px;margin-top:22px}
 .avatares{display:flex}
-.avatares span{width:40px;height:40px;border-radius:50%;border:3px solid #fff;margin-left:-12px;background:linear-gradient(135deg,#C9DBFF,#8FB1F5);display:grid;place-items:center;color:#fff;font-size:.75rem;font-weight:700;box-shadow:0 4px 10px -4px rgba(11,31,77,.3);overflow:hidden}
+.avatares span{width:40px;height:40px;border-radius:50%;border:3px solid #fff;margin-left:-12px;background:linear-gradient(135deg,#FFD9A8,#F5B27A);display:grid;place-items:center;color:#fff;font-size:.75rem;font-weight:700;box-shadow:0 4px 10px -4px rgba(92,10,14,.3);overflow:hidden}
 .avatares span:first-child{margin-left:0}
 .avatares span img{width:100%;height:100%;object-fit:cover}
 .estrelas{display:flex;gap:2px;color:var(--estrela)}
@@ -206,9 +208,9 @@ section{padding:72px 0}
 .prova small{color:var(--texto-2);font-size:.82rem}
 
 /* Card glass (vira faixa no mobile) */
-.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border:1px solid rgba(255,255,255,.85);box-shadow:0 18px 40px -18px rgba(30,91,216,.4);border-radius:var(--raio)}
+.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border:1px solid rgba(255,255,255,.85);box-shadow:0 18px 40px -18px rgba(196,22,28,.4);border-radius:var(--raio)}
 .hero-card{margin-top:20px;padding:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.hero-card .ic-box{background:var(--azul);color:#fff;width:46px;height:46px;border-radius:14px}
+.hero-card .ic-box{background:var(--primaria);color:#fff;width:46px;height:46px;border-radius:14px}
 .hero-card-txt{flex:1;min-width:180px}
 .hero-card strong{display:block;font-size:1rem}
 .hero-card p{margin:0;font-size:.9rem;color:var(--texto-2)}
@@ -216,12 +218,12 @@ section{padding:72px 0}
 
 /* Dente 3D de vidro */
 .dente{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:8px auto 12px;display:grid;place-items:center}
-.dente-glow{position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(79,134,240,.45),rgba(30,91,216,.12) 45%,transparent 70%);filter:blur(6px)}
-.dente-anel{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(30,91,216,.18)}
-.dente-anel.a2{inset:12%;border-style:dashed;border-color:rgba(30,91,216,.22);animation:gira 40s linear infinite}
-.dente svg{position:relative;width:72%;height:auto;filter:drop-shadow(0 24px 30px rgba(30,91,216,.35));animation:levita 6s ease-in-out infinite}
-.dente-sombra{position:absolute;bottom:4%;left:30%;right:30%;height:14px;border-radius:50%;background:rgba(11,31,77,.18);filter:blur(8px);animation:sombra 6s ease-in-out infinite}
-.dente .brilho{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(255,255,255,.9),0 0 24px 8px rgba(79,134,240,.5);animation:pisca 3.2s ease-in-out infinite}
+.dente-glow{position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(247,147,30,.45),rgba(196,22,28,.12) 45%,transparent 70%);filter:blur(6px)}
+.dente-anel{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(196,22,28,.18)}
+.dente-anel.a2{inset:12%;border-style:dashed;border-color:rgba(196,22,28,.22);animation:gira 40s linear infinite}
+.dente svg{position:relative;width:72%;height:auto;filter:drop-shadow(0 24px 30px rgba(196,22,28,.35));animation:levita 6s ease-in-out infinite}
+.dente-sombra{position:absolute;bottom:4%;left:30%;right:30%;height:14px;border-radius:50%;background:rgba(92,10,14,.18);filter:blur(8px);animation:sombra 6s ease-in-out infinite}
+.dente .brilho{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(255,255,255,.9),0 0 24px 8px rgba(247,147,30,.5);animation:pisca 3.2s ease-in-out infinite}
 .dente .b1{top:18%;right:22%}.dente .b2{top:58%;left:14%;animation-delay:1.1s;width:5px;height:5px}.dente .b3{top:30%;left:24%;animation-delay:2s;width:4px;height:4px}
 @keyframes levita{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
 @keyframes sombra{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.8);opacity:.6}}
@@ -237,12 +239,12 @@ section{padding:72px 0}
 .trilho>*{scroll-snap-align:start}
 .controles{display:flex;align-items:center;justify-content:center;gap:16px}
 .controles[hidden]{display:none}
-.seta{width:46px;height:46px;border-radius:50%;border:1px solid var(--borda);background:#fff;color:var(--azul);display:grid;place-items:center;cursor:pointer;box-shadow:var(--sombra);transition:background .2s,color .2s}
-.seta:hover{background:var(--azul);color:#fff}
-.seta:disabled{opacity:.4;cursor:default;background:#fff;color:var(--azul)}
+.seta{width:46px;height:46px;border-radius:50%;border:1px solid var(--borda);background:#fff;color:var(--primaria);display:grid;place-items:center;cursor:pointer;box-shadow:var(--sombra);transition:background .2s,color .2s}
+.seta:hover{background:var(--primaria);color:#fff}
+.seta:disabled{opacity:.4;cursor:default;background:#fff;color:var(--primaria)}
 .pontos{display:flex;gap:8px}
-.pontos button{width:8px;height:8px;border-radius:99px;border:0;padding:0;background:#BFD2F5;cursor:pointer;transition:width .25s,background .25s}
-.pontos button[aria-current="true"]{width:26px;background:var(--azul)}
+.pontos button{width:8px;height:8px;border-radius:99px;border:0;padding:0;background:#F5C9A0;cursor:pointer;transition:width .25s,background .25s}
+.pontos button[aria-current="true"]{width:26px;background:var(--primaria)}
 
 /* ============================================================
    6. ESPECIALIDADES
@@ -252,12 +254,12 @@ section{padding:72px 0}
 .esp-card p{color:var(--texto-2);margin:0;flex:1;font-size:.96rem}
 .acordeao-titulo{text-align:center;font-size:1.25rem;margin:36px 0 18px}
 .acordeao{display:grid;gap:12px;max-width:880px;margin:0 auto}
-.item{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(220,230,247,.7);overflow:hidden}
+.item{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(241,223,194,.7);overflow:hidden}
 .item summary{list-style:none;display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;font-weight:700;font-size:1.02rem}
 .item summary::-webkit-details-marker{display:none}
 .item summary .ic-box{width:42px;height:42px;border-radius:12px}
 .item summary .ic-box .ic{width:22px;height:22px}
-.item summary .chev{margin-left:auto;color:var(--azul);transition:transform .3s}
+.item summary .chev{margin-left:auto;color:var(--primaria);transition:transform .3s}
 .item[open] summary .chev{transform:rotate(180deg)}
 .item-corpo{padding:0 20px 22px;display:grid;gap:18px}
 .item-corpo .ph{aspect-ratio:16/10}
@@ -267,19 +269,19 @@ section{padding:72px 0}
    7. POR QUE A VAMOS SORRIR
    ============================================================ */
 .porque{position:relative;overflow:hidden;padding:64px 0}
-.arco{position:absolute;width:620px;height:620px;border-radius:50%;border:2px solid rgba(30,91,216,.18);right:-260px;top:-300px;pointer-events:none}
-.arco::after{content:"";position:absolute;inset:50px;border-radius:50%;border:1px solid rgba(30,91,216,.12)}
+.arco{position:absolute;width:620px;height:620px;border-radius:50%;border:2px solid rgba(196,22,28,.18);right:-260px;top:-300px;pointer-events:none}
+.arco::after{content:"";position:absolute;inset:50px;border-radius:50%;border:1px solid rgba(196,22,28,.12)}
 .porque-box{position:relative;display:grid;gap:28px;background:#fff;border-radius:28px;padding:32px 24px;box-shadow:var(--sombra)}
 .porque-marca{display:flex;flex-direction:column;gap:10px}
 .porque-marca .logo{font-size:1.3rem}
 .porque-marca .logo-mark{width:52px;height:52px;border-radius:16px}
 .porque-marca p{color:var(--texto-2);margin:0}
-.porque-marca .slogan{font-weight:800;color:var(--azul);font-size:1.05rem}
+.porque-marca .slogan{font-weight:800;color:var(--primaria);font-size:1.05rem}
 .difs{display:grid;grid-template-columns:1fr 1fr}
 .dif{padding:18px 14px;display:flex;flex-direction:column;gap:10px}
 .dif:nth-child(odd){border-right:1px solid var(--borda)}
 .dif:nth-child(-n+2){border-bottom:1px solid var(--borda)}
-.dif .ic{width:30px;height:30px;color:var(--azul)}
+.dif .ic{width:30px;height:30px;color:var(--primaria)}
 .dif strong{font-size:.98rem;line-height:1.3}
 .dif span{font-size:.86rem;color:var(--texto-2);line-height:1.45}
 
@@ -298,13 +300,13 @@ section{padding:72px 0}
 .lista span{color:var(--texto-2);font-size:.95rem}
 .foto-wrap{position:relative}
 .selo{position:absolute;left:-6px;bottom:22px;padding:14px 16px;display:flex;align-items:center;gap:12px;max-width:260px;z-index:2}
-.selo .ic-box{width:42px;height:42px;background:var(--azul);color:#fff;border-radius:12px}
+.selo .ic-box{width:42px;height:42px;background:var(--primaria);color:#fff;border-radius:12px}
 .selo strong{font-size:.92rem;line-height:1.3}
 
-.bio{background:linear-gradient(180deg,#fff 0%,var(--gelo) 100%)}
-.bio-destaque{background:var(--marinho);color:#fff;border-radius:var(--raio);padding:22px;display:flex;gap:16px;align-items:center;margin-bottom:24px}
+.bio{background:linear-gradient(180deg,#fff 0%,var(--creme) 100%)}
+.bio-destaque{background:var(--escura);color:#fff;border-radius:var(--raio);padding:22px;display:flex;gap:16px;align-items:center;margin-bottom:24px}
 .bio-destaque .ic-box{background:rgba(255,255,255,.12);color:#fff;flex:none}
-.bio-destaque p{margin:0;color:#C8D6F5;font-size:.95rem}
+.bio-destaque p{margin:0;color:#F6DCCB;font-size:.95rem}
 .bio-destaque strong{display:block;color:#fff;font-size:1.05rem;margin-bottom:2px}
 
 .galeria{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -315,10 +317,10 @@ section{padding:72px 0}
    9. EQUIPE
    ============================================================ */
 .dentista{overflow:hidden;height:100%}
-.dentista .ph{border-radius:0;aspect-ratio:4/5;background:linear-gradient(180deg,var(--gelo) 0%,#D3E2FF 100%)}
+.dentista .ph{border-radius:0;aspect-ratio:4/5;background:linear-gradient(180deg,var(--creme) 0%,#FFE3B0 100%)}
 .dentista-info{padding:18px 20px 22px}
 .dentista-info h3{font-size:1.08rem;margin-bottom:4px}
-.dentista-info p{margin:0;color:var(--azul);font-weight:600;font-size:.92rem}
+.dentista-info p{margin:0;color:var(--primaria);font-weight:600;font-size:.92rem}
 .dentista-info small{color:var(--texto-2);font-size:.82rem}
 
 /* ============================================================
@@ -326,10 +328,10 @@ section{padding:72px 0}
    ============================================================ */
 .passos{display:grid;gap:18px;counter-reset:passo;position:relative}
 .passo{padding:28px 24px;position:relative}
-.passo-num{width:48px;height:48px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.15rem;box-shadow:0 10px 20px -8px rgba(30,91,216,.7);margin-bottom:16px}
+.passo-num{width:48px;height:48px;border-radius:50%;background:var(--primaria);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.15rem;box-shadow:0 10px 20px -8px rgba(196,22,28,.7);margin-bottom:16px}
 .passo h3{font-size:1.15rem}
 .passo p{color:var(--texto-2);margin:0}
-.passo .ic{position:absolute;top:28px;right:24px;width:30px;height:30px;color:#B5CBF3}
+.passo .ic{position:absolute;top:28px;right:24px;width:30px;height:30px;color:var(--laranja);opacity:.6}
 .centro{text-align:center;margin-top:32px}
 
 /* ============================================================
@@ -354,31 +356,31 @@ section{padding:72px 0}
 /* ============================================================
    13. CTA FINAL
    ============================================================ */
-.cta{background:var(--marinho);color:#fff;position:relative;overflow:hidden}
-.cta::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(30,91,216,.55),transparent 65%);left:-180px;top:-120px}
+.cta{background:var(--escura);color:#fff;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(247,147,30,.45),transparent 65%);left:-180px;top:-120px}
 .cta .arco{border-color:rgba(255,255,255,.1);right:-300px;top:auto;bottom:-360px}
 .cta-grid{position:relative;display:grid;gap:24px;align-items:center}
 .cta .dente{width:min(200px,50vw);margin:0 auto}
 .cta .dente-anel{border-color:rgba(255,255,255,.16)}
-.cta .dente-glow{background:radial-gradient(circle,rgba(110,160,255,.55),transparent 65%)}
+.cta .dente-glow{background:radial-gradient(circle,rgba(247,147,30,.55),transparent 65%)}
 .cta h2{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;color:#fff}
-.cta p{color:#C8D6F5}
+.cta p{color:#F6DCCB}
 .form{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:var(--raio);padding:22px;display:grid;gap:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.form label{font-size:.85rem;font-weight:600;color:#DCE6F7;display:grid;gap:6px}
+.form label{font-size:.85rem;font-weight:600;color:#F1DFC2;display:grid;gap:6px}
 .form input,.form select{min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.95);color:var(--texto);padding:0 16px;font-size:1rem;width:100%}
 .form input:focus,.form select:focus{outline:3px solid var(--laranja);outline-offset:1px}
-.form small{color:#9FB3DE;font-size:.78rem;text-align:center}
+.form small{color:#E0B5A3;font-size:.78rem;text-align:center}
 
 /* ============================================================
    14. LOCALIZAÇÃO
    ============================================================ */
 .local-grid{display:grid;gap:20px}
-.mapa{border-radius:var(--raio);overflow:hidden;min-height:320px;background:var(--gelo)}
+.mapa{border-radius:var(--raio);overflow:hidden;min-height:320px;background:var(--creme)}
 .mapa iframe{width:100%;height:100%;min-height:320px;border:0;display:block}
 .local-info{padding:26px;display:grid;gap:18px;align-content:start}
 .local-info h3{font-size:1.25rem;margin:0}
 .info-linha{display:flex;gap:14px;align-items:flex-start}
-.info-linha .ic{color:var(--azul);margin-top:2px}
+.info-linha .ic{color:var(--primaria);margin-top:2px}
 .info-linha strong{display:block;font-size:.92rem}
 .info-linha span{color:var(--texto-2);font-size:.95rem}
 .local-botoes{display:grid;gap:10px}
@@ -386,17 +388,21 @@ section{padding:72px 0}
 /* ============================================================
    15. RODAPÉ
    ============================================================ */
-.rodape{background:var(--marinho);color:#C8D6F5;padding:56px 0 110px;font-size:.94rem}
+.rodape{background:var(--escura);color:#F6DCCB;padding:56px 0 110px;font-size:.94rem}
 .rodape-grid{display:grid;gap:32px}
 .rodape .logo{color:#fff}
-.rodape .logo small{color:#9FB3DE}
+.rodape .logo small{color:#E0B5A3}
 .rodape h4{color:#fff;font-size:1rem;margin-bottom:14px}
 .rodape ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .rodape a:hover{color:#fff}
 .redes{display:flex;gap:10px;margin-top:16px}
 .redes a{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#fff;transition:background .2s}
-.redes a:hover{background:var(--azul)}
-.rodape-base{border-top:1px solid rgba(255,255,255,.1);margin-top:36px;padding-top:22px;display:grid;gap:8px;font-size:.82rem;color:#9FB3DE}
+.redes a:hover{background:var(--primaria)}
+.rodape-base{border-top:1px solid rgba(255,255,255,.1);margin-top:36px;padding-top:22px;display:grid;gap:8px;font-size:.82rem;color:#E0B5A3}
+
+.ondas{display:block;line-height:0;margin-bottom:-1px;background:#fff}
+.ondas svg{width:100%;height:64px;display:block}
+@media (min-width:768px){.ondas svg{height:96px}}
 
 /* ============================================================
    16. WHATSAPP FLUTUANTE
@@ -419,7 +425,7 @@ section{padding:72px 0}
   section{padding:96px 0}
   .item-corpo{grid-template-columns:240px 1fr;align-items:center}
   .passos{grid-template-columns:repeat(3,1fr)}
-  .passos::before{content:"";position:absolute;top:52px;left:12%;right:12%;height:2px;background:repeating-linear-gradient(90deg,#BFD2F5 0 8px,transparent 8px 16px);z-index:0}
+  .passos::before{content:"";position:absolute;top:52px;left:12%;right:12%;height:2px;background:repeating-linear-gradient(90deg,#F5C9A0 0 8px,transparent 8px 16px);z-index:0}
   .passo{z-index:1}
   .galeria{grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:1fr 1fr}
   .galeria .ph{aspect-ratio:auto;min-height:200px}
@@ -475,9 +481,9 @@ section{padding:72px 0}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient id="dg-corpo" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".96"/>
-      <stop offset=".45" stop-color="#D4E3FF" stop-opacity=".6"/>
-      <stop offset="1" stop-color="#5E8EEB" stop-opacity=".55"/>
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".98"/>
+      <stop offset=".5" stop-color="#FBF6F2" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#E9D8CE" stop-opacity=".8"/>
     </linearGradient>
     <radialGradient id="dg-luz" cx=".32" cy=".26" r=".75">
       <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/>
@@ -486,12 +492,12 @@ section{padding:72px 0}
     </radialGradient>
     <linearGradient id="dg-borda" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/>
-      <stop offset="1" stop-color="#8FB1F5" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#F5B27A" stop-opacity=".7"/>
     </linearGradient>
     <linearGradient id="dg-reflexo" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0" stop-color="#1E5BD8" stop-opacity="0"/>
-      <stop offset=".5" stop-color="#1E5BD8" stop-opacity=".45"/>
-      <stop offset="1" stop-color="#1E5BD8" stop-opacity="0"/>
+      <stop offset="0" stop-color="#FFC72C" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#FFD9A8" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#FFC72C" stop-opacity="0"/>
     </linearGradient>
     <filter id="dg-blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
     <filter id="dg-blur-sm"><feGaussianBlur stdDeviation="1.6"/></filter>
@@ -502,13 +508,13 @@ section{padding:72px 0}
     <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z" fill="url(#dg-corpo)"/>
     <g clip-path="url(#dg-clip)">
       <ellipse cx="128" cy="150" rx="70" ry="22" fill="url(#dg-reflexo)" filter="url(#dg-blur)" transform="rotate(-24 128 150)"/>
-      <ellipse cx="150" cy="70" rx="26" ry="60" fill="#6E9BF0" opacity=".35" filter="url(#dg-blur)"/>
+      <ellipse cx="150" cy="70" rx="26" ry="60" fill="#F5B27A" opacity=".12" filter="url(#dg-blur)"/>
       <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115" fill="none" stroke="#fff" stroke-width="10" opacity=".55" filter="url(#dg-blur)"/>
       <rect x="0" y="0" width="200" height="240" fill="url(#dg-luz)"/>
       <path d="M62 44c-12 4-18 20-15 38" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9" filter="url(#dg-blur-sm)"/>
       <path d="M78 34c6-2 12-1 16 2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/>
       <path d="M66 175c2 18 6 32 10 38" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
-      <path d="M100 30c10 8 14 12 26 12" fill="none" stroke="#BCD2FF" stroke-width="2" opacity=".8"/>
+      <path d="M100 30c10 8 14 12 26 12" fill="none" stroke="#FFD9A8" stroke-width="2" opacity=".8"/>
     </g>
     <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z" fill="none" stroke="url(#dg-borda)" stroke-width="2.2"/>
   </symbol>
@@ -1082,6 +1088,14 @@ section{padding:72px 0}
 <!-- ============================================================
      13. RODAPÉ
      ============================================================ -->
+<!-- Ondas vermelho/laranja: assinatura visual das artes da rede -->
+<div class="ondas" aria-hidden="true">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0 30C300 110 620 -10 980 40s380 30 460 20V120H0z" fill="#F7931E"/>
+    <path d="M0 70C360 10 760 130 1440 60V120H0z" fill="#C4161C"/>
+    <path d="M0 95C420 60 900 130 1440 92V120H0z" fill="#5C0A0E"/>
+  </svg>
+</div>
 <footer class="rodape">
   <div class="container">
     <div class="rodape-grid">
