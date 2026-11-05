@@ -22,7 +22,7 @@
 <meta property="og:image" content="https://[SEU-DOMINIO]/img/og-image.jpg"><!-- 1200x630 -->
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23C4161C' d='M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23EF8333'/%3E%3Cpath d='M17 30q15 14 30 0M15 32l3-5M49 32l-3-5' fill='none' stroke='%23fff' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
 
 <!-- Fonte -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,30 +33,42 @@
 <link rel="preload" as="image" href="img/hero-consultorio.webp" fetchpriority="high">
 
 <!-- schema.org Dentist — preencha endereço, telefone, horário, geo e links -->
+<!-- schema.org: uma entrada por unidade. Adicione "openingHours" (ex.: "Mo-Fr 08:00-18:00") quando tiver o horário -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Dentist",
-  "name": "Vamos Sorrir Odontologia - Feira de Santana",
-  "slogan": "Já sorriu hoje? Vamos Sorrir!",
-  "url": "https://[SEU-DOMINIO]/",
-  "image": "https://[SEU-DOMINIO]/img/og-image.jpg",
-  "telephone": "+55-75-9XXXX-XXXX",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "[Rua, número]",
-    "addressLocality": "Feira de Santana",
-    "addressRegion": "BA",
-    "postalCode": "[CEP]",
-    "addressCountry": "BR"
-  },
-  "geo": { "@type": "GeoCoordinates", "latitude": -12.2664, "longitude": -38.9663 },
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "12:00" }
-  ],
-  "areaServed": "Feira de Santana",
-  "sameAs": ["https://www.instagram.com/[usuario]"]
+  "@graph": [
+    {
+      "@type": "Dentist",
+      "name": "Vamos Sorrir Odontologia - Getúlio Vargas",
+      "url": "https://[SEU-DOMINIO]/",
+      "image": "https://[SEU-DOMINIO]/img/og-image.jpg",
+      "telephone": "+55-75-99182-4476",
+      "address": { "@type": "PostalAddress", "streetAddress": "Av. Getúlio Vargas, 244 - Centro", "addressLocality": "Feira de Santana", "addressRegion": "BA", "addressCountry": "BR" },
+      "areaServed": "Feira de Santana",
+      "sameAs": ["https://www.instagram.com/[usuario]"]
+    },
+    {
+      "@type": "Dentist",
+      "name": "Vamos Sorrir Odontologia - Visconde do Rio Branco",
+      "url": "https://[SEU-DOMINIO]/",
+      "image": "https://[SEU-DOMINIO]/img/og-image.jpg",
+      "telephone": "+55-75-99297-9256",
+      "address": { "@type": "PostalAddress", "streetAddress": "Rua Visconde do Rio Branco, 57 - Centro", "addressLocality": "Feira de Santana", "addressRegion": "BA", "addressCountry": "BR" },
+      "areaServed": "Feira de Santana",
+      "sameAs": ["https://www.instagram.com/[usuario]"]
+    },
+    {
+      "@type": "Dentist",
+      "name": "Vamos Sorrir Odontologia - Cidade Nova",
+      "url": "https://[SEU-DOMINIO]/",
+      "image": "https://[SEU-DOMINIO]/img/og-image.jpg",
+      "telephone": "+55-75-3226-5235",
+      "address": { "@type": "PostalAddress", "streetAddress": "Rua Dois, 01 - Cidade Nova", "addressLocality": "Feira de Santana", "addressRegion": "BA", "addressCountry": "BR" },
+      "areaServed": "Feira de Santana",
+      "sameAs": ["https://www.instagram.com/[usuario]"]
+    }
+  ]
 }
 </script>
 
@@ -80,7 +92,8 @@
   --primaria-hover:#A10F15;
   --escura:#5C0A0E;        /* vinho profundo: rodapé e faixa de CTA */
   --escura-2:#7A0F14;
-  --laranja:#F7931E;       /* laranja das artes: ícones de apoio, ondas, botão do formulário */
+  --laranja:#F7931E;
+  --laranja-logo:#EF8333;  /* laranja exato do logo */       /* laranja das artes: ícones de apoio, ondas, botão do formulário */
   --amarelo:#FFC72C;       /* amarelo da fachada: marca-texto e detalhes */
   --creme:#FFF4DC;         /* fundo de seção (amarelo bem suave) */
   --creme-2:#FFFAF0;
@@ -168,10 +181,11 @@ section{padding:72px 0}
 .nav{position:fixed;inset:0 0 auto;z-index:50;height:var(--nav-h);background:rgba(255,255,255,.82);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(241,223,194,.6);transition:box-shadow .3s}
 .nav.scrolled{box-shadow:0 8px 24px -16px rgba(92,10,14,.35)}
 .nav .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;color:var(--escura)}
-.logo-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primaria),#F7931E);display:grid;place-items:center;color:#fff}
-.logo-mark .ic{width:22px;height:22px}
-.logo small{display:block;font-size:.7rem;font-weight:600;color:var(--texto-2);letter-spacing:0}
+.logo{display:flex;align-items:center;gap:12px;color:var(--laranja-logo)}
+.logo-txt{width:84px;height:55px;flex:none}
+.logo-circulo{width:56px;height:56px;flex:none;filter:drop-shadow(0 8px 16px rgba(239,131,51,.35))}
+.logo-local{font-size:.72rem;font-weight:700;line-height:1.25;color:var(--texto-2);border-left:1px solid var(--borda);padding-left:12px}
+.logo-local b{display:block;color:var(--texto);font-size:.8rem}
 .nav-links{display:none;gap:28px;font-weight:600;font-size:.95rem;color:var(--texto-2)}
 .nav-links a:hover{color:var(--primaria)}
 .nav-cta{display:none;min-height:44px;padding:0 22px}
@@ -273,8 +287,7 @@ section{padding:72px 0}
 .arco::after{content:"";position:absolute;inset:50px;border-radius:50%;border:1px solid rgba(196,22,28,.12)}
 .porque-box{position:relative;display:grid;gap:28px;background:#fff;border-radius:28px;padding:32px 24px;box-shadow:var(--sombra)}
 .porque-marca{display:flex;flex-direction:column;gap:10px}
-.porque-marca .logo{font-size:1.3rem}
-.porque-marca .logo-mark{width:52px;height:52px;border-radius:16px}
+.porque-marca .logo-circulo{width:104px;height:104px}
 .porque-marca p{color:var(--texto-2);margin:0}
 .porque-marca .slogan{font-weight:800;color:var(--primaria);font-size:1.05rem}
 .difs{display:grid;grid-template-columns:1fr 1fr}
@@ -385,13 +398,23 @@ section{padding:72px 0}
 .info-linha span{color:var(--texto-2);font-size:.95rem}
 .local-botoes{display:grid;gap:10px}
 
+.abas{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 -20px 20px;padding:4px 20px 8px}
+.abas::-webkit-scrollbar{display:none}
+.abas button{flex:none;border:1px solid var(--borda);background:#fff;border-radius:16px;padding:10px 18px;font-weight:700;font-size:.92rem;cursor:pointer;text-align:left;line-height:1.3;transition:background .2s,color .2s,border-color .2s}
+.abas button small{display:block;font-weight:500;font-size:.78rem;color:var(--texto-2)}
+.abas button[aria-selected="true"]{background:var(--primaria);border-color:var(--primaria);color:#fff;box-shadow:var(--sombra)}
+.abas button[aria-selected="true"] small{color:#FFE3D6}
+.info-linha a{color:var(--primaria);font-weight:600}
+@media (min-width:768px){.abas{justify-content:center;margin:0 0 24px;padding:4px 0 8px}}
+
 /* ============================================================
    15. RODAPÉ
    ============================================================ */
 .rodape{background:var(--escura);color:#F6DCCB;padding:56px 0 110px;font-size:.94rem}
 .rodape-grid{display:grid;gap:32px}
-.rodape .logo{color:#fff}
-.rodape .logo small{color:#E0B5A3}
+.rodape .logo-circulo{width:76px;height:76px}
+.rodape .logo-local{color:#E0B5A3;border-color:rgba(255,255,255,.18)}
+.rodape .logo-local b{color:#fff}
 .rodape h4{color:#fff;font-size:1rem;margin-bottom:14px}
 .rodape ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
 .rodape a:hover{color:#fff}
@@ -519,6 +542,18 @@ section{padding:72px 0}
     <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z" fill="none" stroke="url(#dg-borda)" stroke-width="2.2"/>
   </symbol>
 
+  <!-- LOGO Vamos Sorrir: "Vamos" fino, "Sorrir" em negrito e o sorriso. Cor = currentColor -->
+  <symbol id="logo-txt" viewBox="0 0 120 78">
+    <g fill="currentColor" font-family="Plus Jakarta Sans,Montserrat,Arial,sans-serif" text-anchor="middle">
+      <text x="60" y="26" font-size="27" font-weight="400" letter-spacing="-.4">Vamos</text>
+      <text x="60" y="56" font-size="31" font-weight="800" letter-spacing="-.4">Sorrir</text>
+    </g>
+    <path d="M36 65q24 15 48 0M34.5 67.5l2.6-4.6M85.5 67.5l-2.6-4.6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="logo-circulo" viewBox="0 0 120 120">
+    <circle cx="60" cy="60" r="60" fill="#EF8333"/>
+    <use href="#logo-txt" x="19" y="33" width="82" height="53" color="#fff"/>
+  </symbol>
   <symbol id="i-dente" viewBox="0 0 24 24"><path d="M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/></symbol>
   <symbol id="i-aparelho" viewBox="0 0 24 24"><path d="M3 12h18"/><rect x="5" y="9" width="3.5" height="6" rx="1"/><rect x="10.25" y="9" width="3.5" height="6" rx="1"/><rect x="15.5" y="9" width="3.5" height="6" rx="1"/></symbol>
   <symbol id="i-implante" viewBox="0 0 24 24"><path d="M7.5 3h9l-1 4h-7z"/><path d="M9 9.5h6M9.5 12.5h5M10 15.5h4M10.5 18.5h3L12 21z"/></symbol>
@@ -556,10 +591,10 @@ section{padding:72px 0}
      ============================================================ -->
 <header class="nav" id="nav">
   <div class="container">
-    <!-- LOGO: troque o bloco abaixo por <img src="img/logo.svg" alt="Vamos Sorrir Odontologia" width="160" height="40"> -->
+    <!-- LOGO (SVG recriado). Para usar o arquivo oficial: <img src="img/logo.svg" alt="Vamos Sorrir" width="72" height="47"> -->
     <a href="#inicio" class="logo" aria-label="Vamos Sorrir Odontologia, página inicial">
-      <span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span>
-      <span>Vamos Sorrir<small>Odontologia · Feira de Santana</small></span>
+      <svg class="logo-txt" aria-hidden="true"><use href="#logo-txt"/></svg>
+      <span class="logo-local"><b>Odontologia</b>Feira de Santana</span>
     </a>
     <nav class="nav-links" aria-label="Principal">
       <a href="#inicio">Início</a>
@@ -756,7 +791,7 @@ section{padding:72px 0}
     <div class="porque-box reveal">
       <div class="porque-marca">
         <!-- LOGO (versão grande) -->
-        <span class="logo"><span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span>Vamos Sorrir</span>
+        <svg class="logo-circulo" role="img" aria-label="Vamos Sorrir"><use href="#logo-circulo"/></svg>
         <p class="slogan">Já sorriu hoje? Vamos Sorrir!</p>
         <p>Qualidade com ótimo custo-benefício, numa rede de clínicas presente em várias cidades da Bahia.</p>
       </div>
@@ -1003,7 +1038,7 @@ section{padding:72px 0}
       </details>
       <details class="item">
         <summary>Onde fica a clínica?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
-        <div class="item-corpo"><p>Estamos em [rua, número, bairro], Feira de Santana (BA). Veja o mapa e o botão "Como chegar" logo abaixo.</p></div>
+        <div class="item-corpo"><p>Temos 3 unidades em Feira de Santana: Av. Getúlio Vargas, 244 (Centro), Rua Visconde do Rio Branco, 57 (Centro) e Rua Dois, 01 (Cidade Nova). Veja o mapa e o botão "Como chegar" logo abaixo.</p></div>
       </details>
     </div>
   </div>
@@ -1034,6 +1069,14 @@ section{padding:72px 0}
       <label>Telefone (WhatsApp)
         <input type="tel" name="telefone" autocomplete="tel" inputmode="tel" required placeholder="(75) 9 0000-0000">
       </label>
+      <label>Unidade
+        <select name="unidade">
+          <option>Qualquer uma / a mais próxima</option>
+          <option>Getúlio Vargas (Centro)</option>
+          <option>Visconde do Rio Branco (Centro)</option>
+          <option>Rua Dois (Cidade Nova)</option>
+        </select>
+      </label>
       <label>Especialidade
         <select name="especialidade">
           <option>Ainda não sei, quero uma avaliação</option>
@@ -1061,21 +1104,26 @@ section{padding:72px 0}
     <div class="sec-head reveal">
       <span class="eyebrow">Localização</span>
       <h2>Venha nos <span class="destaque">visitar</span></h2>
-      <p>Dentista em Feira de Santana, fácil de chegar.</p>
+      <p>São 3 unidades em Feira de Santana. Escolha a mais perto de você.</p>
+    </div>
+    <!-- UNIDADES: os dados ficam em UNIDADES, no script do fim da página -->
+    <div class="abas reveal" role="tablist" aria-label="Unidades">
+      <button role="tab" aria-selected="true" data-unidade="0">Getúlio Vargas<small>Centro</small></button>
+      <button role="tab" aria-selected="false" data-unidade="1">Visconde do Rio Branco<small>Centro</small></button>
+      <button role="tab" aria-selected="false" data-unidade="2">Rua Dois<small>Cidade Nova</small></button>
     </div>
     <div class="local-grid">
       <div class="mapa moldura reveal">
         <!-- MAPA: no Google Maps, clique em Compartilhar > Incorporar mapa e cole o src aqui -->
-        <iframe title="Mapa da Vamos Sorrir Odontologia em Feira de Santana" src="https://maps.google.com/maps?q=Vamos%20Sorrir%20Odontologia%20Feira%20de%20Santana&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        <iframe title="Mapa da Vamos Sorrir Odontologia em Feira de Santana" id="mapaFrame" src="https://maps.google.com/maps?q=Av.%20Get%C3%BAlio%20Vargas%2C%20244%2C%20Centro%2C%20Feira%20de%20Santana%20-%20BA&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
       </div>
       <div class="card local-info reveal d1">
-        <h3>Vamos Sorrir · Feira de Santana</h3>
-        <div class="info-linha"><svg class="ic"><use href="#i-pin"/></svg><div><strong>Endereço</strong><span>[Rua, número, bairro]<br>Feira de Santana – BA</span></div></div>
+        <h3 id="unNome">Vamos Sorrir · Getúlio Vargas</h3>
+        <div class="info-linha"><svg class="ic"><use href="#i-pin"/></svg><div><strong>Endereço</strong><span id="unEnd">Av. Getúlio Vargas, 244 – Centro<br>Feira de Santana – BA</span></div></div>
         <div class="info-linha"><svg class="ic"><use href="#i-relogio"/></svg><div><strong>Horário</strong><span>Seg a sex: [Xh–Xh]<br>Sábado: [Xh–Xh]</span></div></div>
-        <div class="info-linha"><svg class="ic"><use href="#i-fone"/></svg><div><strong>WhatsApp</strong><span>[(75) 9XXXX-XXXX]</span></div></div>
+        <div class="info-linha"><svg class="ic"><use href="#i-fone"/></svg><div><strong>Telefone</strong><span><a id="unTel" href="tel:+5575991824476">(75) 9 9182-4476</a></span></div></div>
         <div class="local-botoes">
-          <!-- COMO CHEGAR: troque "destination" pelo endereço exato -->
-          <a class="btn btn-primario" href="https://www.google.com/maps/dir/?api=1&destination=Vamos+Sorrir+Odontologia+Feira+de+Santana" target="_blank" rel="noopener"><svg class="ic ic-sm"><use href="#i-pin"/></svg> Como chegar</a>
+          <a class="btn btn-primario" id="unRota" href="https://www.google.com/maps/dir/?api=1&destination=Av.+Get%C3%BAlio+Vargas%2C+244%2C+Centro%2C+Feira+de+Santana+-+BA" target="_blank" rel="noopener"><svg class="ic ic-sm"><use href="#i-pin"/></svg> Como chegar</a>
           <a class="btn btn-whats" data-wa href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar</a>
         </div>
       </div>
@@ -1100,7 +1148,7 @@ section{padding:72px 0}
   <div class="container">
     <div class="rodape-grid">
       <div>
-        <span class="logo"><span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span><span>Vamos Sorrir<small>Odontologia · Feira de Santana</small></span></span>
+        <span class="logo"><svg class="logo-circulo" role="img" aria-label="Vamos Sorrir"><use href="#logo-circulo"/></svg><span class="logo-local"><b>Odontologia</b>Feira de Santana</span></span>
         <p style="margin-top:14px">Já sorriu hoje? Vamos Sorrir!</p>
         <div class="redes">
           <a href="https://www.instagram.com/[usuario]" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic"><use href="#i-insta"/></svg></a>
@@ -1118,8 +1166,10 @@ section{padding:72px 0}
       <div>
         <h4>Contato</h4>
         <ul>
-          <li>[Rua, número, bairro]<br>Feira de Santana – BA</li>
-          <li>WhatsApp: [(75) 9XXXX-XXXX]</li>
+          <!-- Telefones vistos nas artes da rede: confirme se continuam ativos -->
+          <li>Av. Getúlio Vargas, 244 – Centro<br><a href="tel:+5575991824476">(75) 9 9182-4476</a></li>
+          <li>R. Visconde do Rio Branco, 57 – Centro<br><a href="tel:+5575992979256">(75) 9 9297-9256</a></li>
+          <li>Rua Dois, 01 – Cidade Nova<br><a href="tel:+557532265235">(75) 3226-5235</a></li>
           <li>Instagram: [@usuario]</li>
           <li>Seg a sex [Xh–Xh] · Sáb [Xh–Xh]</li>
         </ul>
@@ -1256,10 +1306,33 @@ var CONFIG = {
     var msg = 'Olá! Vim pelo site e quero agendar uma avaliação.\n\n' +
               '*Nome:* ' + nome + '\n' +
               '*Telefone:* ' + fone + '\n' +
-              '*Especialidade:* ' + esp;
+              '*Especialidade:* ' + esp + '\n' +
+              '*Unidade:* ' + form.unidade.value;
     var url = linkWhats(msg);
     var w = window.open(url, '_blank');
     if (w) w.opener = null; else location.href = url;
+  });
+
+  /* Unidades: troca mapa, endereço, telefone e rota */
+  var UNIDADES = [
+    { nome: 'Getúlio Vargas', end: 'Av. Getúlio Vargas, 244 – Centro', busca: 'Av. Getúlio Vargas, 244, Centro, Feira de Santana - BA', tel: '(75) 9 9182-4476' },
+    { nome: 'Visconde do Rio Branco', end: 'Rua Visconde do Rio Branco, 57 – Centro', busca: 'Rua Visconde do Rio Branco, 57, Centro, Feira de Santana - BA', tel: '(75) 9 9297-9256' },
+    { nome: 'Cidade Nova', end: 'Rua Dois, 01 – Cidade Nova', busca: 'Rua Dois, 01, Cidade Nova, Feira de Santana - BA', tel: '(75) 3226-5235' }
+  ];
+  var abas = document.querySelectorAll('[data-unidade]');
+  abas.forEach(function (bt) {
+    bt.addEventListener('click', function () {
+      var u = UNIDADES[+bt.getAttribute('data-unidade')];
+      abas.forEach(function (b) { b.setAttribute('aria-selected', b === bt); });
+      var q = encodeURIComponent(u.busca);
+      document.getElementById('mapaFrame').src = 'https://maps.google.com/maps?q=' + q + '&z=16&output=embed';
+      document.getElementById('unRota').href = 'https://www.google.com/maps/dir/?api=1&destination=' + q;
+      document.getElementById('unNome').textContent = 'Vamos Sorrir · ' + u.nome;
+      document.getElementById('unEnd').innerHTML = u.end + '<br>Feira de Santana – BA';
+      var t = document.getElementById('unTel');
+      t.textContent = u.tel;
+      t.href = 'tel:+55' + u.tel.replace(/\D/g, '');
+    });
   });
 
   document.getElementById('ano').textContent = new Date().getFullYear();
