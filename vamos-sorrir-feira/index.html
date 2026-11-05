@@ -427,6 +427,26 @@ section{padding:72px 0}
 .ondas svg{width:100%;height:64px;display:block}
 @media (min-width:768px){.ondas svg{height:96px}}
 
+.escolha{border:0;padding:24px 20px calc(24px + env(safe-area-inset-bottom));width:100%;max-width:100%;margin:auto 0 0;border-radius:28px 28px 0 0;background:#fff;color:var(--texto);box-shadow:0 -20px 50px -20px rgba(92,10,14,.4)}
+.escolha[open]{animation:sobe .3s ease}
+.escolha::backdrop{background:rgba(42,21,18,.45);backdrop-filter:blur(3px)}
+.escolha-topo{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.escolha h3{font-size:1.25rem;margin:0}
+.escolha p{color:var(--texto-2);font-size:.95rem;margin:8px 0 18px}
+.escolha-fechar{width:40px;height:40px;border-radius:50%;border:1px solid var(--borda);background:#fff;display:grid;place-items:center;cursor:pointer;flex:none;color:var(--texto)}
+.escolha-lista{display:grid;gap:10px}
+.escolha-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--borda);border-radius:18px;transition:border-color .2s,background .2s}
+.escolha-item:hover{border-color:var(--primaria);background:var(--creme-2)}
+.escolha-item .ic-box{width:44px;height:44px;border-radius:14px;flex:none;color:var(--primaria)}
+.escolha-item div{flex:1;min-width:0}
+.escolha-item strong{display:block;font-size:1rem}
+.escolha-item span{display:block;font-size:.85rem;color:var(--texto-2)}
+.escolha-item .escolha-acao{flex:none;font-size:.82rem;font-weight:700;padding:8px 12px;border-radius:99px;background:var(--whats-escuro);color:#fff!important;display:flex;align-items:center;gap:6px}
+.escolha-item .escolha-acao.ligar{background:var(--primaria)}
+.escolha-acao .ic{width:16px;height:16px}
+@keyframes sobe{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media (min-width:640px){.escolha{max-width:460px;margin:auto;border-radius:28px;padding:28px}}
+
 /* ============================================================
    16. WHATSAPP FLUTUANTE
    ============================================================ */
@@ -603,7 +623,7 @@ section{padding:72px 0}
       <a href="#equipe">Equipe</a>
       <a href="#contato">Contato</a>
     </nav>
-    <a class="btn btn-primario nav-cta" data-wa href="https://wa.me/5575900000000">Agendar</a>
+    <a class="btn btn-primario nav-cta" data-wa href="https://wa.me/5575991824476">Agendar</a>
     <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navMenu">
       <svg class="ic"><use href="#i-menu"/></svg>
     </button>
@@ -614,7 +634,7 @@ section{padding:72px 0}
     <a href="#sobre">Sobre</a>
     <a href="#equipe">Equipe</a>
     <a href="#contato">Contato</a>
-    <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000">Agendar pelo WhatsApp</a>
+    <a class="btn btn-primario" data-wa href="https://wa.me/5575991824476">Agendar pelo WhatsApp</a>
   </nav>
 </header>
 
@@ -631,7 +651,7 @@ section{padding:72px 0}
 
   <div class="container hero-inner">
     <div class="hero-titulo">
-      <span class="eyebrow">Dentista em Feira de Santana</span>
+      <span class="eyebrow"><svg class="ic ic-sm"><use href="#i-pin"/></svg>3 unidades em Feira de Santana</span>
       <!-- HEADLINE -->
       <h1>Seu sorriso de volta,<br><span class="destaque">sem medo</span> e sem surpresas.</h1>
     </div>
@@ -650,9 +670,9 @@ section{padding:72px 0}
     </div>
 
     <div class="hero-corpo">
-      <p class="hero-sub">Todas as especialidades num só lugar, atendimento acolhedor e um plano de tratamento que cabe no seu orçamento, explicado com clareza. Já sorriu hoje? Vamos Sorrir!</p>
+      <p class="hero-sub">Dentista em Feira de Santana com todas as especialidades num só lugar, atendimento acolhedor e um plano de tratamento que cabe no seu orçamento, explicado com clareza.</p>
       <div class="hero-botoes">
-        <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000">
+        <a class="btn btn-primario" data-wa href="https://wa.me/5575991824476">
           <svg class="ic ic-sm"><use href="#i-agenda"/></svg> Agendar avaliação
         </a>
         <a class="btn btn-secundario" href="#sobre">Conhecer a clínica</a>
@@ -665,7 +685,7 @@ section{padding:72px 0}
           <strong>Primeira avaliação</strong>
           <p>Entenda seu caso e receba um plano claro.</p>
         </div>
-        <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar minha primeira avaliação." href="https://wa.me/5575900000000">
+        <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar minha primeira avaliação." href="https://wa.me/5575991824476">
           <svg class="ic ic-sm"><use href="#i-whats"/></svg> Falar no WhatsApp
         </a>
       </div>
@@ -706,25 +726,25 @@ section{padding:72px 0}
           <span class="ic-box"><svg class="ic"><use href="#i-dente"/></svg></span>
           <h3>Clínico geral</h3>
           <p>Limpeza, restaurações e check-up para cuidar da saúde da boca da família toda.</p>
-          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clínico geral" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clínico geral" href="https://wa.me/5575991824476">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
         </article>
         <article class="card esp-card reveal d1">
           <span class="ic-box"><svg class="ic"><use href="#i-aparelho"/></svg></span>
           <h3>Ortodontia</h3>
           <p>Aparelhos para alinhar os dentes e melhorar a mordida, em crianças e adultos.</p>
-          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Ortodontia" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Ortodontia" href="https://wa.me/5575991824476">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
         </article>
         <article class="card esp-card reveal d2">
           <span class="ic-box"><svg class="ic"><use href="#i-implante"/></svg></span>
           <h3>Implantes</h3>
           <p>Uma opção para repor dentes perdidos e voltar a mastigar com mais segurança.</p>
-          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Implantes" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Implantes" href="https://wa.me/5575991824476">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
         </article>
         <article class="card esp-card reveal d3">
           <span class="ic-box"><svg class="ic"><use href="#i-brilho"/></svg></span>
           <h3>Clareamento</h3>
           <p>Clareamento feito com acompanhamento do dentista, do jeito certo para o seu caso.</p>
-          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clareamento" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clareamento" href="https://wa.me/5575991824476">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
         </article>
       </div>
       <div class="controles" hidden>
@@ -744,7 +764,7 @@ section{padding:72px 0}
           <div class="ph" data-label="Foto: prótese dentária"><img src="img/esp-protese.webp" alt="Dentista explicando prótese dentária para paciente" width="800" height="500" loading="lazy" decoding="async"></div>
           <div>
             <p>Próteses fixas e removíveis para devolver a função e a confiança de sorrir. O dentista mostra as opções e explica cada uma antes de qualquer decisão.</p>
-            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Prótese dentária" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Prótese dentária" href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
           </div>
         </div>
       </details>
@@ -754,7 +774,7 @@ section{padding:72px 0}
           <div class="ph" data-label="Foto: endodontia"><img src="img/esp-endodontia.webp" alt="Consultório preparado para tratamento de canal" width="800" height="500" loading="lazy" decoding="async"></div>
           <div>
             <p>Tratamento de canal para salvar o dente, feito com anestesia e no seu ritmo. Você é informado de cada etapa.</p>
-            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Endodontia" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Endodontia" href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
           </div>
         </div>
       </details>
@@ -764,7 +784,7 @@ section{padding:72px 0}
           <div class="ph" data-label="Foto: atendimento infantil"><img src="img/esp-odontopediatria.webp" alt="Criança sendo atendida com calma pela dentista" width="800" height="500" loading="lazy" decoding="async"></div>
           <div>
             <p>Atendimento pensado para crianças, com paciência e linguagem que elas entendem, para criar uma relação tranquila com o dentista desde cedo.</p>
-            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Odontopediatria" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Odontopediatria" href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
           </div>
         </div>
       </details>
@@ -774,7 +794,7 @@ section{padding:72px 0}
           <div class="ph" data-label="Foto: periodontia"><img src="img/esp-periodontia.webp" alt="Dentista examinando a gengiva de um paciente" width="800" height="500" loading="lazy" decoding="async"></div>
           <div>
             <p>Cuidado com a gengiva: sangramento, mau hálito e dentes "moles" merecem atenção. A gente avalia e explica o tratamento indicado.</p>
-            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Periodontia" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Periodontia" href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
           </div>
         </div>
       </details>
@@ -828,7 +848,7 @@ section{padding:72px 0}
         <li><span class="ic-box"><svg class="ic"><use href="#i-chat"/></svg></span><div><strong>Tudo explicado antes</strong><span>Você entende cada etapa antes de começar, sem termos complicados.</span></div></li>
         <li><span class="ic-box"><svg class="ic"><use href="#i-sorriso"/></svg></span><div><strong>Sem julgamento</strong><span>Não importa há quanto tempo. O importante é que você chegou.</span></div></li>
       </ul>
-      <a class="btn btn-primario" data-wa="Olá! Vim pelo site. Tenho um pouco de medo de dentista e quero agendar uma avaliação com calma." href="https://wa.me/5575900000000">Quero começar com calma</a>
+      <a class="btn btn-primario" data-wa="Olá! Vim pelo site. Tenho um pouco de medo de dentista e quero agendar uma avaliação com calma." href="https://wa.me/5575991824476">Quero começar com calma</a>
     </div>
   </div>
 </section>
@@ -955,7 +975,7 @@ section{padding:72px 0}
       </article>
     </div>
     <div class="centro reveal">
-      <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Dar o primeiro passo</a>
+      <a class="btn btn-primario" data-wa href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Dar o primeiro passo</a>
     </div>
   </div>
 </section>
@@ -1071,10 +1091,10 @@ section{padding:72px 0}
       </label>
       <label>Unidade
         <select name="unidade">
-          <option>Qualquer uma / a mais próxima</option>
-          <option>Getúlio Vargas (Centro)</option>
-          <option>Visconde do Rio Branco (Centro)</option>
-          <option>Rua Dois (Cidade Nova)</option>
+          <option value="">A mais próxima de mim</option>
+          <option value="0">Getúlio Vargas (Centro)</option>
+          <option value="1">Visconde do Rio Branco (Centro)</option>
+          <option value="2">Rua Dois (Cidade Nova)</option>
         </select>
       </label>
       <label>Especialidade
@@ -1124,7 +1144,7 @@ section{padding:72px 0}
         <div class="info-linha"><svg class="ic"><use href="#i-fone"/></svg><div><strong>Telefone</strong><span><a id="unTel" href="tel:+5575991824476">(75) 9 9182-4476</a></span></div></div>
         <div class="local-botoes">
           <a class="btn btn-primario" id="unRota" href="https://www.google.com/maps/dir/?api=1&destination=Av.+Get%C3%BAlio+Vargas%2C+244%2C+Centro%2C+Feira+de+Santana+-+BA" target="_blank" rel="noopener"><svg class="ic ic-sm"><use href="#i-pin"/></svg> Como chegar</a>
-          <a class="btn btn-whats" data-wa href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar</a>
+          <a class="btn btn-whats" id="unWa" data-wa data-un="0" href="https://wa.me/5575991824476"><svg class="ic ic-sm"><use href="#i-whats"/></svg> <span>Agendar nesta unidade</span></a>
         </div>
       </div>
     </div>
@@ -1152,7 +1172,7 @@ section{padding:72px 0}
         <p style="margin-top:14px">Já sorriu hoje? Vamos Sorrir!</p>
         <div class="redes">
           <a href="https://www.instagram.com/[usuario]" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic"><use href="#i-insta"/></svg></a>
-          <a data-wa href="https://wa.me/5575900000000" aria-label="WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
+          <a data-wa href="https://wa.me/5575991824476" aria-label="WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
         </div>
       </div>
       <div>
@@ -1183,28 +1203,83 @@ section{padding:72px 0}
   </div>
 </footer>
 
+<!-- Janela de escolha da unidade (abre ao tocar em qualquer botão de WhatsApp) -->
+<dialog class="escolha" id="escolha" aria-labelledby="escolhaTitulo">
+  <div class="escolha-topo">
+    <h3 id="escolhaTitulo">Qual unidade fica melhor para você?</h3>
+    <button class="escolha-fechar" type="button" aria-label="Fechar"><svg class="ic"><use href="#i-fechar"/></svg></button>
+  </div>
+  <p>São 3 unidades em Feira de Santana. Toque na sua e a conversa já abre com a mensagem pronta.</p>
+  <div class="escolha-lista" id="escolhaLista"></div>
+</dialog>
+
 <!-- Botão flutuante de WhatsApp -->
-<a class="whats-flutuante" data-wa href="https://wa.me/5575900000000" aria-label="Agendar pelo WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
+<a class="whats-flutuante" data-wa href="https://wa.me/5575991824476" aria-label="Agendar pelo WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
 
 <script>
 /* ============================================================
-   CONFIGURAÇÃO — troque o número do WhatsApp aqui (só dígitos, com 55 + DDD)
+   CONFIGURAÇÃO — números só com dígitos (55 + DDD + número)
+   whatsapp: null = a unidade não tem WhatsApp (o botão vira "Ligar")
+   whatsappPadrao: usado quando a pessoa não escolhe unidade
    ============================================================ */
 var CONFIG = {
-  whatsapp: '5575900000000',
+  whatsappPadrao: '5575991824476',
   mensagemPadrao: 'Olá! Vim pelo site e quero agendar uma avaliação.'
 };
+var UNIDADES = [
+  { nome: 'Getúlio Vargas', bairro: 'Centro', end: 'Av. Getúlio Vargas, 244 – Centro', busca: 'Av. Getúlio Vargas, 244, Centro, Feira de Santana - BA', tel: '(75) 9 9182-4476', whatsapp: '5575991824476' },
+  { nome: 'Visconde do Rio Branco', bairro: 'Centro', end: 'Rua Visconde do Rio Branco, 57 – Centro', busca: 'Rua Visconde do Rio Branco, 57, Centro, Feira de Santana - BA', tel: '(75) 9 9297-9256', whatsapp: '5575992979256' },
+  { nome: 'Cidade Nova', bairro: 'Cidade Nova', end: 'Rua Dois, 01 – Cidade Nova', busca: 'Rua Dois, 01, Cidade Nova, Feira de Santana - BA', tel: '(75) 3226-5235', whatsapp: null }
+];
 
 (function () {
-  function linkWhats(msg) {
-    return 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(msg || CONFIG.mensagemPadrao);
+  function linkWhats(msg, numero) {
+    return 'https://wa.me/' + (numero || CONFIG.whatsappPadrao) + '?text=' + encodeURIComponent(msg || CONFIG.mensagemPadrao);
+  }
+  function linkTel(u) { return 'tel:+55' + u.tel.replace(/\D/g, ''); }
+  function abrir(url) {
+    var w = window.open(url, '_blank');
+    if (w) w.opener = null; else location.href = url;
   }
 
-  /* Todos os botões com data-wa viram links de WhatsApp com mensagem pré-preenchida */
+  /* Janela de escolha da unidade */
+  var dlg = document.getElementById('escolha');
+  var lista = document.getElementById('escolhaLista');
+  function escolherUnidade(msg) {
+    lista.innerHTML = '';
+    UNIDADES.forEach(function (u) {
+      var a = document.createElement('a');
+      a.className = 'escolha-item';
+      var temWa = !!u.whatsapp;
+      a.href = temWa ? linkWhats(msg + '\n(Unidade ' + u.nome + ')', u.whatsapp) : linkTel(u);
+      if (temWa) { a.target = '_blank'; a.rel = 'noopener'; }
+      a.innerHTML = '<span class="ic-box"><svg class="ic"><use href="#i-pin"/></svg></span>' +
+        '<div><strong>' + u.nome + '</strong><span>' + u.end + '</span></div>' +
+        '<span class="escolha-acao' + (temWa ? '' : ' ligar') + '"><svg class="ic"><use href="' + (temWa ? '#i-whats' : '#i-fone') + '"/></svg>' + (temWa ? 'WhatsApp' : 'Ligar') + '</span>';
+      a.addEventListener('click', function () { dlg.close(); });
+      lista.appendChild(a);
+    });
+    if (dlg.showModal) dlg.showModal(); else abrir(linkWhats(msg));
+  }
+  dlg.querySelector('.escolha-fechar').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });
+
+  /* Botões de WhatsApp: com data-un vão direto na unidade; os demais perguntam a unidade */
   document.querySelectorAll('[data-wa]').forEach(function (a) {
     a.href = linkWhats(a.getAttribute('data-wa'));
     a.target = '_blank';
     a.rel = 'noopener';
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      var msg = a.getAttribute('data-wa') || CONFIG.mensagemPadrao;
+      if (a.hasAttribute('data-un')) {
+        var u = UNIDADES[+a.getAttribute('data-un')];
+        if (u.whatsapp) abrir(linkWhats(msg + '\n(Unidade ' + u.nome + ')', u.whatsapp));
+        else location.href = linkTel(u);
+      } else {
+        escolherUnidade(msg);
+      }
+    });
   });
 
   /* Navbar: sombra ao rolar + menu do celular */
@@ -1307,18 +1382,13 @@ var CONFIG = {
               '*Nome:* ' + nome + '\n' +
               '*Telefone:* ' + fone + '\n' +
               '*Especialidade:* ' + esp + '\n' +
-              '*Unidade:* ' + form.unidade.value;
-    var url = linkWhats(msg);
-    var w = window.open(url, '_blank');
-    if (w) w.opener = null; else location.href = url;
+              '*Unidade:* ' + form.unidade.options[form.unidade.selectedIndex].text;
+    var un = UNIDADES[form.unidade.value];
+    /* Unidade sem WhatsApp (Cidade Nova) cai no número padrão, com a unidade escrita na mensagem */
+    abrir(linkWhats(msg, un && un.whatsapp));
   });
 
-  /* Unidades: troca mapa, endereço, telefone e rota */
-  var UNIDADES = [
-    { nome: 'Getúlio Vargas', end: 'Av. Getúlio Vargas, 244 – Centro', busca: 'Av. Getúlio Vargas, 244, Centro, Feira de Santana - BA', tel: '(75) 9 9182-4476' },
-    { nome: 'Visconde do Rio Branco', end: 'Rua Visconde do Rio Branco, 57 – Centro', busca: 'Rua Visconde do Rio Branco, 57, Centro, Feira de Santana - BA', tel: '(75) 9 9297-9256' },
-    { nome: 'Cidade Nova', end: 'Rua Dois, 01 – Cidade Nova', busca: 'Rua Dois, 01, Cidade Nova, Feira de Santana - BA', tel: '(75) 3226-5235' }
-  ];
+  /* Abas de unidade: troca mapa, endereço, telefone, rota e o botão de agendar */
   var abas = document.querySelectorAll('[data-unidade]');
   abas.forEach(function (bt) {
     bt.addEventListener('click', function () {
@@ -1331,7 +1401,11 @@ var CONFIG = {
       document.getElementById('unEnd').innerHTML = u.end + '<br>Feira de Santana – BA';
       var t = document.getElementById('unTel');
       t.textContent = u.tel;
-      t.href = 'tel:+55' + u.tel.replace(/\D/g, '');
+      t.href = linkTel(u);
+      var wa = document.getElementById('unWa');
+      wa.setAttribute('data-un', bt.getAttribute('data-unidade'));
+      wa.querySelector('span').textContent = u.whatsapp ? 'Agendar nesta unidade' : 'Ligar para esta unidade';
+      wa.querySelector('use').setAttribute('href', u.whatsapp ? '#i-whats' : '#i-fone');
     });
   });
 
