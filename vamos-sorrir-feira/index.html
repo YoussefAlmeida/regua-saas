@@ -1,0 +1,1255 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- ============================================================
+     SEO LOCAL — troque [SEU-DOMINIO] pelo domínio final
+     ============================================================ -->
+<title>Dentista em Feira de Santana | Vamos Sorrir Odontologia</title>
+<meta name="description" content="Dentista em Feira de Santana com todas as especialidades num só lugar. Atendimento acolhedor, sala de esterilização visitável e plano de tratamento explicado com clareza. Agende pelo WhatsApp.">
+<link rel="canonical" href="https://[SEU-DOMINIO]/">
+<meta name="theme-color" content="#1E5BD8">
+
+<!-- Open Graph / redes sociais -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="Vamos Sorrir Odontologia">
+<meta property="og:title" content="Vamos Sorrir Odontologia | Dentista em Feira de Santana">
+<meta property="og:description" content="Todas as especialidades num só lugar, atendimento humanizado e plano de tratamento que cabe no seu orçamento. Já sorriu hoje? Vamos Sorrir!">
+<meta property="og:url" content="https://[SEU-DOMINIO]/">
+<meta property="og:image" content="https://[SEU-DOMINIO]/img/og-image.jpg"><!-- 1200x630 -->
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231E5BD8' d='M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z'/%3E%3C/svg%3E">
+
+<!-- Fonte -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<!-- Foto do hero: carrega primeiro -->
+<link rel="preload" as="image" href="img/hero-consultorio.webp" fetchpriority="high">
+
+<!-- schema.org Dentist — preencha endereço, telefone, horário, geo e links -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Dentist",
+  "name": "Vamos Sorrir Odontologia - Feira de Santana",
+  "slogan": "Já sorriu hoje? Vamos Sorrir!",
+  "url": "https://[SEU-DOMINIO]/",
+  "image": "https://[SEU-DOMINIO]/img/og-image.jpg",
+  "telephone": "+55-75-9XXXX-XXXX",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "[Rua, número]",
+    "addressLocality": "Feira de Santana",
+    "addressRegion": "BA",
+    "postalCode": "[CEP]",
+    "addressCountry": "BR"
+  },
+  "geo": { "@type": "GeoCoordinates", "latitude": -12.2664, "longitude": -38.9663 },
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "18:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "12:00" }
+  ],
+  "areaServed": "Feira de Santana",
+  "sameAs": ["https://www.instagram.com/[usuario]"]
+}
+</script>
+
+<script>
+  /* Marca que o JS está ativo (as animações só escondem conteúdo quando há JS)
+     e troca fotos ainda não enviadas por um placeholder elegante. */
+  document.documentElement.classList.add('js');
+  addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'IMG' && t.closest('.ph')) t.remove();
+  }, true);
+</script>
+
+<style>
+/* ============================================================
+   1. VARIÁVEIS — troque as cores da marca aqui
+   ============================================================ */
+:root{
+  --azul:#1E5BD8;          /* azul principal (cor oficial da rede) */
+  --azul-hover:#1749B0;
+  --marinho:#0B1F4D;       /* rodapé e faixas de CTA */
+  --marinho-2:#132B66;
+  --gelo:#EAF2FF;          /* fundos de seção */
+  --gelo-2:#F5F9FF;
+  --branco:#FFFFFF;
+  --texto:#0F1B3D;
+  --texto-2:#4A5878;
+  --borda:#DCE6F7;
+  --laranja:#FFA26B;       /* acento quente: só no botão do formulário final */
+  --whats:#25D366;
+  --whats-escuro:#0F7A40;
+  --estrela:#F5B300;
+
+  --raio:22px;
+  --raio-sm:14px;
+  --sombra:0 12px 34px -14px rgba(30,91,216,.28);
+  --sombra-forte:0 22px 50px -18px rgba(30,91,216,.38);
+  --container:1180px;
+  --nav-h:68px;
+  --fonte:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
+/* ============================================================
+   2. BASE
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 12px);-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--fonte);color:var(--texto);background:var(--branco);line-height:1.6;font-size:16px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,h4{line-height:1.15;margin:0 0 .5em;letter-spacing:-.02em}
+p{margin:0 0 1em}
+.container{width:100%;max-width:var(--container);margin:0 auto;padding:0 20px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--azul);outline-offset:3px;border-radius:8px}
+
+.ic{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ic-sm{width:18px;height:18px}
+
+section{padding:72px 0}
+.bg-gelo{background:var(--gelo)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--azul);background:var(--gelo);padding:6px 14px;border-radius:99px;margin-bottom:14px}
+.bg-gelo .eyebrow{background:#fff}
+.sec-head{max-width:640px;margin:0 auto 40px;text-align:center}
+.sec-head h2{font-size:clamp(1.7rem,4.6vw,2.5rem);font-weight:800}
+.sec-head p{color:var(--texto-2);font-size:1.05rem}
+.destaque{color:var(--azul)}
+
+/* Botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 26px;border-radius:99px;font-weight:700;font-size:1rem;border:2px solid transparent;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s,color .2s;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn-primario{background:var(--azul);color:#fff;box-shadow:0 12px 26px -10px rgba(30,91,216,.6)}
+.btn-primario:hover{background:var(--azul-hover)}
+.btn-secundario{background:#fff;color:var(--azul);border-color:var(--borda)}
+.btn-secundario:hover{border-color:var(--azul)}
+.btn-whats{background:var(--whats-escuro);color:#fff}
+.btn-whats:hover{background:#0B6634}
+.btn-laranja{background:var(--laranja);color:var(--marinho)}
+.btn-laranja:hover{background:#FF8F4F}
+.btn-claro{background:#fff;color:var(--marinho)}
+.btn-bloco{width:100%}
+.link-mais{display:inline-flex;align-items:center;gap:6px;color:var(--azul);font-weight:700;font-size:.95rem}
+.link-mais .ic{transition:transform .2s}
+.link-mais:hover .ic{transform:translateX(4px)}
+
+/* Placeholders de foto: se a imagem não existir, aparece o rótulo */
+.ph{position:relative;overflow:hidden;background:linear-gradient(135deg,#EAF2FF 0%,#D3E2FF 100%);border-radius:var(--raio)}
+.ph::before{content:attr(data-label);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;color:#5B76AE;font-size:.85rem;font-weight:600}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1}
+.moldura{border:6px solid #fff;box-shadow:var(--sombra)}
+
+/* Card base */
+.card{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(220,230,247,.7);transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-6px);box-shadow:var(--sombra-forte)}
+.ic-box{width:52px;height:52px;border-radius:16px;background:var(--gelo);color:var(--azul);display:grid;place-items:center}
+.ic-box .ic{width:26px;height:26px}
+
+/* Animação ao rolar */
+.js .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.js .reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.08s}.reveal.d2{transition-delay:.16s}.reveal.d3{transition-delay:.24s}
+
+/* ============================================================
+   3. NAVBAR
+   ============================================================ */
+.nav{position:fixed;inset:0 0 auto;z-index:50;height:var(--nav-h);background:rgba(255,255,255,.82);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-bottom:1px solid rgba(220,230,247,.6);transition:box-shadow .3s}
+.nav.scrolled{box-shadow:0 8px 24px -16px rgba(11,31,77,.35)}
+.nav .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.1rem;letter-spacing:-.02em;color:var(--marinho)}
+.logo-mark{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--azul),#4F86F0);display:grid;place-items:center;color:#fff}
+.logo-mark .ic{width:22px;height:22px}
+.logo small{display:block;font-size:.7rem;font-weight:600;color:var(--texto-2);letter-spacing:0}
+.nav-links{display:none;gap:28px;font-weight:600;font-size:.95rem;color:var(--texto-2)}
+.nav-links a:hover{color:var(--azul)}
+.nav-cta{display:none;min-height:44px;padding:0 22px}
+.nav-toggle{width:44px;height:44px;border-radius:12px;border:1px solid var(--borda);background:#fff;display:grid;place-items:center;cursor:pointer;color:var(--marinho)}
+.nav-menu{position:fixed;top:var(--nav-h);left:0;right:0;background:#fff;padding:12px 20px 24px;box-shadow:0 20px 30px -20px rgba(11,31,77,.35);display:none;flex-direction:column;gap:4px}
+.nav-menu.open{display:flex}
+.nav-menu a{padding:14px 4px;font-weight:600;border-bottom:1px solid var(--gelo)}
+.nav-menu .btn{margin-top:12px;border-bottom:0}
+
+/* ============================================================
+   4. HERO
+   ============================================================ */
+.hero{position:relative;padding:calc(var(--nav-h) + 28px) 0 48px;overflow:hidden;background:var(--gelo-2)}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;filter:blur(10px) saturate(.9);transform:scale(1.08);opacity:.55}
+.hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(245,249,255,.9) 0%,rgba(245,249,255,.75) 50%,rgba(255,255,255,.95) 100%)}
+.hero-inner{position:relative;z-index:1;display:grid;grid-template-areas:"titulo" "visual" "corpo";gap:8px}
+.hero-titulo{grid-area:titulo}
+.hero-visual{grid-area:visual}
+.hero-corpo{grid-area:corpo}
+.hero h1{font-size:clamp(2.1rem,8.4vw,4rem);font-weight:800;margin-bottom:0;letter-spacing:-.035em}
+.hero h1 .destaque{position:relative;white-space:nowrap}
+.hero h1 .destaque::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.16em;background:rgba(30,91,216,.16);border-radius:4px;z-index:-1}
+.hero-sub{font-size:1.08rem;color:var(--texto-2);max-width:520px;margin-bottom:24px}
+.hero-botoes{display:flex;flex-direction:column;gap:12px}
+.prova{display:flex;align-items:center;gap:14px;margin-top:22px}
+.avatares{display:flex}
+.avatares span{width:40px;height:40px;border-radius:50%;border:3px solid #fff;margin-left:-12px;background:linear-gradient(135deg,#C9DBFF,#8FB1F5);display:grid;place-items:center;color:#fff;font-size:.75rem;font-weight:700;box-shadow:0 4px 10px -4px rgba(11,31,77,.3);overflow:hidden}
+.avatares span:first-child{margin-left:0}
+.avatares span img{width:100%;height:100%;object-fit:cover}
+.estrelas{display:flex;gap:2px;color:var(--estrela)}
+.estrelas .ic{width:16px;height:16px}
+.prova strong{display:block;font-size:.95rem}
+.prova small{color:var(--texto-2);font-size:.82rem}
+
+/* Card glass (vira faixa no mobile) */
+.glass{background:rgba(255,255,255,.62);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);border:1px solid rgba(255,255,255,.85);box-shadow:0 18px 40px -18px rgba(30,91,216,.4);border-radius:var(--raio)}
+.hero-card{margin-top:20px;padding:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hero-card .ic-box{background:var(--azul);color:#fff;width:46px;height:46px;border-radius:14px}
+.hero-card-txt{flex:1;min-width:180px}
+.hero-card strong{display:block;font-size:1rem}
+.hero-card p{margin:0;font-size:.9rem;color:var(--texto-2)}
+.hero-card .btn{min-height:46px;padding:0 18px;font-size:.92rem;width:100%}
+
+/* Dente 3D de vidro */
+.dente{position:relative;width:min(230px,62vw);aspect-ratio:1;margin:8px auto 12px;display:grid;place-items:center}
+.dente-glow{position:absolute;inset:6%;border-radius:50%;background:radial-gradient(circle at 50% 45%,rgba(79,134,240,.45),rgba(30,91,216,.12) 45%,transparent 70%);filter:blur(6px)}
+.dente-anel{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(30,91,216,.18)}
+.dente-anel.a2{inset:12%;border-style:dashed;border-color:rgba(30,91,216,.22);animation:gira 40s linear infinite}
+.dente svg{position:relative;width:72%;height:auto;filter:drop-shadow(0 24px 30px rgba(30,91,216,.35));animation:levita 6s ease-in-out infinite}
+.dente-sombra{position:absolute;bottom:4%;left:30%;right:30%;height:14px;border-radius:50%;background:rgba(11,31,77,.18);filter:blur(8px);animation:sombra 6s ease-in-out infinite}
+.dente .brilho{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(255,255,255,.9),0 0 24px 8px rgba(79,134,240,.5);animation:pisca 3.2s ease-in-out infinite}
+.dente .b1{top:18%;right:22%}.dente .b2{top:58%;left:14%;animation-delay:1.1s;width:5px;height:5px}.dente .b3{top:30%;left:24%;animation-delay:2s;width:4px;height:4px}
+@keyframes levita{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-14px) rotate(2deg)}}
+@keyframes sombra{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.8);opacity:.6}}
+@keyframes gira{to{transform:rotate(360deg)}}
+@keyframes pisca{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+
+/* ============================================================
+   5. CARROSSEL (genérico)
+   ============================================================ */
+.carrossel{position:relative}
+.trilho{display:grid;grid-auto-flow:column;grid-auto-columns:82%;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:10px 4px 26px;margin:0 -4px;overscroll-behavior-x:contain}
+.trilho::-webkit-scrollbar{display:none}
+.trilho>*{scroll-snap-align:start}
+.controles{display:flex;align-items:center;justify-content:center;gap:16px}
+.controles[hidden]{display:none}
+.seta{width:46px;height:46px;border-radius:50%;border:1px solid var(--borda);background:#fff;color:var(--azul);display:grid;place-items:center;cursor:pointer;box-shadow:var(--sombra);transition:background .2s,color .2s}
+.seta:hover{background:var(--azul);color:#fff}
+.seta:disabled{opacity:.4;cursor:default;background:#fff;color:var(--azul)}
+.pontos{display:flex;gap:8px}
+.pontos button{width:8px;height:8px;border-radius:99px;border:0;padding:0;background:#BFD2F5;cursor:pointer;transition:width .25s,background .25s}
+.pontos button[aria-current="true"]{width:26px;background:var(--azul)}
+
+/* ============================================================
+   6. ESPECIALIDADES
+   ============================================================ */
+.esp-card{padding:26px;display:flex;flex-direction:column;gap:12px;height:100%}
+.esp-card h3{font-size:1.18rem;margin:6px 0 0}
+.esp-card p{color:var(--texto-2);margin:0;flex:1;font-size:.96rem}
+.acordeao-titulo{text-align:center;font-size:1.25rem;margin:36px 0 18px}
+.acordeao{display:grid;gap:12px;max-width:880px;margin:0 auto}
+.item{background:#fff;border-radius:var(--raio);box-shadow:var(--sombra);border:1px solid rgba(220,230,247,.7);overflow:hidden}
+.item summary{list-style:none;display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;font-weight:700;font-size:1.02rem}
+.item summary::-webkit-details-marker{display:none}
+.item summary .ic-box{width:42px;height:42px;border-radius:12px}
+.item summary .ic-box .ic{width:22px;height:22px}
+.item summary .chev{margin-left:auto;color:var(--azul);transition:transform .3s}
+.item[open] summary .chev{transform:rotate(180deg)}
+.item-corpo{padding:0 20px 22px;display:grid;gap:18px}
+.item-corpo .ph{aspect-ratio:16/10}
+.item-corpo p{color:var(--texto-2);margin-bottom:16px}
+
+/* ============================================================
+   7. POR QUE A VAMOS SORRIR
+   ============================================================ */
+.porque{position:relative;overflow:hidden;padding:64px 0}
+.arco{position:absolute;width:620px;height:620px;border-radius:50%;border:2px solid rgba(30,91,216,.18);right:-260px;top:-300px;pointer-events:none}
+.arco::after{content:"";position:absolute;inset:50px;border-radius:50%;border:1px solid rgba(30,91,216,.12)}
+.porque-box{position:relative;display:grid;gap:28px;background:#fff;border-radius:28px;padding:32px 24px;box-shadow:var(--sombra)}
+.porque-marca{display:flex;flex-direction:column;gap:10px}
+.porque-marca .logo{font-size:1.3rem}
+.porque-marca .logo-mark{width:52px;height:52px;border-radius:16px}
+.porque-marca p{color:var(--texto-2);margin:0}
+.porque-marca .slogan{font-weight:800;color:var(--azul);font-size:1.05rem}
+.difs{display:grid;grid-template-columns:1fr 1fr}
+.dif{padding:18px 14px;display:flex;flex-direction:column;gap:10px}
+.dif:nth-child(odd){border-right:1px solid var(--borda)}
+.dif:nth-child(-n+2){border-bottom:1px solid var(--borda)}
+.dif .ic{width:30px;height:30px;color:var(--azul)}
+.dif strong{font-size:.98rem;line-height:1.3}
+.dif span{font-size:.86rem;color:var(--texto-2);line-height:1.45}
+
+/* ============================================================
+   8. MEDO / BIOSSEGURANÇA / CLÍNICA (blocos de duas colunas)
+   ============================================================ */
+.duas-col{display:grid;gap:36px;align-items:center}
+.duas-col h2{font-size:clamp(1.7rem,4.6vw,2.4rem);font-weight:800}
+.duas-col .lead{color:var(--texto-2);font-size:1.05rem}
+.foto-alta{aspect-ratio:4/5}
+.lista{list-style:none;padding:0;margin:0 0 28px;display:grid;gap:14px}
+.lista li{display:flex;gap:14px;align-items:flex-start}
+.lista .ic-box{width:42px;height:42px;border-radius:12px;flex:none}
+.lista .ic-box .ic{width:22px;height:22px}
+.lista strong{display:block}
+.lista span{color:var(--texto-2);font-size:.95rem}
+.foto-wrap{position:relative}
+.selo{position:absolute;left:-6px;bottom:22px;padding:14px 16px;display:flex;align-items:center;gap:12px;max-width:260px;z-index:2}
+.selo .ic-box{width:42px;height:42px;background:var(--azul);color:#fff;border-radius:12px}
+.selo strong{font-size:.92rem;line-height:1.3}
+
+.bio{background:linear-gradient(180deg,#fff 0%,var(--gelo) 100%)}
+.bio-destaque{background:var(--marinho);color:#fff;border-radius:var(--raio);padding:22px;display:flex;gap:16px;align-items:center;margin-bottom:24px}
+.bio-destaque .ic-box{background:rgba(255,255,255,.12);color:#fff;flex:none}
+.bio-destaque p{margin:0;color:#C8D6F5;font-size:.95rem}
+.bio-destaque strong{display:block;color:#fff;font-size:1.05rem;margin-bottom:2px}
+
+.galeria{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.galeria .ph{aspect-ratio:1}
+.galeria .g1{grid-column:span 2;aspect-ratio:16/10}
+
+/* ============================================================
+   9. EQUIPE
+   ============================================================ */
+.dentista{overflow:hidden;height:100%}
+.dentista .ph{border-radius:0;aspect-ratio:4/5;background:linear-gradient(180deg,var(--gelo) 0%,#D3E2FF 100%)}
+.dentista-info{padding:18px 20px 22px}
+.dentista-info h3{font-size:1.08rem;margin-bottom:4px}
+.dentista-info p{margin:0;color:var(--azul);font-weight:600;font-size:.92rem}
+.dentista-info small{color:var(--texto-2);font-size:.82rem}
+
+/* ============================================================
+   10. COMO FUNCIONA
+   ============================================================ */
+.passos{display:grid;gap:18px;counter-reset:passo;position:relative}
+.passo{padding:28px 24px;position:relative}
+.passo-num{width:48px;height:48px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.15rem;box-shadow:0 10px 20px -8px rgba(30,91,216,.7);margin-bottom:16px}
+.passo h3{font-size:1.15rem}
+.passo p{color:var(--texto-2);margin:0}
+.passo .ic{position:absolute;top:28px;right:24px;width:30px;height:30px;color:#B5CBF3}
+.centro{text-align:center;margin-top:32px}
+
+/* ============================================================
+   11. DEPOIMENTOS
+   ============================================================ */
+.depo{padding:26px;display:flex;flex-direction:column;gap:14px;height:100%}
+.depo blockquote{margin:0;color:var(--texto-2);flex:1;font-size:.98rem}
+.depo-autor{display:flex;align-items:center;gap:12px}
+.depo-autor .ph{width:44px;height:44px;border-radius:50%;flex:none}
+.depo-autor .ph::before{content:"";}
+.depo-autor strong{display:block;font-size:.95rem}
+.depo-autor small{color:var(--texto-2);font-size:.8rem}
+.google-tag{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;color:var(--texto-2)}
+.aviso-placeholder{text-align:center;font-size:.85rem;color:var(--texto-2);margin-top:8px}
+
+/* ============================================================
+   12. FAQ
+   ============================================================ */
+.faq .item-corpo{display:block}
+.faq .item-corpo p{margin:0}
+
+/* ============================================================
+   13. CTA FINAL
+   ============================================================ */
+.cta{background:var(--marinho);color:#fff;position:relative;overflow:hidden}
+.cta::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(30,91,216,.55),transparent 65%);left:-180px;top:-120px}
+.cta .arco{border-color:rgba(255,255,255,.1);right:-300px;top:auto;bottom:-360px}
+.cta-grid{position:relative;display:grid;gap:24px;align-items:center}
+.cta .dente{width:min(200px,50vw);margin:0 auto}
+.cta .dente-anel{border-color:rgba(255,255,255,.16)}
+.cta .dente-glow{background:radial-gradient(circle,rgba(110,160,255,.55),transparent 65%)}
+.cta h2{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;color:#fff}
+.cta p{color:#C8D6F5}
+.form{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:var(--raio);padding:22px;display:grid;gap:14px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.form label{font-size:.85rem;font-weight:600;color:#DCE6F7;display:grid;gap:6px}
+.form input,.form select{min-height:52px;border-radius:14px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.95);color:var(--texto);padding:0 16px;font-size:1rem;width:100%}
+.form input:focus,.form select:focus{outline:3px solid var(--laranja);outline-offset:1px}
+.form small{color:#9FB3DE;font-size:.78rem;text-align:center}
+
+/* ============================================================
+   14. LOCALIZAÇÃO
+   ============================================================ */
+.local-grid{display:grid;gap:20px}
+.mapa{border-radius:var(--raio);overflow:hidden;min-height:320px;background:var(--gelo)}
+.mapa iframe{width:100%;height:100%;min-height:320px;border:0;display:block}
+.local-info{padding:26px;display:grid;gap:18px;align-content:start}
+.local-info h3{font-size:1.25rem;margin:0}
+.info-linha{display:flex;gap:14px;align-items:flex-start}
+.info-linha .ic{color:var(--azul);margin-top:2px}
+.info-linha strong{display:block;font-size:.92rem}
+.info-linha span{color:var(--texto-2);font-size:.95rem}
+.local-botoes{display:grid;gap:10px}
+
+/* ============================================================
+   15. RODAPÉ
+   ============================================================ */
+.rodape{background:var(--marinho);color:#C8D6F5;padding:56px 0 110px;font-size:.94rem}
+.rodape-grid{display:grid;gap:32px}
+.rodape .logo{color:#fff}
+.rodape .logo small{color:#9FB3DE}
+.rodape h4{color:#fff;font-size:1rem;margin-bottom:14px}
+.rodape ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.rodape a:hover{color:#fff}
+.redes{display:flex;gap:10px;margin-top:16px}
+.redes a{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.08);display:grid;place-items:center;color:#fff;transition:background .2s}
+.redes a:hover{background:var(--azul)}
+.rodape-base{border-top:1px solid rgba(255,255,255,.1);margin-top:36px;padding-top:22px;display:grid;gap:8px;font-size:.82rem;color:#9FB3DE}
+
+/* ============================================================
+   16. WHATSAPP FLUTUANTE
+   ============================================================ */
+.whats-flutuante{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:60;width:60px;height:60px;border-radius:50%;background:var(--whats);color:#fff;display:grid;place-items:center;box-shadow:0 14px 30px -8px rgba(15,122,64,.6)}
+.whats-flutuante .ic{width:32px;height:32px}
+.whats-flutuante::before{content:"";position:absolute;inset:0;border-radius:50%;background:var(--whats);z-index:-1;animation:pulso 2.4s ease-out infinite}
+@keyframes pulso{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.6);opacity:0}}
+
+/* ============================================================
+   17. RESPONSIVO (mobile-first → tablet → desktop)
+   ============================================================ */
+@media (min-width:560px){
+  .hero-botoes{flex-direction:row;flex-wrap:wrap}
+  .hero-card .btn{width:auto}
+  .trilho{grid-auto-columns:46%}
+  .local-botoes{grid-template-columns:1fr 1fr}
+}
+@media (min-width:768px){
+  section{padding:96px 0}
+  .item-corpo{grid-template-columns:240px 1fr;align-items:center}
+  .passos{grid-template-columns:repeat(3,1fr)}
+  .passos::before{content:"";position:absolute;top:52px;left:12%;right:12%;height:2px;background:repeating-linear-gradient(90deg,#BFD2F5 0 8px,transparent 8px 16px);z-index:0}
+  .passo{z-index:1}
+  .galeria{grid-template-columns:1.3fr 1fr 1fr;grid-template-rows:1fr 1fr}
+  .galeria .ph{aspect-ratio:auto;min-height:200px}
+  .galeria .g1{grid-column:1;grid-row:span 2;aspect-ratio:auto}
+  .galeria .g4{grid-column:span 2}
+  .rodape-grid{grid-template-columns:1.4fr 1fr 1fr 1.2fr}
+  .rodape-base{grid-template-columns:1fr auto}
+}
+@media (min-width:1024px){
+  .nav-links,.nav-cta{display:flex}
+  .nav-toggle,.nav-menu{display:none!important}
+
+  .hero{padding:calc(var(--nav-h) + 56px) 0 96px;min-height:min(820px,100vh)}
+  .hero-inner{grid-template-areas:"titulo visual" "corpo visual";grid-template-columns:1.1fr .9fr;grid-template-rows:auto 1fr;column-gap:40px;row-gap:22px;align-items:start;min-height:560px}
+  .hero-titulo{align-self:end}
+  .hero-visual{align-self:center}
+  .dente{width:min(380px,100%);margin:-40px auto 0}
+  .hero .dente svg{width:58%}
+  .hero-card{position:absolute;right:-8px;bottom:-90px;width:300px;margin:0;flex-direction:column;align-items:flex-start;padding:22px}
+  .hero-card .btn{width:100%}
+
+  .trilho{grid-auto-columns:calc((100% - 48px)/3);gap:24px}
+  .equipe .trilho{grid-auto-columns:calc((100% - 72px)/4)}
+  /* Especialidades: grid de 4 no desktop */
+  .esp .trilho{grid-auto-columns:auto;grid-auto-flow:row;grid-template-columns:repeat(4,1fr);overflow:visible}
+  .esp .controles{display:none}
+
+  .porque-box{grid-template-columns:260px 1fr;padding:40px;align-items:center}
+  .difs{grid-template-columns:repeat(4,1fr)}
+  .dif{padding:8px 22px;border:0!important;border-left:1px solid var(--borda)!important}
+
+  .duas-col{grid-template-columns:1fr 1fr;gap:64px}
+  .duas-col.inverte>:first-child{order:2}
+  .cta-grid{grid-template-columns:.8fr 1.1fr 1fr;gap:40px}
+  .cta .dente{width:100%}
+  .local-grid{grid-template-columns:1.5fr 1fr}
+  .local-botoes{grid-template-columns:1fr}
+  .mapa,.mapa iframe{min-height:440px}
+  .whats-flutuante{right:28px;bottom:28px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .js .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SPRITE: dente de vidro + ícones de linha (não precisa editar)
+     ============================================================ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="dg-corpo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".96"/>
+      <stop offset=".45" stop-color="#D4E3FF" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#5E8EEB" stop-opacity=".55"/>
+    </linearGradient>
+    <radialGradient id="dg-luz" cx=".32" cy=".26" r=".75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity=".25"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="dg-borda" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#8FB1F5" stop-opacity=".7"/>
+    </linearGradient>
+    <linearGradient id="dg-reflexo" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#1E5BD8" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#1E5BD8" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#1E5BD8" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="dg-blur" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"/></filter>
+    <filter id="dg-blur-sm"><feGaussianBlur stdDeviation="1.6"/></filter>
+    <clipPath id="dg-clip"><path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z"/></clipPath>
+  </defs>
+
+  <symbol id="dente-vidro" viewBox="0 0 200 240">
+    <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z" fill="url(#dg-corpo)"/>
+    <g clip-path="url(#dg-clip)">
+      <ellipse cx="128" cy="150" rx="70" ry="22" fill="url(#dg-reflexo)" filter="url(#dg-blur)" transform="rotate(-24 128 150)"/>
+      <ellipse cx="150" cy="70" rx="26" ry="60" fill="#6E9BF0" opacity=".35" filter="url(#dg-blur)"/>
+      <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115" fill="none" stroke="#fff" stroke-width="10" opacity=".55" filter="url(#dg-blur)"/>
+      <rect x="0" y="0" width="200" height="240" fill="url(#dg-luz)"/>
+      <path d="M62 44c-12 4-18 20-15 38" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" opacity=".9" filter="url(#dg-blur-sm)"/>
+      <path d="M78 34c6-2 12-1 16 2" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".85"/>
+      <path d="M66 175c2 18 6 32 10 38" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>
+      <path d="M100 30c10 8 14 12 26 12" fill="none" stroke="#BCD2FF" stroke-width="2" opacity=".8"/>
+    </g>
+    <path d="M100 30C80 18 50 14 38 30 22 50 26 90 40 115c8 15 10 35 14 60 4 30 12 50 22 47 10-3 10-27 14-47 3-15 6-23 10-23s7 8 10 23c4 20 4 44 14 47 10 3 18-17 22-47 4-25 6-45 14-60 14-25 18-65 2-85-12-16-42-12-62 0z" fill="none" stroke="url(#dg-borda)" stroke-width="2.2"/>
+  </symbol>
+
+  <symbol id="i-dente" viewBox="0 0 24 24"><path d="M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/></symbol>
+  <symbol id="i-aparelho" viewBox="0 0 24 24"><path d="M3 12h18"/><rect x="5" y="9" width="3.5" height="6" rx="1"/><rect x="10.25" y="9" width="3.5" height="6" rx="1"/><rect x="15.5" y="9" width="3.5" height="6" rx="1"/></symbol>
+  <symbol id="i-implante" viewBox="0 0 24 24"><path d="M7.5 3h9l-1 4h-7z"/><path d="M9 9.5h6M9.5 12.5h5M10 15.5h4M10.5 18.5h3L12 21z"/></symbol>
+  <symbol id="i-brilho" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.7 1.8 1.8.7-1.8.7L19 20l-.7-1.8-1.8-.7 1.8-.7z"/></symbol>
+  <symbol id="i-escudo" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-equipe" viewBox="0 0 24 24"><path d="M16 20v-1.5a3.5 3.5 0 00-3.5-3.5h-5A3.5 3.5 0 004 18.5V20"/><circle cx="10" cy="7.5" r="3.5"/><path d="M20 20v-1.5a3.5 3.5 0 00-2.6-3.4M15.5 4.2a3.5 3.5 0 010 6.6"/></symbol>
+  <symbol id="i-coracao" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="i-grade" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-seta" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-baixo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-esq" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-dir" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-estrela" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12 2.8l2.8 5.7 6.3.9-4.6 4.4 1.1 6.2L12 17l-5.6 3 1.1-6.2L2.9 9.4l6.3-.9z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0114 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></symbol>
+  <symbol id="i-relogio" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-fone" viewBox="0 0 24 24"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 006 6L15 14l5 2v3a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></symbol>
+  <symbol id="i-insta" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></symbol>
+  <symbol id="i-whats" viewBox="0 0 24 24"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.03c-.24.68-1.42 1.3-1.95 1.35-.5.05-1.13.07-1.82-.11-.42-.13-.96-.31-1.65-.61-2.9-1.25-4.8-4.17-4.94-4.36-.14-.19-1.18-1.57-1.18-3 0-1.43.75-2.13 1.02-2.42.26-.29.58-.36.77-.36h.55c.18.01.42-.07.66.5.24.58.82 2 .89 2.15.07.14.12.31.02.5-.1.19-.14.31-.29.48-.14.17-.3.38-.43.5-.14.14-.29.3-.13.59.17.29.74 1.22 1.59 1.98 1.09.97 2.01 1.27 2.3 1.42.29.14.46.12.62-.07.17-.19.72-.84.91-1.13.19-.29.38-.24.65-.14.26.1 1.68.79 1.97.94.29.14.48.22.55.34.07.12.07.7-.17 1.38z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+  <symbol id="i-agenda" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-plano" viewBox="0 0 24 24"><path d="M9 3.5h6v3H9z"/><path d="M7 5H5v16h14V5h-2"/><path d="M8.5 13l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-sorriso" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4 4 0 007 0M9 9.5h.01M15 9.5h.01"/></symbol>
+  <symbol id="i-gengiva" viewBox="0 0 24 24"><path d="M3 9c3 2 6 2 9 0s6-2 9 0"/><path d="M6 10v5a2 2 0 004 0v-4M14 11v4a2 2 0 004 0v-5"/></symbol>
+  <symbol id="i-canal" viewBox="0 0 24 24"><path d="M7 3c-2.2 0-4 1.8-4 4.5 0 2 .8 3.3 1.5 4.7.6 1.3.8 2.8 1 4.3.3 2.4.9 4.5 2 4.5 1.3 0 1.4-2.2 1.8-4 .3-1.3.8-2.3 2.7-2.3s2.4 1 2.7 2.3c.4 1.8.5 4 1.8 4 1.1 0 1.7-2.1 2-4.5.2-1.5.4-3 1-4.3.7-1.4 1.5-2.7 1.5-4.7C21 4.8 19.2 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M12 6v6M9.5 9l-1 5M14.5 9l1 5"/></symbol>
+  <symbol id="i-protese" viewBox="0 0 24 24"><path d="M4 8c0-2 1.5-3 3-3s2.5 1 2.5 1S10.5 5 12 5s2.5 1 2.5 1 1-1 2.5-1 3 1 3 3v3H4z"/><path d="M4 11v2c0 2 1 3 2.5 3S9 15 9 13M9 13c0 2 1.3 3 3 3s3-1 3-3M15 13c0 2 1 3 2.5 3S20 15 20 13v-2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-fechar" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-olho" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-mao" viewBox="0 0 24 24"><path d="M7 11V6.5a1.5 1.5 0 013 0V11M10 10V4.5a1.5 1.5 0 013 0V10M13 10V5.5a1.5 1.5 0 013 0V12M16 9.5a1.5 1.5 0 013 0V14c0 4-3 7-7 7-3 0-4.6-1.5-6.3-4l-2.3-3.5a1.5 1.5 0 012.5-1.6L7 13"/></symbol>
+</svg>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<header class="nav" id="nav">
+  <div class="container">
+    <!-- LOGO: troque o bloco abaixo por <img src="img/logo.svg" alt="Vamos Sorrir Odontologia" width="160" height="40"> -->
+    <a href="#inicio" class="logo" aria-label="Vamos Sorrir Odontologia, página inicial">
+      <span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span>
+      <span>Vamos Sorrir<small>Odontologia · Feira de Santana</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="#inicio">Início</a>
+      <a href="#especialidades">Especialidades</a>
+      <a href="#sobre">Sobre</a>
+      <a href="#equipe">Equipe</a>
+      <a href="#contato">Contato</a>
+    </nav>
+    <a class="btn btn-primario nav-cta" data-wa href="https://wa.me/5575900000000">Agendar</a>
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false" aria-controls="navMenu">
+      <svg class="ic"><use href="#i-menu"/></svg>
+    </button>
+  </div>
+  <nav class="nav-menu" id="navMenu" aria-label="Menu móvel">
+    <a href="#inicio">Início</a>
+    <a href="#especialidades">Especialidades</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#equipe">Equipe</a>
+    <a href="#contato">Contato</a>
+    <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000">Agendar pelo WhatsApp</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ============================================================
+     1. HERO
+     ============================================================ -->
+<section class="hero" id="inicio">
+  <div class="hero-bg" aria-hidden="true">
+    <!-- FOTO: consultório moderno (aparece desfocada ao fundo). 1600x1000, .webp -->
+    <img src="img/hero-consultorio.webp" alt="" width="1600" height="1000" fetchpriority="high" onerror="this.remove()">
+  </div>
+
+  <div class="container hero-inner">
+    <div class="hero-titulo">
+      <span class="eyebrow">Dentista em Feira de Santana</span>
+      <!-- HEADLINE -->
+      <h1>Seu sorriso de volta,<br><span class="destaque">sem medo</span> e sem surpresas.</h1>
+    </div>
+
+    <div class="hero-visual">
+      <!-- DENTE 3D: para usar um render próprio, troque o <svg> abaixo por
+           <img src="img/dente-3d.webp" alt="Dente 3D de cristal" width="440" height="440"> -->
+      <div class="dente" aria-hidden="true">
+        <div class="dente-glow"></div>
+        <div class="dente-anel"></div>
+        <div class="dente-anel a2"></div>
+        <svg viewBox="0 0 200 240"><use href="#dente-vidro"/></svg>
+        <span class="brilho b1"></span><span class="brilho b2"></span><span class="brilho b3"></span>
+        <div class="dente-sombra"></div>
+      </div>
+    </div>
+
+    <div class="hero-corpo">
+      <p class="hero-sub">Todas as especialidades num só lugar, atendimento acolhedor e um plano de tratamento que cabe no seu orçamento, explicado com clareza. Já sorriu hoje? Vamos Sorrir!</p>
+      <div class="hero-botoes">
+        <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000">
+          <svg class="ic ic-sm"><use href="#i-agenda"/></svg> Agendar avaliação
+        </a>
+        <a class="btn btn-secundario" href="#sobre">Conhecer a clínica</a>
+      </div>
+
+      <!-- Card glass: no desktop flutua no canto; no celular vira faixa abaixo dos botões -->
+      <div class="hero-card glass">
+        <span class="ic-box"><svg class="ic"><use href="#i-plano"/></svg></span>
+        <div class="hero-card-txt">
+          <strong>Primeira avaliação</strong>
+          <p>Entenda seu caso e receba um plano claro.</p>
+        </div>
+        <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar minha primeira avaliação." href="https://wa.me/5575900000000">
+          <svg class="ic ic-sm"><use href="#i-whats"/></svg> Falar no WhatsApp
+        </a>
+      </div>
+
+      <!-- PROVA SOCIAL: troque a nota e o número pelos dados reais do Google -->
+      <div class="prova">
+        <div class="avatares" aria-hidden="true">
+          <!-- Use fotos reais de pacientes somente com autorização por escrito -->
+          <span></span><span></span><span></span><span>+</span>
+        </div>
+        <div>
+          <div class="estrelas" aria-hidden="true">
+            <svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg>
+          </div>
+          <strong>Nota [4,X] no Google</strong>
+          <small>[NN] avaliações de pacientes</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     2. ESPECIALIDADES
+     ============================================================ -->
+<section class="esp" id="especialidades">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Especialidades</span>
+      <h2>Tudo o que seu sorriso precisa, <span class="destaque">num só lugar</span></h2>
+      <p>Da limpeza ao implante, você resolve tudo com a mesma equipe, sem precisar rodar a cidade atrás de outro dentista.</p>
+    </div>
+
+    <!-- 4 especialidades em destaque (grid no desktop, carrossel com swipe no celular) -->
+    <div class="carrossel" data-carrossel>
+      <div class="trilho">
+        <article class="card esp-card reveal">
+          <span class="ic-box"><svg class="ic"><use href="#i-dente"/></svg></span>
+          <h3>Clínico geral</h3>
+          <p>Limpeza, restaurações e check-up para cuidar da saúde da boca da família toda.</p>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clínico geral" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+        </article>
+        <article class="card esp-card reveal d1">
+          <span class="ic-box"><svg class="ic"><use href="#i-aparelho"/></svg></span>
+          <h3>Ortodontia</h3>
+          <p>Aparelhos para alinhar os dentes e melhorar a mordida, em crianças e adultos.</p>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Ortodontia" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+        </article>
+        <article class="card esp-card reveal d2">
+          <span class="ic-box"><svg class="ic"><use href="#i-implante"/></svg></span>
+          <h3>Implantes</h3>
+          <p>Uma opção para repor dentes perdidos e voltar a mastigar com mais segurança.</p>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Implantes" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+        </article>
+        <article class="card esp-card reveal d3">
+          <span class="ic-box"><svg class="ic"><use href="#i-brilho"/></svg></span>
+          <h3>Clareamento</h3>
+          <p>Clareamento feito com acompanhamento do dentista, do jeito certo para o seu caso.</p>
+          <a class="link-mais" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Clareamento" href="https://wa.me/5575900000000">Saiba mais <svg class="ic ic-sm"><use href="#i-seta"/></svg></a>
+        </article>
+      </div>
+      <div class="controles" hidden>
+        <button class="seta" data-prev aria-label="Anterior"><svg class="ic"><use href="#i-esq"/></svg></button>
+        <div class="pontos"></div>
+        <button class="seta" data-next aria-label="Próximo"><svg class="ic"><use href="#i-dir"/></svg></button>
+      </div>
+    </div>
+
+    <h3 class="acordeao-titulo reveal">Outras especialidades</h3>
+    <!-- Acordeão: para adicionar uma especialidade, copie um bloco <details> -->
+    <div class="acordeao reveal">
+      <details class="item">
+        <summary><span class="ic-box"><svg class="ic"><use href="#i-protese"/></svg></span>Prótese dentária<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo">
+          <!-- FOTO: prótese (800x500) -->
+          <div class="ph" data-label="Foto: prótese dentária"><img src="img/esp-protese.webp" alt="Dentista explicando prótese dentária para paciente" width="800" height="500" loading="lazy" decoding="async"></div>
+          <div>
+            <p>Próteses fixas e removíveis para devolver a função e a confiança de sorrir. O dentista mostra as opções e explica cada uma antes de qualquer decisão.</p>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Prótese dentária" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+          </div>
+        </div>
+      </details>
+      <details class="item">
+        <summary><span class="ic-box"><svg class="ic"><use href="#i-canal"/></svg></span>Endodontia (tratamento de canal)<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo">
+          <div class="ph" data-label="Foto: endodontia"><img src="img/esp-endodontia.webp" alt="Consultório preparado para tratamento de canal" width="800" height="500" loading="lazy" decoding="async"></div>
+          <div>
+            <p>Tratamento de canal para salvar o dente, feito com anestesia e no seu ritmo. Você é informado de cada etapa.</p>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Endodontia" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+          </div>
+        </div>
+      </details>
+      <details class="item">
+        <summary><span class="ic-box"><svg class="ic"><use href="#i-sorriso"/></svg></span>Odontopediatria<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo">
+          <div class="ph" data-label="Foto: atendimento infantil"><img src="img/esp-odontopediatria.webp" alt="Criança sendo atendida com calma pela dentista" width="800" height="500" loading="lazy" decoding="async"></div>
+          <div>
+            <p>Atendimento pensado para crianças, com paciência e linguagem que elas entendem, para criar uma relação tranquila com o dentista desde cedo.</p>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Odontopediatria" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+          </div>
+        </div>
+      </details>
+      <details class="item">
+        <summary><span class="ic-box"><svg class="ic"><use href="#i-gengiva"/></svg></span>Periodontia (gengiva)<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo">
+          <div class="ph" data-label="Foto: periodontia"><img src="img/esp-periodontia.webp" alt="Dentista examinando a gengiva de um paciente" width="800" height="500" loading="lazy" decoding="async"></div>
+          <div>
+            <p>Cuidado com a gengiva: sangramento, mau hálito e dentes "moles" merecem atenção. A gente avalia e explica o tratamento indicado.</p>
+            <a class="btn btn-whats" data-wa="Olá! Vim pelo site e quero agendar uma avaliação de Periodontia" href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     3. POR QUE A VAMOS SORRIR
+     ============================================================ -->
+<section class="porque bg-gelo" id="sobre">
+  <div class="arco" aria-hidden="true"></div>
+  <div class="container">
+    <div class="porque-box reveal">
+      <div class="porque-marca">
+        <!-- LOGO (versão grande) -->
+        <span class="logo"><span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span>Vamos Sorrir</span>
+        <p class="slogan">Já sorriu hoje? Vamos Sorrir!</p>
+        <p>Qualidade com ótimo custo-benefício, numa rede de clínicas presente em várias cidades da Bahia.</p>
+      </div>
+      <div class="difs">
+        <div class="dif"><svg class="ic"><use href="#i-grade"/></svg><strong>Todas as especialidades</strong><span>Seu tratamento completo num só endereço.</span></div>
+        <div class="dif"><svg class="ic"><use href="#i-escudo"/></svg><strong>Esterilização visitável</strong><span>Veja de perto, acompanhado do dentista.</span></div>
+        <div class="dif"><svg class="ic"><use href="#i-equipe"/></svg><strong>Equipe experiente</strong><span>Dentistas especialistas em cada área.</span></div>
+        <div class="dif"><svg class="ic"><use href="#i-coracao"/></svg><strong>Atendimento humanizado</strong><span>Escuta, paciência e respeito ao seu tempo.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     4. MEDO DE DENTISTA
+     ============================================================ -->
+<section class="medo">
+  <div class="container duas-col">
+    <div class="foto-wrap reveal">
+      <!-- FOTO: atendimento tranquilo, paciente relaxado (800x1000) -->
+      <div class="ph moldura foto-alta" data-label="Foto: atendimento tranquilo"><img src="img/medo-atendimento.webp" alt="Dentista conversando com calma com paciente antes do atendimento" width="800" height="1000" loading="lazy" decoding="async"></div>
+      <div class="selo glass">
+        <span class="ic-box"><svg class="ic"><use href="#i-coracao"/></svg></span>
+        <strong>Aqui ninguém julga. A gente acolhe.</strong>
+      </div>
+    </div>
+    <div class="reveal d1">
+      <span class="eyebrow">Medo de dentista?</span>
+      <h2>Faz tempo que você não vai ao dentista? <span class="destaque">Tudo bem.</span></h2>
+      <p class="lead">Muita gente adia a consulta por medo de dor, ansiedade ou vergonha. Você não precisa explicar nada: a gente começa com uma conversa, no seu tempo.</p>
+      <!-- Confirme com a clínica que estas práticas fazem parte do atendimento -->
+      <ul class="lista">
+        <li><span class="ic-box"><svg class="ic"><use href="#i-mao"/></svg></span><div><strong>Você no controle</strong><span>Combinamos um sinal para pausar o atendimento sempre que precisar.</span></div></li>
+        <li><span class="ic-box"><svg class="ic"><use href="#i-chat"/></svg></span><div><strong>Tudo explicado antes</strong><span>Você entende cada etapa antes de começar, sem termos complicados.</span></div></li>
+        <li><span class="ic-box"><svg class="ic"><use href="#i-sorriso"/></svg></span><div><strong>Sem julgamento</strong><span>Não importa há quanto tempo. O importante é que você chegou.</span></div></li>
+      </ul>
+      <a class="btn btn-primario" data-wa="Olá! Vim pelo site. Tenho um pouco de medo de dentista e quero agendar uma avaliação com calma." href="https://wa.me/5575900000000">Quero começar com calma</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     5. BIOSSEGURANÇA
+     ============================================================ -->
+<section class="bio">
+  <div class="container duas-col inverte">
+    <div class="foto-wrap reveal">
+      <!-- FOTO: sala de esterilização (800x1000) -->
+      <div class="ph moldura foto-alta" data-label="Foto: sala de esterilização"><img src="img/esterilizacao.webp" alt="Sala exclusiva de esterilização da Vamos Sorrir em Feira de Santana" width="800" height="1000" loading="lazy" decoding="async"></div>
+      <div class="selo glass">
+        <span class="ic-box"><svg class="ic"><use href="#i-olho"/></svg></span>
+        <strong>Sala aberta para você visitar</strong>
+      </div>
+    </div>
+    <div class="reveal d1">
+      <span class="eyebrow">Biossegurança</span>
+      <h2>Limpeza que você pode <span class="destaque">ver com os próprios olhos</span></h2>
+      <p class="lead">Temos salas exclusivas de esterilização. E não é só falar: você pode visitar a sala acompanhado do dentista e ver como seus instrumentos são preparados.</p>
+      <div class="bio-destaque">
+        <span class="ic-box"><svg class="ic"><use href="#i-escudo"/></svg></span>
+        <div><strong>Quer conhecer a sala?</strong><p>É só pedir no dia da sua consulta.</p></div>
+      </div>
+      <!-- Ajuste os itens conforme o protocolo real da unidade -->
+      <ul class="lista">
+        <li><span class="ic-box"><svg class="ic"><use href="#i-check"/></svg></span><div><strong>Sala exclusiva para esterilização</strong><span>Separada dos consultórios, só para esse cuidado.</span></div></li>
+        <li><span class="ic-box"><svg class="ic"><use href="#i-check"/></svg></span><div><strong>Instrumentais embalados</strong><span>Abertos na sua frente, na hora do atendimento.</span></div></li>
+        <li><span class="ic-box"><svg class="ic"><use href="#i-check"/></svg></span><div><strong>Transparência total</strong><span>Pergunte o que quiser: a gente mostra e explica.</span></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     6. CONHEÇA A CLÍNICA
+     ============================================================ -->
+<section class="clinica">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Conheça a clínica</span>
+      <h2>Um espaço pensado para você <span class="destaque">se sentir à vontade</span></h2>
+      <p>Ambiente limpo, claro e confortável no coração de Feira de Santana. Venha tomar um café e conhecer a gente.</p>
+    </div>
+    <!-- FOTOS da unidade (troque os arquivos na pasta img/) -->
+    <div class="galeria">
+      <div class="ph moldura g1 reveal" data-label="Foto: recepção"><img src="img/clinica-recepcao.webp" alt="Recepção da clínica Vamos Sorrir em Feira de Santana" width="900" height="900" loading="lazy" decoding="async"></div>
+      <div class="ph moldura g2 reveal d1" data-label="Foto: consultório"><img src="img/clinica-consultorio.webp" alt="Consultório odontológico moderno" width="600" height="600" loading="lazy" decoding="async"></div>
+      <div class="ph moldura g3 reveal d2" data-label="Foto: esterilização"><img src="img/clinica-esterilizacao.webp" alt="Área de esterilização de instrumentais" width="600" height="600" loading="lazy" decoding="async"></div>
+      <div class="ph moldura g4 reveal d3" data-label="Foto: fachada"><img src="img/clinica-fachada.webp" alt="Fachada da Vamos Sorrir Odontologia em Feira de Santana" width="1000" height="500" loading="lazy" decoding="async"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     7. NOSSA EQUIPE
+     ============================================================ -->
+<section class="equipe bg-gelo" id="equipe">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Nossa equipe</span>
+      <h2>Quem vai <span class="destaque">cuidar de você</span></h2>
+      <p>Dentistas especialistas que explicam tudo com calma e tratam você pelo nome.</p>
+    </div>
+    <!-- Para adicionar um dentista, copie um <article class="card dentista"> -->
+    <div class="carrossel" data-carrossel>
+      <div class="trilho">
+        <article class="card dentista">
+          <div class="ph" data-label="Foto do dentista"><img src="img/dentista-1.webp" alt="Foto de [Nome do dentista]" width="600" height="750" loading="lazy" decoding="async"></div>
+          <div class="dentista-info"><h3>[Nome do dentista]</h3><p>[Especialidade]</p><small>CRO-BA [número]</small></div>
+        </article>
+        <article class="card dentista">
+          <div class="ph" data-label="Foto do dentista"><img src="img/dentista-2.webp" alt="Foto de [Nome do dentista]" width="600" height="750" loading="lazy" decoding="async"></div>
+          <div class="dentista-info"><h3>[Nome do dentista]</h3><p>[Especialidade]</p><small>CRO-BA [número]</small></div>
+        </article>
+        <article class="card dentista">
+          <div class="ph" data-label="Foto do dentista"><img src="img/dentista-3.webp" alt="Foto de [Nome do dentista]" width="600" height="750" loading="lazy" decoding="async"></div>
+          <div class="dentista-info"><h3>[Nome do dentista]</h3><p>[Especialidade]</p><small>CRO-BA [número]</small></div>
+        </article>
+        <article class="card dentista">
+          <div class="ph" data-label="Foto do dentista"><img src="img/dentista-4.webp" alt="Foto de [Nome do dentista]" width="600" height="750" loading="lazy" decoding="async"></div>
+          <div class="dentista-info"><h3>[Nome do dentista]</h3><p>[Especialidade]</p><small>CRO-BA [número]</small></div>
+        </article>
+        <article class="card dentista">
+          <div class="ph" data-label="Foto do dentista"><img src="img/dentista-5.webp" alt="Foto de [Nome do dentista]" width="600" height="750" loading="lazy" decoding="async"></div>
+          <div class="dentista-info"><h3>[Nome do dentista]</h3><p>[Especialidade]</p><small>CRO-BA [número]</small></div>
+        </article>
+      </div>
+      <div class="controles" hidden>
+        <button class="seta" data-prev aria-label="Anterior"><svg class="ic"><use href="#i-esq"/></svg></button>
+        <div class="pontos"></div>
+        <button class="seta" data-next aria-label="Próximo"><svg class="ic"><use href="#i-dir"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     8. COMO FUNCIONA
+     ============================================================ -->
+<section class="como">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Como funciona</span>
+      <h2>Começar é <span class="destaque">simples</span></h2>
+      <p>Três passos e você sai sabendo exatamente o que fazer.</p>
+    </div>
+    <div class="passos">
+      <article class="card passo reveal">
+        <span class="passo-num">1</span><svg class="ic"><use href="#i-whats"/></svg>
+        <h3>Chame no WhatsApp</h3>
+        <p>Escolha o melhor dia e horário. A gente responde rapidinho e tira suas dúvidas.</p>
+      </article>
+      <article class="card passo reveal d1">
+        <span class="passo-num">2</span><svg class="ic"><use href="#i-dente"/></svg>
+        <h3>Faça sua avaliação</h3>
+        <p>O dentista conversa com você, examina com cuidado e entende o que você precisa.</p>
+      </article>
+      <article class="card passo reveal d2">
+        <span class="passo-num">3</span><svg class="ic"><use href="#i-plano"/></svg>
+        <h3>Receba um plano claro</h3>
+        <p>Um plano de tratamento que cabe no seu orçamento, explicado com clareza, sem letra miúda.</p>
+      </article>
+    </div>
+    <div class="centro reveal">
+      <a class="btn btn-primario" data-wa href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Dar o primeiro passo</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     9. DEPOIMENTOS — SOMENTE avaliações reais do Google.
+        Copie o texto, nome e foto (com autorização) de cada avaliação.
+     ============================================================ -->
+<section class="depoimentos bg-gelo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Depoimentos</span>
+      <h2>O que nossos pacientes <span class="destaque">dizem</span></h2>
+      <p>Avaliações reais de pacientes no Google.</p>
+    </div>
+    <div class="carrossel" data-carrossel>
+      <div class="trilho">
+        <article class="card depo">
+          <div class="estrelas" aria-label="5 estrelas"><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg></div>
+          <blockquote>"[Cole aqui o texto de uma avaliação real do Google.]"</blockquote>
+          <div class="depo-autor"><div class="ph"><img src="img/depo-1.webp" alt="Foto de [Nome do paciente]" width="88" height="88" loading="lazy" decoding="async"></div><div><strong>[Nome do paciente]</strong><span class="google-tag">Avaliação no Google</span></div></div>
+        </article>
+        <article class="card depo">
+          <div class="estrelas" aria-label="5 estrelas"><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg></div>
+          <blockquote>"[Cole aqui o texto de uma avaliação real do Google.]"</blockquote>
+          <div class="depo-autor"><div class="ph"><img src="img/depo-2.webp" alt="Foto de [Nome do paciente]" width="88" height="88" loading="lazy" decoding="async"></div><div><strong>[Nome do paciente]</strong><span class="google-tag">Avaliação no Google</span></div></div>
+        </article>
+        <article class="card depo">
+          <div class="estrelas" aria-label="5 estrelas"><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg></div>
+          <blockquote>"[Cole aqui o texto de uma avaliação real do Google.]"</blockquote>
+          <div class="depo-autor"><div class="ph"><img src="img/depo-3.webp" alt="Foto de [Nome do paciente]" width="88" height="88" loading="lazy" decoding="async"></div><div><strong>[Nome do paciente]</strong><span class="google-tag">Avaliação no Google</span></div></div>
+        </article>
+        <article class="card depo">
+          <div class="estrelas" aria-label="5 estrelas"><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg><svg class="ic"><use href="#i-estrela"/></svg></div>
+          <blockquote>"[Cole aqui o texto de uma avaliação real do Google.]"</blockquote>
+          <div class="depo-autor"><div class="ph"><img src="img/depo-4.webp" alt="Foto de [Nome do paciente]" width="88" height="88" loading="lazy" decoding="async"></div><div><strong>[Nome do paciente]</strong><span class="google-tag">Avaliação no Google</span></div></div>
+        </article>
+      </div>
+      <div class="controles" hidden>
+        <button class="seta" data-prev aria-label="Anterior"><svg class="ic"><use href="#i-esq"/></svg></button>
+        <div class="pontos"></div>
+        <button class="seta" data-next aria-label="Próximo"><svg class="ic"><use href="#i-dir"/></svg></button>
+      </div>
+    </div>
+    <!-- Troque pelo link "Ver avaliações" do seu Perfil da Empresa no Google -->
+    <p class="aviso-placeholder"><a class="link-mais" href="https://www.google.com/maps/search/?api=1&query=Vamos+Sorrir+Odontologia+Feira+de+Santana" target="_blank" rel="noopener">Ver todas as avaliações no Google <svg class="ic ic-sm"><use href="#i-seta"/></svg></a></p>
+  </div>
+</section>
+
+<!-- ============================================================
+     10. FAQ
+     ============================================================ -->
+<section class="faq">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Dúvidas frequentes</span>
+      <h2>Perguntas que <span class="destaque">todo mundo faz</span></h2>
+    </div>
+    <div class="acordeao reveal">
+      <details class="item">
+        <summary>Dói?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo"><p>Nossa prioridade é o seu conforto. Usamos anestesia sempre que o procedimento pede, explicamos cada etapa antes de começar e combinamos um sinal para você pedir pausa quando quiser. Se você tem medo, conte para a gente no WhatsApp: vamos com calma.</p></div>
+      </details>
+      <details class="item">
+        <summary>Vocês atendem crianças?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo"><p>Sim! Temos odontopediatria, com atendimento pensado para os pequenos. A família toda pode ser atendida no mesmo lugar.</p></div>
+      </details>
+      <details class="item">
+        <summary>Aceita convênio?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <!-- TROQUE pela informação real: lista de convênios ou "não atendemos convênio" -->
+        <div class="item-corpo"><p>[Lista de convênios aceitos ou "Não atendemos convênio".] Na avaliação, você recebe um plano de tratamento que cabe no seu orçamento, explicado com clareza.</p></div>
+      </details>
+      <details class="item">
+        <summary>Como é a primeira consulta?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo"><p>É uma conversa e um exame com calma. O dentista entende sua queixa, avalia sua boca e explica o que encontrou. No fim, você recebe um plano de tratamento claro, com as etapas e as opções para o seu caso.</p></div>
+      </details>
+      <details class="item">
+        <summary>Precisa marcar horário?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo"><p>Recomendamos agendar pelo WhatsApp para garantir seu horário e evitar espera. É rápido: você escolhe o dia e a gente confirma.</p></div>
+      </details>
+      <details class="item">
+        <summary>Onde fica a clínica?<svg class="ic chev"><use href="#i-baixo"/></svg></summary>
+        <div class="item-corpo"><p>Estamos em [rua, número, bairro], Feira de Santana (BA). Veja o mapa e o botão "Como chegar" logo abaixo.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     11. CTA FINAL + FORMULÁRIO (abre o WhatsApp, sem back-end)
+     ============================================================ -->
+<section class="cta">
+  <div class="arco" aria-hidden="true"></div>
+  <div class="container cta-grid">
+    <div class="dente reveal" aria-hidden="true">
+      <div class="dente-glow"></div>
+      <div class="dente-anel"></div>
+      <div class="dente-anel a2"></div>
+      <svg viewBox="0 0 200 240"><use href="#dente-vidro"/></svg>
+      <span class="brilho b1"></span><span class="brilho b2"></span>
+      <div class="dente-sombra"></div>
+    </div>
+    <div class="reveal d1">
+      <h2>Pronto para voltar a sorrir?</h2>
+      <p>Deixe seu nome e o que você procura. A gente abre o WhatsApp com tudo preenchido para você só tocar em enviar.</p>
+    </div>
+    <form class="form reveal d2" id="formAgendar" novalidate>
+      <label>Seu nome
+        <input type="text" name="nome" autocomplete="name" required placeholder="Como podemos te chamar?">
+      </label>
+      <label>Telefone (WhatsApp)
+        <input type="tel" name="telefone" autocomplete="tel" inputmode="tel" required placeholder="(75) 9 0000-0000">
+      </label>
+      <label>Especialidade
+        <select name="especialidade">
+          <option>Ainda não sei, quero uma avaliação</option>
+          <option>Clínico geral</option>
+          <option>Ortodontia</option>
+          <option>Implantes</option>
+          <option>Clareamento</option>
+          <option>Prótese dentária</option>
+          <option>Endodontia (canal)</option>
+          <option>Odontopediatria</option>
+          <option>Periodontia</option>
+        </select>
+      </label>
+      <button class="btn btn-laranja btn-bloco" type="submit"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar pelo WhatsApp</button>
+      <small>Seus dados vão direto para a nossa conversa no WhatsApp.</small>
+    </form>
+  </div>
+</section>
+
+<!-- ============================================================
+     12. LOCALIZAÇÃO
+     ============================================================ -->
+<section class="local" id="contato">
+  <div class="container">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Localização</span>
+      <h2>Venha nos <span class="destaque">visitar</span></h2>
+      <p>Dentista em Feira de Santana, fácil de chegar.</p>
+    </div>
+    <div class="local-grid">
+      <div class="mapa moldura reveal">
+        <!-- MAPA: no Google Maps, clique em Compartilhar > Incorporar mapa e cole o src aqui -->
+        <iframe title="Mapa da Vamos Sorrir Odontologia em Feira de Santana" src="https://maps.google.com/maps?q=Vamos%20Sorrir%20Odontologia%20Feira%20de%20Santana&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+      </div>
+      <div class="card local-info reveal d1">
+        <h3>Vamos Sorrir · Feira de Santana</h3>
+        <div class="info-linha"><svg class="ic"><use href="#i-pin"/></svg><div><strong>Endereço</strong><span>[Rua, número, bairro]<br>Feira de Santana – BA</span></div></div>
+        <div class="info-linha"><svg class="ic"><use href="#i-relogio"/></svg><div><strong>Horário</strong><span>Seg a sex: [Xh–Xh]<br>Sábado: [Xh–Xh]</span></div></div>
+        <div class="info-linha"><svg class="ic"><use href="#i-fone"/></svg><div><strong>WhatsApp</strong><span>[(75) 9XXXX-XXXX]</span></div></div>
+        <div class="local-botoes">
+          <!-- COMO CHEGAR: troque "destination" pelo endereço exato -->
+          <a class="btn btn-primario" href="https://www.google.com/maps/dir/?api=1&destination=Vamos+Sorrir+Odontologia+Feira+de+Santana" target="_blank" rel="noopener"><svg class="ic ic-sm"><use href="#i-pin"/></svg> Como chegar</a>
+          <a class="btn btn-whats" data-wa href="https://wa.me/5575900000000"><svg class="ic ic-sm"><use href="#i-whats"/></svg> Agendar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================================================
+     13. RODAPÉ
+     ============================================================ -->
+<footer class="rodape">
+  <div class="container">
+    <div class="rodape-grid">
+      <div>
+        <span class="logo"><span class="logo-mark"><svg class="ic"><use href="#i-dente"/></svg></span><span>Vamos Sorrir<small>Odontologia · Feira de Santana</small></span></span>
+        <p style="margin-top:14px">Já sorriu hoje? Vamos Sorrir!</p>
+        <div class="redes">
+          <a href="https://www.instagram.com/[usuario]" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic"><use href="#i-insta"/></svg></a>
+          <a data-wa href="https://wa.me/5575900000000" aria-label="WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
+        </div>
+      </div>
+      <div>
+        <h4>Links rápidos</h4>
+        <ul><li><a href="#inicio">Início</a></li><li><a href="#especialidades">Especialidades</a></li><li><a href="#sobre">Sobre</a></li><li><a href="#equipe">Equipe</a></li><li><a href="#contato">Contato</a></li></ul>
+      </div>
+      <div>
+        <h4>Especialidades</h4>
+        <ul><li>Clínico geral</li><li>Ortodontia</li><li>Implantes</li><li>Clareamento</li><li>Prótese · Endodontia</li><li>Odontopediatria · Periodontia</li></ul>
+      </div>
+      <div>
+        <h4>Contato</h4>
+        <ul>
+          <li>[Rua, número, bairro]<br>Feira de Santana – BA</li>
+          <li>WhatsApp: [(75) 9XXXX-XXXX]</li>
+          <li>Instagram: [@usuario]</li>
+          <li>Seg a sex [Xh–Xh] · Sáb [Xh–Xh]</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rodape-base">
+      <!-- RESPONSÁVEL TÉCNICO: obrigatório pelo CFO -->
+      <span>Responsável técnico: [Nome] – CRO-BA [número]</span>
+      <span>© <span id="ano">2026</span> Vamos Sorrir Odontologia</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Botão flutuante de WhatsApp -->
+<a class="whats-flutuante" data-wa href="https://wa.me/5575900000000" aria-label="Agendar pelo WhatsApp"><svg class="ic"><use href="#i-whats"/></svg></a>
+
+<script>
+/* ============================================================
+   CONFIGURAÇÃO — troque o número do WhatsApp aqui (só dígitos, com 55 + DDD)
+   ============================================================ */
+var CONFIG = {
+  whatsapp: '5575900000000',
+  mensagemPadrao: 'Olá! Vim pelo site e quero agendar uma avaliação.'
+};
+
+(function () {
+  function linkWhats(msg) {
+    return 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(msg || CONFIG.mensagemPadrao);
+  }
+
+  /* Todos os botões com data-wa viram links de WhatsApp com mensagem pré-preenchida */
+  document.querySelectorAll('[data-wa]').forEach(function (a) {
+    a.href = linkWhats(a.getAttribute('data-wa'));
+    a.target = '_blank';
+    a.rel = 'noopener';
+  });
+
+  /* Navbar: sombra ao rolar + menu do celular */
+  var nav = document.getElementById('nav');
+  var toggle = document.getElementById('navToggle');
+  var menu = document.getElementById('navMenu');
+  addEventListener('scroll', function () { nav.classList.toggle('scrolled', scrollY > 10); }, { passive: true });
+  toggle.addEventListener('click', function () {
+    var aberto = menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', aberto);
+    toggle.setAttribute('aria-label', aberto ? 'Fechar menu' : 'Abrir menu');
+    toggle.querySelector('use').setAttribute('href', aberto ? '#i-fechar' : '#i-menu');
+  });
+  menu.addEventListener('click', function (e) {
+    if (e.target.closest('a')) { menu.classList.remove('open'); toggle.setAttribute('aria-expanded', false); toggle.querySelector('use').setAttribute('href', '#i-menu'); }
+  });
+
+  /* Fade-up ao rolar */
+  var els = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: .08 });
+    els.forEach(function (el) { io.observe(el); });
+  } else {
+    els.forEach(function (el) { el.classList.add('in'); });
+  }
+
+  /* Carrosséis: setas, pontinhos e swipe nativo (scroll-snap) */
+  document.querySelectorAll('[data-carrossel]').forEach(function (c) {
+    var trilho = c.querySelector('.trilho');
+    var itens = Array.prototype.slice.call(trilho.children);
+    var ctr = c.querySelector('.controles');
+    var pontos = c.querySelector('.pontos');
+    var prev = c.querySelector('[data-prev]');
+    var next = c.querySelector('[data-next]');
+
+    function passo() { return itens.length > 1 ? itens[1].offsetLeft - itens[0].offsetLeft : trilho.clientWidth; }
+    function paginas() {
+      var visiveis = Math.max(1, Math.round(trilho.clientWidth / passo()));
+      return Math.max(1, itens.length - visiveis + 1);
+    }
+    function atual() { return Math.round(trilho.scrollLeft / passo()); }
+
+    function montar() {
+      var n = paginas();
+      var temScroll = trilho.scrollWidth > trilho.clientWidth + 4;
+      ctr.hidden = !temScroll;
+      pontos.innerHTML = '';
+      for (var i = 0; i < n; i++) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Ir para o item ' + (i + 1));
+        (function (i) { b.addEventListener('click', function () { trilho.scrollTo({ left: i * passo(), behavior: 'smooth' }); }); })(i);
+        pontos.appendChild(b);
+      }
+      marcar();
+    }
+    function marcar() {
+      var i = Math.min(atual(), paginas() - 1);
+      Array.prototype.forEach.call(pontos.children, function (b, k) { b.setAttribute('aria-current', k === i); });
+      prev.disabled = trilho.scrollLeft < 4;
+      next.disabled = trilho.scrollLeft + trilho.clientWidth >= trilho.scrollWidth - 4;
+    }
+    prev.addEventListener('click', function () { trilho.scrollBy({ left: -passo(), behavior: 'smooth' }); });
+    next.addEventListener('click', function () { trilho.scrollBy({ left: passo(), behavior: 'smooth' }); });
+    var raf;
+    trilho.addEventListener('scroll', function () { cancelAnimationFrame(raf); raf = requestAnimationFrame(marcar); }, { passive: true });
+    var t;
+    addEventListener('resize', function () { clearTimeout(t); t = setTimeout(montar, 150); });
+    montar();
+  });
+
+  /* Acordeão: abre um por vez dentro do mesmo grupo */
+  document.querySelectorAll('.acordeao').forEach(function (grupo) {
+    grupo.addEventListener('toggle', function (e) {
+      if (!e.target.open) return;
+      grupo.querySelectorAll('details[open]').forEach(function (d) { if (d !== e.target) d.open = false; });
+    }, true);
+  });
+
+  /* Formulário final → WhatsApp com os dados */
+  var form = document.getElementById('formAgendar');
+  var tel = form.telefone;
+  tel.addEventListener('input', function () {
+    var d = tel.value.replace(/\D/g, '').slice(0, 11);
+    var f = d;
+    if (d.length > 2) f = '(' + d.slice(0, 2) + ') ' + d.slice(2);
+    if (d.length > 7) f = '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+    tel.value = f;
+  });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var nome = form.nome.value.trim();
+    var fone = tel.value.trim();
+    if (!nome) { form.nome.focus(); return; }
+    if (fone.replace(/\D/g, '').length < 10) { tel.focus(); return; }
+    var esp = form.especialidade.value;
+    var msg = 'Olá! Vim pelo site e quero agendar uma avaliação.\n\n' +
+              '*Nome:* ' + nome + '\n' +
+              '*Telefone:* ' + fone + '\n' +
+              '*Especialidade:* ' + esp;
+    var url = linkWhats(msg);
+    var w = window.open(url, '_blank');
+    if (w) w.opener = null; else location.href = url;
+  });
+
+  document.getElementById('ano').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
