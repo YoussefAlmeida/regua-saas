@@ -34,7 +34,9 @@ export async function GET(req: NextRequest) {
   // Bahia = UTC-3: dia local começa às 03:00 UTC
   const [y, m, d] = data.split('-').map(Number)
   const inicio_gte = new Date(Date.UTC(y, m - 1, d, 3, 0, 0)).toISOString()
-  const inicio_lt  = new Date(Date.UTC(y, m - 1, d + 1, 3, 0, 0)).toISOString()
+  // ?dias=7 → a semana a partir de "data" (visão semanal da agenda)
+  const dias = Math.min(7, Math.max(1, Number(req.nextUrl.searchParams.get('dias') ?? 1) || 1))
+  const inicio_lt  = new Date(Date.UTC(y, m - 1, d + dias, 3, 0, 0)).toISOString()
 
   const db = criarClienteServico()
   let consulta = db

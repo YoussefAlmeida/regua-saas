@@ -37,6 +37,10 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
       const extra = d.entrada === 'removida' ? ' (entrada saiu do caixa)' : d.entrada === 'lancada' ? ' (entrada lançada)' : ''
       return { texto: `${STATUS[novo] ?? 'mudou'} um atendimento${a.status === 'concluido' ? ' que estava concluído' : ''}${extra}`, alerta: a.status === 'concluido' }
     }
+    case 'agendamentos:remarcar': {
+      const quando = (v: unknown) => new Date(String(v)).toLocaleString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+      return { texto: `remarcou um horário de ${quando(a.inicio)} para ${quando(d.inicio)}${a.profissional_id !== d.profissional_id ? ' (trocou o barbeiro)' : ''}`, alerta: false }
+    }
     case 'agendamentos:criar':
       return { texto: `marcou um horário${d.origem === 'link' ? ' pelo link' : ''}`, alerta: false }
     case 'bloqueios_agenda:criar': return { texto: 'bloqueou um horário na agenda', alerta: false }
