@@ -123,7 +123,7 @@ export default function MeusAgendamentos({
     const json = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ t: json.erro ?? 'Não deu pra cancelar', erro: true }); return }
     setAgs(prev => prev.map(x => x.id === a.id ? { ...x, status: 'cancelado', cancelado_por: 'cliente' } : x))
-    setMsg({ t: 'Cancelado. A barbearia já foi avisada.' })
+    setMsg({ t: 'Cancelado. A barbearia já foi avisada. Quer outro horário? Toca em Marcar.' })
   }
 
   const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
