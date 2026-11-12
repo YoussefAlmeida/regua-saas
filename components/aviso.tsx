@@ -46,7 +46,7 @@ export default function Avisos() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-20 inset-x-0 z-[60] flex flex-col items-center gap-2 px-4 pointer-events-none"
+      className="fixed bottom-20 md:bottom-6 inset-x-0 md:left-60 z-[60] flex flex-col items-center gap-2 px-4 pointer-events-none"
     >
       {lista.map(({ id, texto, tipo }) => {
         const { cls, Icone } = ESTILO[tipo]

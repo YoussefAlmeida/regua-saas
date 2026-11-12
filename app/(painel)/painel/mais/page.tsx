@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import Link from 'next/link'
-import { Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut, Clock, ShieldCheck, Lock } from 'lucide-react'
+import { LayoutDashboard, Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut, Clock, ShieldCheck, Lock } from 'lucide-react'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 
 export default async function MaisPage() {
@@ -9,6 +9,7 @@ export default async function MaisPage() {
   const plano = await planoDaBarbearia(h.get('x-barbearia-id')!)
 
   const ITENS_DONO = [
+    { href: '/painel/dashboard', label: 'Dashboard', desc: 'Visão geral dos últimos 30 dias', icon: LayoutDashboard },
     { href: '/painel/mais/servicos', label: 'Serviços', desc: 'Preços e duração', icon: Scissors },
     { href: '/painel/mais/barbeiros', label: 'Equipe', desc: 'Barbeiros e aprovações', icon: Users },
     { href: '/painel/mais/horarios', label: 'Horários e bloqueios', desc: 'Expediente, almoço e folgas da equipe', icon: Clock },

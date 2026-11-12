@@ -18,7 +18,7 @@ export default function NavInferior({ papel }: { papel: string }) {
   const itens = papel === 'dono' ? ITENS : ITENS.filter(i => i.href !== '/painel/financeiro')
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur border-t border-line z-20 pb-[env(safe-area-inset-bottom)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur border-t border-line z-20 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-lg mx-auto flex">
         {itens.map(({ href, label, icon: Icon }) => {
           const ativo = pathname.startsWith(href)

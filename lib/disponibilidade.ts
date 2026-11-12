@@ -146,6 +146,27 @@ function expediente(barbearia: BarbeariaHorario, horarios: HorarioTrabalho[], da
   }
 }
 
+/** Minutos que o barbeiro atende no dia (expediente menos pausas); 0 = folga ou fechado */
+export function minutosDeExpediente(
+  barbearia: BarbeariaHorario,
+  horarios: { dia_semana: number; inicio: string; fim: string; intervalo_inicio: string | null; intervalo_fim: string | null }[],
+  data: string,
+): number {
+  const exp = expediente(barbearia, horarios, data)
+  if (!exp) return 0
+  // Pausas recortadas pelo expediente e unidas (almoço da barbearia e do barbeiro podem se sobrepor)
+  const pausas = exp.pausas
+    .map(p => ({ a: Math.max(p.a, exp.inicio), b: Math.min(p.b, exp.fim) }))
+    .filter(p => p.b > p.a)
+    .sort((x, y) => x.a - y.a)
+  let parado = 0, ate = exp.inicio
+  for (const p of pausas) {
+    const a = Math.max(p.a, ate)
+    if (p.b > a) { parado += p.b - a; ate = p.b }
+  }
+  return exp.fim - exp.inicio - parado
+}
+
 function slotsDoDia(exp: Expediente | null, ocupados: Ocupado[], data: string, duracao_min: number, agora: number): string[] {
   if (!exp) return []
   const livres: string[] = []
