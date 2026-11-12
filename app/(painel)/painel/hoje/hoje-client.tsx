@@ -207,7 +207,7 @@ export default function HojeClient({
             <Clock size={11} /> Próximo
           </p>
           <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: proximo.servico?.cor ?? '#9A4A1A' }} />
+            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: proximo.servico?.cor ?? '#C5A46D' }} />
             <div className="flex-1">
               <p className="font-semibold font-ui text-sm text-fg">{proximo.cliente?.nome ?? '—'}</p>
               <p className="font-body text-xs text-fg-muted">{proximo.servico?.nome} · {hora(proximo.inicio)} · {proximo.profissional?.nome}</p>

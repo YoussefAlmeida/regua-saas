@@ -21,12 +21,12 @@ const PASSOS: { id: Passo; t: string }[] = [
 interface Servico { id: string; nome: string; preco: number; duracao_min: number }
 
 const SUGESTOES = [
-  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#9A4A1A' },
-  { nome: 'Barba', preco: '20', duracao_min: 20, cor: '#6BA3D6' },
-  { nome: 'Corte + barba', preco: '45', duracao_min: 50, cor: '#4FB477' },
-  { nome: 'Pezinho', preco: '10', duracao_min: 10, cor: '#6A635B' },
-  { nome: 'Sobrancelha', preco: '10', duracao_min: 10, cor: '#6A635B' },
-  { nome: 'Pigmentação', preco: '25', duracao_min: 30, cor: '#E2564D' },
+  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#C5A46D' },
+  { nome: 'Barba', preco: '20', duracao_min: 20, cor: '#8AB4DC' },
+  { nome: 'Corte + barba', preco: '45', duracao_min: 50, cor: '#6FB08E' },
+  { nome: 'Pezinho', preco: '10', duracao_min: 10, cor: '#A9A59D' },
+  { nome: 'Sobrancelha', preco: '10', duracao_min: 10, cor: '#A9A59D' },
+  { nome: 'Pigmentação', preco: '25', duracao_min: 30, cor: '#E5746A' },
 ]
 
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -210,7 +210,7 @@ export default function ComecarClient({
                   <Plus size={12} /> {s.nome}
                 </button>
               ))}
-              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#9A4A1A' })} className="font-semibold px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs text-fg-muted hover:text-amber">
+              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#C5A46D' })} className="font-semibold px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs text-fg-muted hover:text-amber">
                 Outro…
               </button>
             </div>

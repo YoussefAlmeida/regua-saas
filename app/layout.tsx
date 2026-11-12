@@ -1,13 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { Fraunces, Instrument_Sans } from "next/font/google"
+import { Outfit, Instrument_Sans } from "next/font/google"
 import "./globals.css"
 import { urlDoSiteFixa } from "@/lib/site-url"
 
-// Títulos: serifa com personagem (ofício, tradição) — sem caixa alta
-const fraunces = Fraunces({
+// Títulos: sans geométrica, moderna (direção premium dark)
+const titulos = Outfit({
   subsets: ["latin"],
-  style: ["normal", "italic"],
-  axes: ["opsz", "SOFT"],
   variable: "--font-display",
   display: "swap",
 })
@@ -35,14 +33,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#F6F3EE",
+  themeColor: "#17191D",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="pt-BR"
-      className={`${fraunces.variable} ${instrument.variable}`}
+      className={`${titulos.variable} ${instrument.variable}`}
     >
       <body className="bg-bg text-fg font-body antialiased min-h-screen">
         {children}

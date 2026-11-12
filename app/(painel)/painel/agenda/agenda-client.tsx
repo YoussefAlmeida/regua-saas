@@ -300,7 +300,7 @@ export default function AgendaClient({
                 <div className="flex items-start gap-3">
                   <div
                     className="w-3 h-3 rounded-full shrink-0 mt-1"
-                    style={{ backgroundColor: ag.servico?.cor ?? '#9A4A1A' }}
+                    style={{ backgroundColor: ag.servico?.cor ?? '#C5A46D' }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">

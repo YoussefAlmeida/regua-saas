@@ -4,65 +4,77 @@
 
 /* ================================================================
    RÉGUA — Design Tokens
-   Direção "Ofício": papel quente, tinta e cobre. Claro, legível no
-   balcão com sol, com cara de barbearia de respeito.
-   (os nomes amber/accent ficaram por compatibilidade: hoje são o cobre)
+   Identidade oficial "premium dark": preto carvão, grafite, dourado
+   fosco, off-white e verde.
+     Preto carvão  #17191D  fundo
+     Grafite       #25282E  cartões e superfícies
+     Dourado fosco #C5A46D  ação principal e destaque (com parcimônia)
+     Off-white     #F2EFE9  texto
+     Verde         #477A60  confirmação e indicadores positivos
+   O verde oficial é escuro demais pra TEXTO sobre o carvão (contraste
+   3,5:1); o token "entrada" usa um tom mais claro da mesma cor (6,9:1)
+   e o oficial fica em --verde, pra preenchimentos.
+   (os nomes amber/accent ficaram por compatibilidade: hoje são o dourado)
    ================================================================ */
 @layer base {
   :root {
+    color-scheme: dark;
+
     /* ── shadcn/ui — sistema HSL ──────────────────────────────── */
-    --background:          36 33% 95%;    /* #F6F3EE */
-    --foreground:          36 9% 10%;     /* #1B1916 */
-    --card:                0 0% 100%;
-    --card-foreground:     36 9% 10%;
-    --popover:             0 0% 100%;
-    --popover-foreground:  36 9% 10%;
-    --primary:             22 71% 35%;    /* #9A4A1A — cobre */
-    --primary-foreground:  0 0% 100%;
-    --secondary:           36 22% 90%;
-    --secondary-foreground: 36 9% 10%;
-    --muted:               36 22% 90%;
-    --muted-foreground:    32 8% 39%;     /* #6A635B */
-    --accent:              22 71% 35%;
-    --accent-foreground:   0 0% 100%;
-    --destructive:         4 62% 44%;     /* #B4322A */
-    --destructive-foreground: 0 0% 100%;
-    --border:              38 21% 83%;    /* #DDD6CA */
-    --input:               35 9% 52%;
-    --ring:                22 71% 35%;
+    --background:          220 12% 10%;   /* #17191D */
+    --foreground:          40 26% 93%;    /* #F2EFE9 */
+    --card:                220 10% 16%;   /* #25282E */
+    --card-foreground:     40 26% 93%;
+    --popover:             220 10% 16%;
+    --popover-foreground:  40 26% 93%;
+    --primary:             38 43% 60%;    /* #C5A46D — dourado fosco */
+    --primary-foreground:  220 12% 10%;
+    --secondary:           218 10% 20%;
+    --secondary-foreground: 40 26% 93%;
+    --muted:               218 10% 20%;
+    --muted-foreground:    40 7% 64%;     /* #A9A59D */
+    --accent:              38 43% 60%;
+    --accent-foreground:   220 12% 10%;
+    --destructive:         5 70% 66%;     /* #E5746A */
+    --destructive-foreground: 220 12% 10%;
+    --border:              220 10% 24%;   /* #373B43 */
+    --input:               220 6% 48%;
+    --ring:                38 43% 60%;
     --radius:              0.75rem;
 
     /* ── RÉGUA custom tokens ──────────────────────────────────── */
-    --bg:            #F6F3EE;   /* papel */
-    --surface:       #FFFFFF;   /* cartões */
-    --surface-2:     #EFEAE2;   /* áreas recuadas, chips */
-    --line:          #DDD6CA;   /* divisórias */
-    --line-forte:    #8C8274;   /* borda de campo (contraste 3:1) */
-    --fg:            #1B1916;   /* tinta */
-    --fg-muted:      #6A635B;
-    --regua-accent:  #9A4A1A;   /* cobre */
-    --accent-press:  #7E3B13;
-    --accent-fg:     #FFFFFF;
+    --bg:            #17191D;   /* preto carvão */
+    --surface:       #25282E;   /* grafite: cartões */
+    --surface-2:     #2E3239;   /* áreas recuadas, chips */
+    --line:          #373B43;   /* divisórias discretas */
+    --line-forte:    #737882;   /* borda de campo (contraste 3:1) */
+    --fg:            #F2EFE9;   /* off-white */
+    --fg-muted:      #A9A59D;
+    --regua-accent:  #C5A46D;   /* dourado fosco */
+    --accent-press:  #B39258;
+    --accent-fg:     #17191D;   /* texto sobre o dourado */
+    --verde:         #477A60;   /* verde oficial (preenchimentos) */
 
     /* Semântica financeira — NUNCA usar pra success/error */
-    --entrada:  #2E7A4E;
-    --saida:    #B4322A;
-    --info:     #2F5F8A;
+    --entrada:  #6FB08E;
+    --saida:    #E5746A;
+    --info:     #8AB4DC;
 
     /* Mesmas cores em canais RGB — o Tailwind usa pra transparência
        (bg-entrada/10, border-amber/30…). Mudou a cor acima? Mude aqui. */
-    --bg-rgb:           246 243 238;
-    --surface-rgb:      255 255 255;
-    --surface-2-rgb:    239 234 226;
-    --line-rgb:         221 214 202;
-    --fg-rgb:           27 25 22;
-    --fg-muted-rgb:     106 99 91;
-    --accent-rgb:       154 74 26;
-    --accent-press-rgb: 126 59 19;
-    --accent-fg-rgb:    255 255 255;
-    --entrada-rgb:      46 122 78;
-    --saida-rgb:        180 50 42;
-    --info-rgb:         47 95 138;
+    --bg-rgb:           23 25 29;
+    --surface-rgb:      37 40 46;
+    --surface-2-rgb:    46 50 57;
+    --line-rgb:         55 59 67;
+    --fg-rgb:           242 239 233;
+    --fg-muted-rgb:     169 165 157;
+    --accent-rgb:       197 164 109;
+    --accent-press-rgb: 179 146 88;
+    --accent-fg-rgb:    23 25 29;
+    --verde-rgb:        71 122 96;
+    --entrada-rgb:      111 176 142;
+    --saida-rgb:        229 116 106;
+    --info-rgb:         138 180 220;
 
     /* Tipografia: --font-display e --font-body vêm do next/font (app/layout.tsx).
        Não redefinir aqui — o :root sobrescrevia a fonte carregada. */
@@ -93,7 +105,7 @@
     text-wrap: balance;
   }
 
-  /* Títulos em serifa: um pouco mais justos */
+  /* Títulos: um pouco mais justos */
   .font-display {
     letter-spacing: -0.015em;
     font-optical-sizing: auto;
@@ -117,7 +129,7 @@
   }
 
   ::selection {
-    background: rgb(var(--accent-rgb) / 0.18);
+    background: rgb(var(--accent-rgb) / 0.3);
   }
 
   :focus-visible {
