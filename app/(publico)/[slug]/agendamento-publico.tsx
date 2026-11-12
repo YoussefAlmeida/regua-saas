@@ -63,6 +63,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+  // Horário marcado num cadastro que a barbearia fez: sem acesso à conta por aqui
+  const [semAcesso, setSemAcesso] = useState(false)
 
   const dias = useMemo(proximosDias, [])
   const ordem: Etapa[] = soUmBarbeiro ? ['servico', 'horario', 'dados'] : ['servico', 'barbeiro', 'horario', 'dados']
@@ -158,6 +160,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
       if (json.horarioOcupado) { setEtapa('horario'); carregarAgenda(profissional, servico, data) }
       return
     }
+    setSemAcesso(!!json.semAcesso)
     if (json.cliente?.nome) setLogado({ nome: json.cliente.nome })
     setSenha('')
     setEtapa('sucesso')
@@ -495,13 +498,20 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <p className="font-body text-sm text-fg-muted max-w-xs mx-auto">
                   A gente te lembra pelo WhatsApp 2 horas antes. Se precisar cancelar, dá pra fazer até 1 hora antes.
                 </p>
+                {semAcesso && (
+                  <p className="font-body text-sm text-fg bg-surface border border-line rounded-card p-4 max-w-xs mx-auto text-left">
+                    A barbearia já tinha seu cadastro. Pra ver e cancelar seus horários por aqui, pede pra ela te mandar o link de acesso no WhatsApp.
+                  </p>
+                )}
                 <div className="flex flex-col gap-2 max-w-xs mx-auto">
-                  <Link
-                    href={`/${barbearia.slug}/meus-agendamentos`}
-                    className="font-semibold bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
-                  >
-                    Ver meus horários
-                  </Link>
+                  {!semAcesso && (
+                    <Link
+                      href={`/${barbearia.slug}/meus-agendamentos`}
+                      className="font-semibold bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
+                    >
+                      Ver meus horários
+                    </Link>
+                  )}
                   <button onClick={novoAgendamento} className="text-amber font-ui text-xs uppercase tracking-wider py-2 hover:underline">
                     Marcar outro
                   </button>

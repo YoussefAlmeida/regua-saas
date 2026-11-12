@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { getSessao, hashSenha, verificarSenha, criarToken } from '@/lib/auth'
+import { getSessao, hashSenha, verificarSenha, criarToken, versaoDaSessao } from '@/lib/auth'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { registrarErro } from '@/lib/erros'
@@ -37,6 +37,9 @@ export interface ClienteResolvido {
   whatsapp: string
   /** Token novo quando o cliente acabou de entrar/criar conta — gravar no cookie */
   token?: string
+  /** Cadastro feito pela barbearia e ainda sem senha: o horário é marcado, mas ninguém
+      entra na conta só por saber o número (o acesso vem pelo link que a barbearia manda) */
+  semAcesso?: boolean
 }
 
 type Resultado = { ok: true; cliente: ClienteResolvido } | { ok: false; res: NextResponse }
@@ -89,7 +92,8 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
     .maybeSingle()
   if (erroBusca) return falhaBanco('buscar cliente', erroBusca, barbearia_id)
 
-  const tokenDe = (id: string) => criarToken({ usuario_id: id, papel: 'cliente', barbearia_id })
+  const tokenDe = async (id: string) =>
+    criarToken({ usuario_id: id, papel: 'cliente', barbearia_id, sv: await versaoDaSessao(id) })
 
   if (acesso.acesso === 'novo') {
     const problema = problemaNaSenha(acesso.senha, [whatsapp], SENHA_MIN_CLIENTE)
@@ -102,14 +106,15 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
       if (existente.senha_definida) {
         return falha('Você já tem conta aqui. Toca em "Já tenho conta" e entra com sua senha.', 409, { jaTemConta: true })
       }
-      // Cliente que a barbearia cadastrou: no primeiro acesso ele escolhe a senha
-      const { error } = await db
-        .from('usuarios')
-        .update({ senha_hash: await hashSenha(acesso.senha), senha_definida: true, nome: acesso.nome, atualizado_em: new Date().toISOString() })
-        .eq('id', existente.id)
-      if (error) return falhaBanco('definir senha', error, barbearia_id)
-      await registrarAceite(existente.id)
-      return { ok: true, cliente: { id: existente.id, nome: acesso.nome, whatsapp, token: await tokenDe(existente.id) } }
+      // Cliente que a barbearia cadastrou e ainda não tem senha. Antes, quem digitasse
+      // esse WhatsApp escolhia a senha e entrava na conta (via o histórico da pessoa).
+      // Agora o horário é marcado no cadastro dela, sem abrir a conta: o acesso a
+      // "Meus horários" vem pelo link de senha que a barbearia manda no WhatsApp dela.
+      if (!existente.ativo) return falha('Essa conta está desativada. Fala com a barbearia.', 403)
+      if (!(await permitirUso(`uso:conta-nova:${ip}`, 5, 60 * 60 * 1000))) {
+        return falha('Muitas tentativas a partir desta conexão. Tenta de novo daqui a pouco.', 429)
+      }
+      return { ok: true, cliente: { id: existente.id, nome: existente.nome, whatsapp, semAcesso: true } }
     }
 
     // Contra cadastro em massa (e WhatsApp disparado pra números de terceiros)

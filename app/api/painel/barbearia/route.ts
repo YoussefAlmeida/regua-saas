@@ -9,7 +9,9 @@ const SchemaPatch = z.object({
   telefone: z.string().max(20).nullable().optional(),
   endereco: z.string().max(200).nullable().optional(),
   instagram: z.string().max(50).nullable().optional(),
-  logo_url: z.string().nullable().optional(),
+  // Só imagem do nosso Storage (antes aceitava qualquer endereço)
+  logo_url: z.string().max(500).nullable().optional()
+    .refine(u => !u || (!!process.env.NEXT_PUBLIC_SUPABASE_URL && u.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fotos/`)), 'logo inválido'),
   horario_funcionamento: z.record(
     z.object({
       ativo: z.boolean(),

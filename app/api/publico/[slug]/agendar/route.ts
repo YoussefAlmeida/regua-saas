@@ -9,6 +9,8 @@ import { situacaoPlano } from '@/lib/planos'
 import { enviarTexto, textoConfirmacaoCliente, textoNotificacaoBarbeiro } from '@/lib/whatsapp'
 
 const MAX_HORARIOS_FUTUROS = 3
+/** Até quantos dias à frente o link aceita (a tela mostra 21; folga pra fuso e virada do dia) */
+const MAX_DIAS_A_FRENTE = 60
 import { registrarErro } from '@/lib/erros'
 
 const SchemaAgendar = z.object({
@@ -49,6 +51,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
 
   // O horário precisa estar livre de verdade (expediente, feriado, bloqueio, passado)
   const inicioDate = new Date(inicio)
+  // Só horário "redondo": 09:00:30 passava na conferência (que olha HH:MM) e
+  // inutilizava o horário seguinte do barbeiro
+  if (inicioDate.getUTCSeconds() !== 0 || inicioDate.getUTCMilliseconds() !== 0) {
+    return NextResponse.json({ erro: 'Horário inválido. Escolhe um dos horários da lista.' }, { status: 400 })
+  }
+  if (inicioDate.getTime() > Date.now() + MAX_DIAS_A_FRENTE * 86_400_000) {
+    return NextResponse.json({ erro: 'Ainda não dá pra marcar tão longe. Escolhe uma data mais próxima.' }, { status: 400 })
+  }
   const local = dataHoraLocal(inicioDate.toISOString())
   const livres = await horariosLivres(db, barbearia, profissional_id, local.data, servico.duracao_min)
   if (!livres.includes(local.hora)) {
@@ -151,7 +161,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
       .eq('id', agendamento.id)
   }
 
-  const res = NextResponse.json({ ok: true, agendamento, cliente: { nome: cliente.nome } }, { status: 201 })
+  const res = NextResponse.json(
+    cliente.semAcesso
+      ? { ok: true, agendamento, semAcesso: true }
+      : { ok: true, agendamento, cliente: { nome: cliente.nome } },
+    { status: 201 },
+  )
   if (cliente.token) gravarCookieSessao(res, cliente.token)
   return res
 }

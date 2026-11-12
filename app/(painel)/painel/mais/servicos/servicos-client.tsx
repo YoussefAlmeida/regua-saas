@@ -104,6 +104,12 @@ export default function ServicosClient({
     const res = await fetch(`/api/painel/servicos/${s.id}`, { method: 'DELETE' })
     const json = await res.json()
     if (!res.ok) { alert(json.erro); return }
+    if (json.arquivado) {
+      // Tem atendimento no histórico: foi desativado, não apagado
+      setServicos(prev => prev.map(x => x.id === s.id ? json.servico : x))
+      alert(`"${s.nome}" já foi usado em atendimentos, então foi desativado em vez de apagado. O histórico continua certo.`)
+      return
+    }
     setServicos(prev => prev.filter(x => x.id !== s.id))
   }
 

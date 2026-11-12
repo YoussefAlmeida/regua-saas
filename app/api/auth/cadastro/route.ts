@@ -6,6 +6,7 @@ import { problemaNaSenha } from '@/lib/senha'
 import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 import { falhaInterna } from '@/lib/erros'
 import { VERSAO_TERMOS } from '@/lib/empresa'
+import { ipDa, permitirUso } from '@/lib/limite-login'
 
 const Schema = z.object({
   barbearia_nome: z.string().min(2).max(80),
@@ -27,6 +28,11 @@ export async function POST(req: NextRequest) {
   if (!parse.success) {
     const semAceite = parse.error.issues.some(i => i.path[0] === 'aceite')
     return NextResponse.json({ erro: semAceite ? 'Aceite os Termos e a Política de Privacidade pra continuar' : 'Dados inválidos', detalhes: parse.error.flatten() }, { status: 400 })
+  }
+
+  // Contra criação de barbearias em massa (cada cadastro custa um hash de senha e ocupa um link)
+  if (!(await permitirUso(`uso:cadastro-barbearia:${ipDa(req)}`, 5, 60 * 60 * 1000))) {
+    return NextResponse.json({ erro: 'Muitos cadastros a partir desta conexão. Tenta de novo daqui a pouco.' }, { status: 429 })
   }
 
   const d = parse.data
