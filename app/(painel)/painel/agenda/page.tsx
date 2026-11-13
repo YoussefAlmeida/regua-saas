@@ -17,7 +17,7 @@ export default async function AgendaPage() {
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .eq('barbearia_id', barbearia_id)

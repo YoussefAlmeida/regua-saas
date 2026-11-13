@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import HojeClient from './hoje-client'
+import { comInicio } from '@/lib/extras'
 
 export default async function HojePage() {
   const h = await headers()
@@ -22,7 +23,7 @@ export default async function HojePage() {
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .eq('barbearia_id', barbearia_id)
@@ -32,7 +33,9 @@ export default async function HojePage() {
     .order('inicio')
   // Barbeiro vê só a própria agenda e o próprio número (seção 6.1.1)
   if (souBarbeiro) qHoje = qHoje.eq('profissional_id', meuProfissionalId)
-  const { data: agendamentos } = await qHoje
+  const { data: agsBrutos } = await qHoje
+  // Atendimento em andamento (coluna nova; sem ela, vem vazio)
+  const agendamentos = await comInicio(db, agsBrutos ?? [])
 
   // Atendimentos que já passaram e ninguém marcou (últimos 7 dias, antes de hoje)
   const seteDiasAtras = new Date(Date.UTC(y, m - 1, d - 7, 3, 0, 0)).toISOString()
@@ -41,7 +44,7 @@ export default async function HojePage() {
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .eq('barbearia_id', barbearia_id)

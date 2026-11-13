@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, CalendarDays, Wallet, Users2, Users, Scissors, Clock,
-  BarChart3, ShieldCheck, Settings, CreditCard, LogOut, UserRound,
+  BarChart3, ShieldCheck, Settings, CreditCard, LogOut, UserRound, Percent,
 } from 'lucide-react'
 import { Marca } from '@/components/marca'
 
@@ -20,6 +20,7 @@ const DONO = [
   { href: '/painel/mais/servicos', label: 'Serviços', icon: Scissors },
   { href: '/painel/mais/horarios', label: 'Horários', icon: Clock },
   { href: '/painel/financeiro', label: 'Financeiro', icon: Wallet },
+  { href: '/painel/mais/comissoes', label: 'Comissões', icon: Percent },
   { href: '/painel/mais/relatorios', label: 'Relatórios', icon: BarChart3 },
   { href: '/painel/mais/historico', label: 'Histórico', icon: ShieldCheck },
   { href: '/painel/mais/configuracoes', label: 'Configurações', icon: Settings },
@@ -63,11 +64,12 @@ export default function NavLateral({ papel, barbearia, plano }: { papel: string;
               key={href}
               href={href}
               aria-current={ativo ? 'page' : undefined}
-              className={`flex items-center gap-3 rounded-button px-3 py-2.5 font-ui text-sm transition-colors ${
-                ativo ? 'bg-amber/15 text-amber font-semibold' : 'text-fg-muted hover:text-fg hover:bg-surface-alt'
+              className={`relative flex items-center gap-3 rounded-button px-3 py-2.5 font-ui text-sm transition-colors ${
+                ativo ? 'bg-surface-alt text-fg font-semibold' : 'text-fg-muted hover:text-fg hover:bg-surface-alt'
               }`}
             >
-              <Icon size={17} strokeWidth={ativo ? 2.2 : 1.7} />
+              {ativo && <span className="absolute -left-3 top-2 bottom-2 w-0.5 rounded-full bg-amber" aria-hidden />}
+              <Icon size={17} strokeWidth={ativo ? 2.2 : 1.7} className={ativo ? 'text-amber' : ''} />
               {label}
             </Link>
           )

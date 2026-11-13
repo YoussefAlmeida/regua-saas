@@ -85,7 +85,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .maybeSingle()
