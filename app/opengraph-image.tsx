@@ -12,7 +12,7 @@ export default function Imagem() {
         <div style={{ fontSize: 120, fontWeight: 700, letterSpacing: 18, color: '#F2EFE9' }}>RÉGUA</div>
         <div style={{ width: 220, height: 10, background: '#C5A46D', borderRadius: 5, margin: '16px 0 40px' }} />
         <div style={{ fontSize: 56, fontWeight: 700, lineHeight: 1.15 }}>Sua barbearia na régua.</div>
-        <div style={{ fontSize: 32, marginTop: 24, color: '#A9A59D' }}>Agendamento pelo link, lembrete no WhatsApp e caixa no celular. 14 dias grátis.</div>
+        <div style={{ fontSize: 32, marginTop: 24, color: '#A9A59D' }}>Agendamento pelo link, agenda da equipe e caixa no celular. 14 dias grátis.</div>
       </div>
     ),
     size,

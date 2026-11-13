@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s — RÉGUA",
     default: "RÉGUA — Sua barbearia na régua.",
   },
-  description: "Agenda online, lembrete no WhatsApp e caixa da barbearia no celular. Seu cliente marca pelo link, sem baixar app. 14 dias grátis.",
+  description: "Agenda online, agenda da equipe e caixa da barbearia no celular. Seu cliente marca pelo link, sem baixar app. 14 dias grátis.",
   metadataBase: new URL(urlDoSiteFixa()),
   applicationName: "RÉGUA",
   openGraph: { type: "website", locale: "pt_BR", siteName: "RÉGUA" },
