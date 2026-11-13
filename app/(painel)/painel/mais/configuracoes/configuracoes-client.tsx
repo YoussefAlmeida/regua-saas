@@ -74,8 +74,8 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
   const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
-    <form onSubmit={salvar} className="px-4 py-6 max-w-lg mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+    <form onSubmit={salvar} className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-10 md:gap-y-8 md:items-start">
+      <div className="flex items-center justify-between md:col-span-2">
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Configurações</h1>
         <button
           type="submit"
@@ -169,7 +169,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
                   className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${h.ativo ? 'bg-amber' : 'bg-line'}`}
                 >
                   <span
-                    className={`absolute top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${h.ativo ? 'translate-x-4' : 'translate-x-0.5'}`}
+                    className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${h.ativo ? 'translate-x-[18px]' : 'translate-x-0.5'}`}
                   />
                 </button>
                 <span className={`font-ui text-xs uppercase tracking-wider w-7 shrink-0 ${h.ativo ? 'text-fg' : 'text-fg-muted'}`}>

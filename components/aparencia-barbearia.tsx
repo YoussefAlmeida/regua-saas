@@ -79,7 +79,8 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
   const btnSec = 'font-semibold inline-flex items-center gap-1.5 border border-line text-fg hover:border-amber/50 font-ui text-xs px-3 py-2 rounded-button transition-colors disabled:opacity-50'
 
   return (
-    <section className="px-4 pb-10 max-w-lg mx-auto space-y-5" aria-labelledby="titulo-aparencia">
+    <div className="px-4 md:px-8 pb-10 max-w-lg md:max-w-5xl mx-auto">
+    <section className="space-y-5 md:max-w-lg" aria-labelledby="titulo-aparencia">
       <div className="border-t border-line pt-8 flex items-center justify-between gap-3">
         <div>
           <h2 id="titulo-aparencia" className="font-display text-xl font-semibold text-fg">Aparência da página</h2>
@@ -177,5 +178,6 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
         </>
       )}
     </section>
+    </div>
   )
 }

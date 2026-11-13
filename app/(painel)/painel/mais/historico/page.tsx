@@ -18,7 +18,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
   const plano = await planoDaBarbearia(sessao.barbearia_id)
   if (!plano.recursos.historico) {
     return (
-      <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
+      <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-5">
         <div className="flex items-center gap-3">
           <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
           <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Histórico</h1>
@@ -53,7 +53,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
   const chip = (ativo: boolean) => `font-semibold px-3 py-1.5 rounded-full border font-ui text-[11px] ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted'}`
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-5">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
         <div>

@@ -98,7 +98,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   const nomeMes = new Date(Date.UTC(y, m - 1, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Link href={sessao.papel === 'dono' ? '/painel/mais/relatorios' : '/painel/mais'} className="text-fg-muted hover:text-fg" aria-label="Voltar">
           <ChevronLeft size={20} />
@@ -109,6 +109,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
         </div>
       </div>
 
+      <div className="grid md:grid-cols-2 gap-6 md:gap-4 md:items-stretch">
       {/* Mês em andamento contra o mês passado inteiro */}
       <section className="bg-surface border border-line rounded-card p-5 flex items-center gap-5">
         <div className="relative w-[124px] h-[124px] shrink-0" role="img" aria-label={progresso === null ? 'Sem mês anterior pra comparar' : `${progresso}% do valor de ${nomeMesPassado}`}>
@@ -144,6 +145,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           {periodos[0].qtd} atendimento{periodos[0].qtd !== 1 ? 's' : ''} concluído{periodos[0].qtd !== 1 ? 's' : ''}
         </p>
       </section>
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {periodos.slice(1).map(p => (

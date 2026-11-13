@@ -32,7 +32,7 @@ export default async function PlanoPage() {
   const agendado = barbearia?.plano_agendado ? PLANOS[barbearia.plano_agendado as PlanoPagoId] : null
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Plano</h1>
@@ -107,8 +107,8 @@ export default async function PlanoPage() {
       </p>
 
       {/* Planos */}
-      <section className="space-y-3">
-        <h2 className="font-semibold font-ui text-sm text-fg-muted">Planos</h2>
+      <section className="space-y-3 md:space-y-0 md:grid md:grid-cols-3 md:gap-4 md:items-stretch">
+        <h2 className="font-semibold font-ui text-sm text-fg-muted md:col-span-3">Planos</h2>
         {LISTA_PLANOS.map(p => {
           const atual = !plano.emTeste && !plano.somenteLeitura && plano.plano === p.id
           const recomendado = !atual && p.id === ideal

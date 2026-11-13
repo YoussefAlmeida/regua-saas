@@ -521,7 +521,7 @@ export default function FinanceiroClient({
                           onClick={() => toggleFixa(d)}
                           className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${d.ativa ? 'bg-amber' : 'bg-line'}`}
                         >
-                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${d.ativa ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                          <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${d.ativa ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
                         </button>
                         <button onClick={() => abrirFixa(d)} className="flex-1 min-w-0 text-left">
                           <p className="font-body text-sm text-fg truncate">{d.descricao}</p>
