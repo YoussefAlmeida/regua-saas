@@ -10,6 +10,7 @@ const Schema = z.object({
   preco: z.number().min(0).optional(),
   duracao_min: z.number().int().min(5).max(480).optional(),
   cor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  descricao: z.string().trim().max(140).nullable().optional(),
   ativo: z.boolean().optional(),
 })
 

@@ -23,6 +23,32 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ slug
 
   const db = criarClienteServico()
 
+  // "Qualquer profissional": os horários de todos, e quem atende em cada um
+  if (profissional_id === 'qualquer') {
+    if (!de || !DATA.test(de)) return NextResponse.json({ erro: 'Informe a data inicial' }, { status: 400 })
+    const { data: srv } = await db.from('servicos')
+      .select('duracao_min, barbearia:barbearias!inner(id, slug, horario_funcionamento, dias_fechados)')
+      .eq('id', servico_id).eq('ativo', true).eq('barbearia.slug', slug).maybeSingle()
+    if (!srv) return NextResponse.json({ erro: 'Serviço não encontrado' }, { status: 404 })
+    const b = (Array.isArray(srv.barbearia) ? srv.barbearia[0] : srv.barbearia) as {
+      id: string; horario_funcionamento: Record<string, never> | null; dias_fechados: string[] | null
+    }
+    const { data: profs } = await db.from('profissionais').select('id').eq('barbearia_id', b.id).eq('ativo', true).order('nome').limit(30)
+    const listas = await Promise.all((profs ?? []).map(async p => [p.id, await horariosLivresPeriodo(db, b, p.id, de, dias, srv.duracao_min)] as const))
+    const porProfissional: Record<string, Record<string, string[]>> = Object.fromEntries(listas)
+    // Para cada dia e horário, o primeiro profissional livre
+    const quem: Record<string, Record<string, string>> = {}
+    for (const [pid, porDia] of listas) {
+      for (const [dia, horas] of Object.entries(porDia)) {
+        quem[dia] ??= {}
+        for (const h of horas) quem[dia][h] ??= pid
+      }
+    }
+    const uniao = Object.fromEntries(Object.entries(quem).map(([dia, m]) => [dia, Object.keys(m).sort()]))
+    for (const [, porDia] of listas) for (const dia of Object.keys(porDia)) uniao[dia] ??= []
+    return NextResponse.json({ dias: uniao, quem, porProfissional }, { headers: { 'Cache-Control': 'no-store' } })
+  }
+
   // Uma ida ao banco: serviço + barbeiro, já conferindo que são dessa barbearia
   const [{ data: servico }, { data: profissional }] = await Promise.all([
     db.from('servicos')

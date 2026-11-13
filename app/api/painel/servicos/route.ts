@@ -11,6 +11,7 @@ const Schema = z.object({
   preco: z.number().min(0),
   duracao_min: z.number().int().min(5).max(480),
   cor: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+  descricao: z.string().trim().max(140).nullable().optional(),
 })
 
 export async function GET() {
