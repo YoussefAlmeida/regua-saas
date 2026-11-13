@@ -8,6 +8,9 @@ export default async function HojePage() {
   const souBarbeiro = h.get('x-papel') === 'barbeiro'
   const meuProfissionalId = h.get('x-profissional-id') ?? ''
   const db = await criarClienteAutenticado()
+  const { data: eu } = souBarbeiro
+    ? await db.from('usuarios').select('nome').eq('id', h.get('x-usuario-id') ?? '').maybeSingle()
+    : { data: null }
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
   const [y, m, d] = hoje.split('-').map(Number)
@@ -86,6 +89,7 @@ export default async function HojePage() {
       movimentacoesHoje={movHoje ?? []}
       data={hoje}
       souBarbeiro={souBarbeiro}
+      nome={eu?.nome?.split(' ')[0] ?? ''}
     />
   )
 }

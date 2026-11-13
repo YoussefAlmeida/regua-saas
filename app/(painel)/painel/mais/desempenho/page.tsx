@@ -41,7 +41,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   const semana = inicioLocalUTC(y, m, d - ((diaSemana + 6) % 7))         // segunda-feira
   const mes = inicioLocalUTC(y, m, 1)
   const seteDias = inicioLocalUTC(y, m, d - 6)
-  const desde = new Date(Math.min(semana.getTime(), mes.getTime(), seteDias.getTime()))
+  const mesPassado = inicioLocalUTC(y, m - 1, 1)
+  const desde = new Date(Math.min(semana.getTime(), mesPassado.getTime(), seteDias.getTime()))
 
   const { data: ags } = await todasAsLinhas((de, ate) => db
     .from('agendamentos')
@@ -62,6 +63,13 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
     { rotulo: 'Semana', ...soma(semana) },
     { rotulo: 'Mês', ...soma(mes) },
   ]
+
+  // Mês passado inteiro: referência pro anel de progresso do mês
+  const doMesPassado = feitos.filter(a => { const t = new Date(a.inicio); return t >= mesPassado && t < mes })
+  const totalMesPassado = doMesPassado.reduce((s, a) => s + Number(a.valor_servico), 0)
+  const progresso = totalMesPassado > 0 ? Math.round((periodos[2].valor / totalMesPassado) * 100) : null
+  const nomeMesPassado = new Date(Date.UTC(y, m - 2, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
+  const RAIO = 52, VOLTA = 2 * Math.PI * RAIO
 
   const faltasMes = (ags ?? []).filter(a => a.status === 'faltou' && new Date(a.inicio) >= mes).length
 
@@ -100,6 +108,33 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           {sessao.papel === 'dono' && <p className="font-body text-xs text-fg-muted">Desempenho do barbeiro</p>}
         </div>
       </div>
+
+      {/* Mês em andamento contra o mês passado inteiro */}
+      <section className="bg-surface border border-line rounded-card p-5 flex items-center gap-5">
+        <div className="relative w-[124px] h-[124px] shrink-0" role="img" aria-label={progresso === null ? 'Sem mês anterior pra comparar' : `${progresso}% do valor de ${nomeMesPassado}`}>
+          <svg viewBox="0 0 124 124" className="w-full h-full -rotate-90" aria-hidden>
+            <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--surface-2-rgb))" strokeWidth="10" />
+            {progresso !== null && progresso > 0 && (
+              <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--verde-rgb))" strokeWidth="10" strokeLinecap="round"
+                strokeDasharray={`${(Math.min(progresso, 100) / 100) * VOLTA} ${VOLTA}`} />
+            )}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="font-mono text-xl font-semibold text-fg leading-none">{progresso === null ? '—' : `${progresso}%`}</span>
+            <span className="font-body text-[11px] text-fg-muted mt-1">de {nomeMesPassado}</span>
+          </div>
+        </div>
+        <div className="min-w-0">
+          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Em {nomeMes}</p>
+          <p className="font-mono text-xl font-semibold text-fg whitespace-nowrap mt-1">{brl(periodos[2].valor)}</p>
+          <p className="font-body text-xs text-fg-muted mt-0.5">{periodos[2].qtd} atendimento{periodos[2].qtd !== 1 ? 's' : ''}</p>
+          <p className="font-body text-xs text-fg-muted mt-2">
+            {progresso === null
+              ? 'Sem atendimento concluído no mês passado pra comparar.'
+              : `${nomeMesPassado[0].toUpperCase()}${nomeMesPassado.slice(1)} inteiro fechou em ${brl(totalMesPassado)}.`}
+          </p>
+        </div>
+      </section>
 
       {/* Hoje em destaque, semana e mês embaixo */}
       <section className="bg-surface border border-line rounded-card p-5">
