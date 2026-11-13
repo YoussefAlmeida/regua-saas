@@ -93,9 +93,9 @@ export default function AtendimentoAgora({ ag, ocupado, onFinalizar, onFaltou }:
         </div>
       )}
 
-      <div className="flex gap-2">
-        <button onClick={() => onFinalizar(ag.id)} disabled={ocupado} className="ds-btn-primary flex-1 !min-h-[50px] text-[15px]"><Check size={17} aria-hidden /> Concluir · {formatBRL(ag.valor_servico)}</button>
-        <button onClick={() => onFaltou(ag.id)} disabled={ocupado} className="ds-btn-secondary !min-h-[50px] px-5">Faltou</button>
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => onFinalizar(ag.id)} disabled={ocupado} className="ds-btn-primary flex-[999_1_auto] !min-h-[50px] text-[15px] whitespace-nowrap"><Check size={17} aria-hidden /> Concluir · {formatBRL(ag.valor_servico)}</button>
+        <button onClick={() => onFaltou(ag.id)} disabled={ocupado} className="ds-btn-secondary flex-1 !min-h-[50px] px-5">Faltou</button>
       </div>
       <ContatoCliente whatsapp={ag.cliente?.whatsapp} mensagem={`Oi, ${ag.cliente?.nome?.split(' ')[0] ?? ''}! Sobre seu horário das ${hora(ag.inicio)}:`} />
     </section>

@@ -31,7 +31,7 @@ export default function GraficoFaturamento({ pontos }: { pontos: PontoDia[] }) {
     return () => ro.disconnect()
   }, [])
 
-  const A = 200, esq = 58, dir = 12, topo = 10, base = 24
+  const A = 200, esq = 64, dir = 12, topo = 10, base = 24
   const w = Math.max(0, largura - esq - dir), h = A - topo - base
   const max = teto(Math.max(...pontos.map(p => p.valor), 0))
   const x = (i: number) => esq + (pontos.length > 1 ? (i / (pontos.length - 1)) * w : w / 2)
@@ -64,8 +64,8 @@ export default function GraficoFaturamento({ pontos }: { pontos: PontoDia[] }) {
             </g>
           ))}
           {pontos.map((pt, i) => (i % passo === 0 || i === pontos.length - 1) && (
-            // Último rótulo só se não encostar no anterior
-            (i !== pontos.length - 1 || (pontos.length - 1) % passo === 0 || (pontos.length - 1) % passo > passo / 2) && (
+            // O último dia sempre aparece; some o rótulo que encostaria nele
+            (i === pontos.length - 1 || x(pontos.length - 1) - x(i) >= 64) && (
               <text key={pt.data} x={x(i)} y={A - 6} textAnchor={i === pontos.length - 1 ? 'end' : i === 0 ? 'start' : 'middle'} fontSize={11} fill="rgb(var(--fg-muted-rgb))">
                 {diaMes(pt.data)}
               </text>

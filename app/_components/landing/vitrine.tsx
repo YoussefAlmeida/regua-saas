@@ -42,19 +42,19 @@ export function PainelVitrine() {
           ))}
         </div>
         <div className="flex-1 min-w-0 p-4 space-y-3">
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2.5">
             {([[CalendarCheck, '267', 'Agendamentos', '+12%'], [CircleDollarSign, 'R$ 12.480', 'Faturamento', '+18%'], [Users2, '156', 'Clientes ativos', '+9%']] as const).map(([Icone, v, r, d]) => (
-              <div key={r} className="rounded-xl border border-line bg-bg/60 p-3">
+              <div key={r} className="rounded-xl border border-line bg-bg/60 p-2 sm:p-3">
                 <Icone size={14} className="text-amber" />
-                <p className="mt-2 text-[15px] font-semibold text-fg tabular-nums whitespace-nowrap">{v}</p>
-                <p className="text-[10px] text-fg-muted">{r} <span className="text-entrada font-semibold">{d}</span></p>
+                <p className="mt-2 text-[12px] sm:text-[15px] font-semibold text-fg tabular-nums whitespace-nowrap">{v}</p>
+                <p className="text-[9px] sm:text-[10px] text-fg-muted break-words">{r} <span className="text-entrada font-semibold">{d}</span></p>
               </div>
             ))}
           </div>
           <div className="rounded-xl border border-line bg-bg/60 p-3">
-            <div className="flex items-baseline justify-between">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-2">
               <p className="text-[11px] text-fg-muted">Faturamento · últimos 30 dias</p>
-              <p className="text-[13px] font-semibold text-fg tabular-nums">R$ 12.480,00</p>
+              <p className="text-[13px] font-semibold text-fg tabular-nums whitespace-nowrap">R$ 12.480,00</p>
             </div>
             <Grafico />
           </div>

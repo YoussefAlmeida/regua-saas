@@ -1,5 +1,6 @@
 'use client'
 
+import Cabe from '@/components/cabe'
 import { useState } from 'react'
 import { Check, Pencil } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
@@ -50,8 +51,8 @@ export default function ComissoesClient({ linhasIniciais, liberado }: { linhasIn
   return (
     <>
       <div className="grid grid-cols-2 gap-3">
-        <div className="ds-card p-4"><p className="ds-eyebrow">Gerado em serviços</p><p className="font-display text-xl font-semibold text-fg mt-2 tabular-nums whitespace-nowrap">{brl(gerado)}</p></div>
-        <div className="ds-card p-4"><p className="ds-eyebrow">Comissões a pagar</p><p className="font-display text-xl font-semibold text-amber mt-2 tabular-nums whitespace-nowrap">{brl(total)}</p></div>
+        <div className="ds-card p-4"><p className="ds-eyebrow">Gerado em serviços</p><p className="font-display text-xl font-semibold text-fg mt-2 tabular-nums"><Cabe>{brl(gerado)}</Cabe></p></div>
+        <div className="ds-card p-4"><p className="ds-eyebrow">Comissões a pagar</p><p className="font-display text-xl font-semibold text-amber mt-2 tabular-nums"><Cabe>{brl(total)}</Cabe></p></div>
       </div>
 
       {!liberado && <p className="ds-card p-4 font-body text-sm text-fg">As comissões ainda não foram liberadas nesta conta. Fala com o suporte do RÉGUA.</p>}

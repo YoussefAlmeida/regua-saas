@@ -85,7 +85,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
             const totalCortes = c.agendamentos.filter(a => a.status === 'concluido').length
             const ultimo = ultimoCorte(c.agendamentos)
             return (
-              <div key={c.id} className="ds-card px-4 py-4 flex items-center gap-3">
+              <div key={c.id} className="ds-card px-4 py-4 flex items-center gap-2 min-[400px]:gap-3">
                 <div className="w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-display text-sm text-amber shrink-0">
                   {c.nome.charAt(0).toUpperCase()}
                 </div>
@@ -93,16 +93,17 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
                   <p className="font-semibold font-ui text-sm text-fg truncate">{c.nome}</p>
                   <div className="flex items-center gap-3 mt-0.5">
                     {c.whatsapp && (
-                      <span className="font-body text-xs text-fg-muted">{c.whatsapp}</span>
+                      <span className="font-body text-xs text-fg-muted truncate">{c.whatsapp}</span>
                     )}
                   </div>
+                  <p className="font-body text-xs text-fg-muted mt-0.5 min-[400px]:hidden"><span className="text-amber">{totalCortes}</span> {totalCortes === 1 ? 'corte' : 'cortes'}{ultimo ? ` · último ${ultimo}` : ''}</p>
                 </div>
                 <LinkNovaSenha endpoint="/api/painel/recuperacao" corpo={{ usuario_id: c.id }} nome={c.nome} compacto />
                 <button onClick={() => apagarDados(c)} title="Apagar dados (LGPD)" aria-label={`Apagar dados de ${c.nome}`}
                   className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-saida hover:bg-saida/10 transition-colors shrink-0">
                   <Trash2 size={14} />
                 </button>
-                <div className="text-right shrink-0">
+                <div className="text-right shrink-0 hidden min-[400px]:block">
                   <p className="font-mono text-sm text-amber">{totalCortes}</p>
                   <p className="font-body text-xs text-fg-muted">{totalCortes === 1 ? 'corte' : 'cortes'}</p>
                   {ultimo && (

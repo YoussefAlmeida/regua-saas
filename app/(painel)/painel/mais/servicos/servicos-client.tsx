@@ -163,7 +163,7 @@ export default function ServicosClient({
           {servicos.map(s => (
             <div
               key={s.id}
-              className={`bg-surface rounded-card border px-4 py-4 flex items-center gap-3 transition-opacity ${
+              className={`bg-surface rounded-card border px-4 py-4 flex flex-wrap min-[400px]:flex-nowrap items-center gap-x-3 gap-y-1 transition-opacity ${
                 s.ativo ? 'border-line' : 'border-line opacity-50'
               }`}
             >
@@ -180,13 +180,13 @@ export default function ServicosClient({
                 {s.descricao && <p className="font-body text-xs text-fg-muted truncate">{s.descricao}</p>}
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className="font-mono text-sm text-amber">{formatBRL(s.preco)}</span>
-                  <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
+                  <span className="flex items-center gap-1 font-body text-xs text-fg-muted whitespace-nowrap">
                     <Clock size={11} />
                     {s.duracao_min} min
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center justify-end gap-2 shrink-0 basis-full min-[400px]:basis-auto">
                 <button
                   onClick={() => toggleAtivo(s)}
                   title={s.ativo ? 'Desativar' : 'Ativar'}

@@ -1,5 +1,6 @@
 'use client'
 
+import Cabe from '@/components/cabe'
 import { confirmar } from '@/components/confirmar'
 import GraficoBarras from '@/components/dashboard/grafico-barras'
 
@@ -352,7 +353,7 @@ export default function FinanceiroClient({
                 <div className="grid md:grid-cols-3 gap-3 md:gap-4">
                 <div className="ds-card p-5">
                   <p className="ds-eyebrow">Sobrou no mês</p>
-                  <p className={`font-mono text-5xl md:text-2xl leading-tight mt-1 whitespace-nowrap ${saldo >= 0 ? 'text-entrada' : 'text-saida'}`}>{brl(saldo)}</p>
+                  <p className={`font-mono text-[2.5rem] md:text-2xl leading-tight mt-1 ${saldo >= 0 ? 'text-entrada' : 'text-saida'}`}><Cabe>{brl(saldo)}</Cabe></p>
                   <p className="font-body text-xs text-fg-muted mt-1">o que entrou menos o que saiu</p>
                 </div>
 
@@ -363,9 +364,9 @@ export default function FinanceiroClient({
                   ].map(c => (
                     <div key={c.rot} className="ds-card p-4">
                       <p className="ds-eyebrow">{c.rot}</p>
-                      <p className={`font-mono text-lg mt-1 whitespace-nowrap ${c.cor}`}>{brl(c.v)}</p>
+                      <p className={`font-mono text-lg mt-1 ${c.cor}`}><Cabe>{brl(c.v)}</Cabe></p>
                       {c.vari ? (
-                        <p className={`flex items-center gap-1 font-body text-xs mt-1 ${c.vari.sobe === c.bomSubir ? 'text-entrada' : 'text-saida'}`}>
+                        <p className={`flex flex-wrap items-center gap-x-1 font-body text-xs mt-1 ${c.vari.sobe === c.bomSubir ? 'text-entrada' : 'text-saida'}`}>
                           {c.vari.sobe ? <TrendingUp size={12} /> : <TrendingDown size={12} />} {c.vari.txt} vs mês passado
                         </p>
                       ) : <p className="font-body text-xs text-fg-muted mt-1">sem mês anterior</p>}

@@ -88,7 +88,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/entrar" className="px-3 py-2 text-sm font-semibold text-fg hover:text-amber">Entrar</Link>
-            <Link href={cadastro} className={`${btnOuro} px-4 py-2.5 text-sm`}>Testar grátis</Link>
+            <Link href={cadastro} className={`${btnOuro} px-4 py-2.5 text-sm whitespace-nowrap`}>Testar grátis</Link>
           </div>
         </div>
       </header>
@@ -118,7 +118,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         {/* O produto: painel do dono + link do cliente */}
         <div className="relative max-w-5xl mx-auto px-5 mt-14 md:mt-20 pb-10">
           <PainelVitrine />
-          <CelularVitrine className="hidden md:block absolute -right-2 lg:-right-10 -bottom-2" />
+          <CelularVitrine className="hidden md:block absolute right-2 xl:-right-10 -bottom-2" />
           <p className="sr-only">Imagem do painel do dono com agendamentos, faturamento e próximos horários, e do link de agendamento no celular do cliente.</p>
         </div>
       </section>
@@ -210,8 +210,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                 )}
                 <h3 className="font-display text-[26px] font-semibold">{p.label}</h3>
                 <p className="mt-1 text-sm text-fg-muted">{p.desc}</p>
-                <p className="mt-6 flex items-baseline gap-1">
-                  <span className="font-display text-[42px] leading-none font-semibold tabular-nums">{formatBRL(p.preco)}</span>
+                <p className="mt-6 flex flex-wrap items-baseline gap-1">
+                  <span className="font-display text-[34px] lg:text-[42px] leading-none font-semibold tabular-nums whitespace-nowrap">{formatBRL(p.preco)}</span>
                   <span className="text-sm text-fg-muted">/mês</span>
                 </p>
                 <ul className="mt-6 space-y-2.5 flex-1">
