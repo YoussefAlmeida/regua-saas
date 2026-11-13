@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import { useState, useCallback, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Plus, X, Check, Clock, User, Scissors, Undo2, Lock, CalendarClock } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
@@ -181,7 +182,7 @@ export default function AgendaClient({
   const [salvandoStatus, setSalvandoStatus] = useState(false)
 
   async function atualizarStatus(id: string, status: Status, senha?: string) {
-    if (!senha && status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
+    if (!senha && status === 'cancelado' && !(await confirmar('Cancelar esse horário?', 'Ele volta a ficar livre na agenda. Lembre de avisar o cliente.', { rotulo: 'Cancelar horário', perigo: true }))) return
     setSalvandoStatus(true)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
@@ -322,8 +323,8 @@ export default function AgendaClient({
     : visao === 'mes' ? new Date(`${data.slice(0, 7)}-15T12:00:00`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
     : `${semana[0].slice(8, 10)}/${semana[0].slice(5, 7)} a ${semana[6].slice(8, 10)}/${semana[6].slice(5, 7)}`
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem-5.5rem)] md:h-[calc(100dvh-3.5rem)]">
@@ -483,7 +484,7 @@ export default function AgendaClient({
                 <div key={`b-${b.id}`} className="flex items-center gap-3 border border-dashed border-line rounded-card px-4 py-3 bg-surface-alt/40">
                   <Lock size={14} className="text-fg-muted shrink-0" />
                   <div className="min-w-0">
-                    <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">
+                    <p className="ds-eyebrow">
                       {b.profissional_id === null ? 'Barbearia fechada' : 'Bloqueado'} · {diaTodo ? 'dia inteiro' : `${formatarHora(b.inicio)} – ${formatarHora(b.fim)}`}
                     </p>
                     {b.motivo && <p className="font-body text-xs text-fg-muted truncate">{b.motivo}</p>}

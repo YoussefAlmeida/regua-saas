@@ -34,7 +34,7 @@ export default function LoginAdmin() {
           <h1 className="font-display text-4xl text-amber">Régua</h1>
           <p className="font-ui text-[11px] uppercase tracking-[0.2em] text-fg-muted">Painel do dono do sistema</p>
         </div>
-        <form onSubmit={entrar} className="bg-surface border border-line rounded-card p-6 space-y-4">
+        <form onSubmit={entrar} className="ds-card p-6 space-y-4">
           <div className="space-y-1">
             <label htmlFor="senha" className="font-ui text-sm font-medium text-fg">Senha do admin</label>
             <input

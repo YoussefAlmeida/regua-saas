@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import GraficoBarras from '@/components/dashboard/grafico-barras'
 
 import { useMemo, useState } from 'react'
@@ -298,7 +299,7 @@ export default function FinanceiroClient({
   }
 
   async function deletarFixa(d: DespesaFixa) {
-    if (!confirm(`Apagar "${d.descricao}"? Os meses já lançados continuam no extrato.`)) return
+    if (!(await confirmar(`Apagar "${d.descricao}"?`, 'Os meses já lançados continuam no extrato.', { rotulo: 'Apagar', perigo: true }))) return
     const res = await fetch(`/api/painel/despesas-fixas/${d.id}`, { method: 'DELETE' }).catch(() => null)
     if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
     setDespesas(prev => prev.filter(x => x.id !== d.id))
@@ -307,8 +308,8 @@ export default function FinanceiroClient({
   }
 
   // ── Estilos ─────────────────────────────────────────────────
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
   const chip = (ativo: boolean) => `font-semibold shrink-0 px-3 py-1.5 rounded-full border font-ui text-[11px] transition-colors ${ativo ? 'bg-amber text-accent-fg border-amber' : 'border-line text-fg-muted hover:text-fg'}`
   const totalFixo = despesas.filter(d => d.ativa).reduce((s, d) => s + Number(d.valor), 0)
   const catsDoTipo = categorias.filter(c => c.tipo === novo.tipo)
@@ -349,8 +350,8 @@ export default function FinanceiroClient({
             {tab === 'resumo' && (
               <div className="space-y-4">
                 <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-                <div className="bg-surface border border-line rounded-card p-5">
-                  <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Sobrou no mês</p>
+                <div className="ds-card p-5">
+                  <p className="ds-eyebrow">Sobrou no mês</p>
                   <p className={`font-mono text-5xl md:text-2xl leading-tight mt-1 whitespace-nowrap ${saldo >= 0 ? 'text-entrada' : 'text-saida'}`}>{brl(saldo)}</p>
                   <p className="font-body text-xs text-fg-muted mt-1">o que entrou menos o que saiu</p>
                 </div>
@@ -360,8 +361,8 @@ export default function FinanceiroClient({
                     { rot: 'Entrou', v: entradas, cor: 'text-entrada', vari: varEnt, bomSubir: true },
                     { rot: 'Saiu', v: saidas, cor: 'text-saida', vari: varSai, bomSubir: false },
                   ].map(c => (
-                    <div key={c.rot} className="bg-surface border border-line rounded-card p-4">
-                      <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">{c.rot}</p>
+                    <div key={c.rot} className="ds-card p-4">
+                      <p className="ds-eyebrow">{c.rot}</p>
                       <p className={`font-mono text-lg mt-1 whitespace-nowrap ${c.cor}`}>{brl(c.v)}</p>
                       {c.vari ? (
                         <p className={`flex items-center gap-1 font-body text-xs mt-1 ${c.vari.sobe === c.bomSubir ? 'text-entrada' : 'text-saida'}`}>
@@ -375,7 +376,7 @@ export default function FinanceiroClient({
                 </div>
 
                 {porDiaDoMes.some(b => b.valor > 0) && (
-                  <section className="bg-surface border border-line rounded-card p-4">
+                  <section className="ds-card p-4">
                     <h2 className="font-ui text-sm font-semibold text-fg">Evolução do faturamento</h2>
                     <p className="font-body text-xs text-fg-muted mb-8">Entradas no caixa por dia de {mesLabel(mes)}</p>
                     <GraficoBarras barras={porDiaDoMes} descricao={`Entradas no caixa por dia de ${mesLabel(mes)}`} />
@@ -390,8 +391,8 @@ export default function FinanceiroClient({
 
                 <div className="grid md:grid-cols-2 gap-4 items-start">
                 {porBarbeiro.length > 0 && (
-                  <section className="bg-surface border border-line rounded-card p-4">
-                    <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-3">Entradas por barbeiro</p>
+                  <section className="ds-card p-4">
+                    <p className="ds-eyebrow mb-3">Entradas por barbeiro</p>
                     <ul className="space-y-2.5">
                       {porBarbeiro.map(([nome, v]) => (
                         <li key={nome}>
@@ -404,8 +405,8 @@ export default function FinanceiroClient({
                 )}
 
                 {porCategoria.length > 0 && (
-                  <section className="bg-surface border border-line rounded-card p-4">
-                    <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-3">Pra onde foi o dinheiro</p>
+                  <section className="ds-card p-4">
+                    <p className="ds-eyebrow mb-3">Pra onde foi o dinheiro</p>
                     <ul className="space-y-2.5">
                       {porCategoria.map(([nome, { v, cor }]) => (
                         <li key={nome}>
@@ -462,7 +463,7 @@ export default function FinanceiroClient({
                         <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted">{diaLabel(dia)}</p>
                         <p className={`font-mono text-xs ${totalDia >= 0 ? 'text-entrada' : 'text-saida'}`}>{totalDia >= 0 ? '+' : ''}{brl(totalDia)}</p>
                       </div>
-                      <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+                      <ul className="ds-card divide-y divide-line">
                         {lista.map(m => {
                           const o = origemDe(m)
                           return (
@@ -502,8 +503,8 @@ export default function FinanceiroClient({
             )}
             {tab === 'fixas' && podeDespesasFixas && (
               <div className="space-y-4">
-                <div className="bg-surface border border-line rounded-card p-4">
-                  <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Custo fixo por mês</p>
+                <div className="ds-card p-4">
+                  <p className="ds-eyebrow">Custo fixo por mês</p>
                   <p className="font-mono text-3xl text-saida mt-1">{brl(totalFixo)}</p>
                   <p className="font-body text-xs text-fg-muted mt-1">Cada uma entra sozinha no caixa no dia do vencimento.</p>
                 </div>
@@ -511,7 +512,7 @@ export default function FinanceiroClient({
                 {despesas.length === 0 ? (
                   <p className="font-body text-sm text-fg-muted text-center py-6">Cadastre aluguel, energia, internet… e esqueça de lançar todo mês.</p>
                 ) : (
-                  <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+                  <ul className="ds-card divide-y divide-line">
                     {despesas.map(d => (
                       <li key={d.id} className={`flex items-center gap-3 px-4 py-3 ${!d.ativa ? 'opacity-50' : ''}`}>
                         <button
@@ -660,7 +661,7 @@ export default function FinanceiroClient({
           <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">{aberto.tipo === 'entrada' ? 'Entrada' : 'Saída'} · {diaLabel(aberto.data)}</p>
+                <p className="ds-eyebrow">{aberto.tipo === 'entrada' ? 'Entrada' : 'Saída'} · {diaLabel(aberto.data)}</p>
                 <p className={`font-mono text-4xl mt-1 ${aberto.tipo === 'entrada' ? 'text-entrada' : 'text-saida'}`}>{brl(Number(aberto.valor))}</p>
               </div>
               <button onClick={() => { setAberto(null); setEdit(null) }} aria-label="Fechar"><X size={18} className="text-fg-muted" /></button>

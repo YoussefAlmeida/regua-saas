@@ -21,7 +21,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
       <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-5">
         <div className="flex items-center gap-3">
           <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Histórico</h1>
+          <h1 className="ds-titulo">Histórico</h1>
         </div>
         <RecursoBloqueado
           titulo="Quem lançou, quem apagou, quem mudou valor"
@@ -57,7 +57,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
         <div>
-          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Histórico</h1>
+          <h1 className="ds-titulo">Histórico</h1>
           <p className="font-body text-xs text-fg-muted">Quem lançou, quem apagou, quem mudou valor</p>
         </div>
       </div>
@@ -77,7 +77,7 @@ export default async function HistoricoPage({ searchParams }: { searchParams: Pr
           <p className="font-ui text-[11px] uppercase tracking-wider text-fg-muted mb-1.5 px-1">
             {new Date(dia + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}
           </p>
-          <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+          <ul className="ds-card divide-y divide-line">
             {lista.map(l => {
               const u = Array.isArray(l.usuario) ? l.usuario[0] : l.usuario
               const { texto, alerta } = descreverAuditoria(l)

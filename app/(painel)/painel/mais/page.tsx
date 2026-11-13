@@ -31,7 +31,7 @@ export default async function MaisPage() {
 
   return (
     <div className="px-4 py-6 max-w-lg mx-auto">
-      <h1 className="font-display text-[28px] font-semibold leading-tight text-fg mb-6">Mais</h1>
+      <h1 className="ds-titulo mb-6">Mais</h1>
 
       <div className="space-y-2">
         {itens.map(({ href, label, desc, icon: Icon, bloqueado }) => (

@@ -73,7 +73,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
     avisar('Aparência salva. Já vale na sua página de agendamento.', 'sucesso')
   }
 
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const labelCls = 'ds-label'
   const btnSec = 'font-semibold inline-flex items-center gap-1.5 border border-line text-fg hover:border-amber/50 font-ui text-xs px-3 py-2 rounded-button transition-colors disabled:opacity-50'
 
   return (
@@ -90,7 +90,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
       </div>
 
       {!liberada ? (
-        <p className="flex gap-2 font-body text-sm text-fg bg-surface border border-line rounded-card p-4">
+        <p className="flex gap-2 font-body text-sm text-fg ds-card p-4">
           <AlertTriangle size={16} className="text-amber shrink-0 mt-0.5" aria-hidden />
           A personalização ainda não foi liberada nesta conta. Fala com o suporte do RÉGUA.
         </p>
@@ -123,7 +123,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
           </div>
 
           {/* Cor de destaque */}
-          <label className="flex items-center gap-3 bg-surface border border-line rounded-card p-3 cursor-pointer">
+          <label className="flex items-center gap-3 ds-card p-3 cursor-pointer">
             <input type="color" value={primaria} onChange={e => setPrimaria(e.target.value.toUpperCase())} className="w-11 h-11 rounded-button bg-transparent border border-line cursor-pointer p-0.5 shrink-0" />
             <span className="flex-1 min-w-0">
               <span className="font-ui text-sm font-medium text-fg block">Cor de destaque</span>
@@ -134,8 +134,8 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
 
           {/* Prévia com as cores já ajustadas */}
           <div className="rounded-card border border-line bg-bg p-4 space-y-3" style={tema.vars as React.CSSProperties} aria-label="Prévia das cores">
-            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Prévia</p>
-            <div className="flex items-center justify-between bg-surface border border-line rounded-card px-4 py-3">
+            <p className="ds-eyebrow">Prévia</p>
+            <div className="flex items-center justify-between ds-card px-4 py-3">
               <span className="font-ui text-sm font-semibold text-fg">Corte masculino</span>
               <span className="font-mono text-base text-amber">R$ 40,00</span>
             </div>

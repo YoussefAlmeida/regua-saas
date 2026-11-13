@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Image from 'next/image'
 import { Plus, Pencil, Trash2, Clock, Check, X, ImagePlus } from 'lucide-react'
@@ -120,26 +121,26 @@ export default function ServicosClient({
   }
 
   async function deletar(s: Servico) {
-    if (!confirm(`Deletar "${s.nome}"? Esta ação não pode ser desfeita.`)) return
+    if (!(await confirmar(`Apagar "${s.nome}"?`, 'Se o serviço já foi usado em atendimentos, ele é só desativado, pra manter o histórico.', { rotulo: 'Apagar', perigo: true }))) return
     const res = await fetch(`/api/painel/servicos/${s.id}`, { method: 'DELETE' })
     const json = await res.json()
-    if (!res.ok) { alert(json.erro); return }
+    if (!res.ok) { avisar(json.erro ?? 'Não deu pra apagar', 'erro'); return }
     if (json.arquivado) {
       // Tem atendimento no histórico: foi desativado, não apagado
       setServicos(prev => prev.map(x => x.id === s.id ? json.servico : x))
-      alert(`"${s.nome}" já foi usado em atendimentos, então foi desativado em vez de apagado. O histórico continua certo.`)
+      avisar(`"${s.nome}" já foi usado em atendimentos, então foi desativado em vez de apagado.`, 'info')
       return
     }
     setServicos(prev => prev.filter(x => x.id !== s.id))
   }
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Serviços</h1>
+        <h1 className="ds-titulo">Serviços</h1>
         <button
           onClick={abrirNovo}
           className="font-semibold flex items-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors"

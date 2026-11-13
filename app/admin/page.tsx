@@ -79,7 +79,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {/* Números do negócio */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <div className="col-span-2 bg-surface border border-amber/30 rounded-card p-4">
-            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Receita mensal (MRR)</p>
+            <p className="ds-eyebrow">Receita mensal (MRR)</p>
             <p className="font-mono text-4xl text-amber mt-1">{formatBRL(mrr)}</p>
             <p className="font-body text-xs text-fg-muted mt-1">{conta('ativo')} pagando</p>
           </div>
@@ -87,8 +87,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
             { st: 'trial', n: conta('trial') },
             { st: 'leitura', n: conta('leitura') },
           ].map(c => (
-            <Link key={c.st} href={filtroUrl(c.st)} className="bg-surface border border-line rounded-card p-4 hover:border-amber/40">
-              <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">{STATUS_ADMIN[c.st].rotulo}</p>
+            <Link key={c.st} href={filtroUrl(c.st)} className="ds-card p-4 hover:border-amber/40">
+              <p className="ds-eyebrow">{STATUS_ADMIN[c.st].rotulo}</p>
               <p className="font-mono text-3xl text-fg mt-1">{c.n}</p>
             </Link>
           ))}
@@ -135,7 +135,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
         {filtradas.length === 0 ? (
           <p className="font-body text-sm text-fg-muted text-center py-12">Nenhuma barbearia com esse filtro.</p>
         ) : (
-          <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+          <ul className="ds-card divide-y divide-line">
             {filtradas.map(b => {
               const st = STATUS_ADMIN[b.status] ?? { rotulo: b.status, cor: 'text-fg-muted border-line' }
               const diasTeste = Math.ceil((new Date(b.trial_fim).getTime() - Date.now()) / DIA)

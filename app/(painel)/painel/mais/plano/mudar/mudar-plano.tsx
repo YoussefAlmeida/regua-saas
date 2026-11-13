@@ -58,11 +58,11 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
           <li key={p} className={`flex-1 h-1 rounded-full ${i <= passo ? 'bg-amber' : 'bg-surface-alt'}`} aria-label={p} />
         ))}
       </ol>
-      <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Passo {passo + 1} de {passos.length} · {etapa}</p>
+      <p className="ds-eyebrow">Passo {passo + 1} de {passos.length} · {etapa}</p>
 
       {etapa === 'O que muda' && (
         <section className="space-y-4">
-          <div className="bg-surface border border-line rounded-card p-4 space-y-1">
+          <div className="ds-card p-4 space-y-1">
             <p className="font-body text-sm text-fg">
               De <strong>{de.nome}</strong> ({formatBRL(de.preco)}) pra <strong>{para.nome}</strong> ({formatBRL(para.preco)}) por mês.
             </p>
@@ -98,7 +98,7 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
             O {para.nome} vai até <strong>{para.max}</strong> na agenda. Escolha quem continua recebendo horário novo
             <span className="text-fg-muted"> ({ficam.length} de {para.max})</span>.
           </p>
-          <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+          <ul className="ds-card divide-y divide-line">
             {pessoas.map(p => {
               const fica = ficam.includes(p.id)
               const travado = !fica && para.max !== null && ficam.length >= para.max
@@ -131,7 +131,7 @@ export default function MudarPlano({ de, para, pagoAte, perde, pessoas }: {
 
       {etapa === 'Confirmar' && (
         <section className="space-y-3">
-          <div className="bg-surface border border-line rounded-card p-4 space-y-2 font-body text-sm text-fg">
+          <div className="ds-card p-4 space-y-2 font-body text-sm text-fg">
             <p>Pedido: plano <strong>{para.nome}</strong> por {formatBRL(para.preco)}/mês.</p>
             {precisaEscolher && (
               <>

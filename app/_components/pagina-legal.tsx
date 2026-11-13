@@ -9,7 +9,7 @@ export default function PaginaLegal({ titulo, atualizado, children }: { titulo: 
       <header className="border-b border-line px-4 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link href="/" aria-label="RÉGUA, início"><Marca className="text-fg" /></Link>
-          <nav className="flex gap-4 font-ui text-xs uppercase tracking-wider text-fg-muted">
+          <nav className="flex gap-4 ds-eyebrow">
             <Link href="/termos" className="hover:text-fg">Termos</Link>
             <Link href="/privacidade" className="hover:text-fg">Privacidade</Link>
           </nav>

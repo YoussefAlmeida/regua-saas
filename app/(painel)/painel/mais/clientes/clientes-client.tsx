@@ -50,7 +50,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Clientes</h1>
+        <h1 className="ds-titulo">Clientes</h1>
         <span className="font-mono text-sm text-fg-muted">{lista.length}</span>
       </div>
 
@@ -85,7 +85,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
             const totalCortes = c.agendamentos.filter(a => a.status === 'concluido').length
             const ultimo = ultimoCorte(c.agendamentos)
             return (
-              <div key={c.id} className="bg-surface border border-line rounded-card px-4 py-4 flex items-center gap-3">
+              <div key={c.id} className="ds-card px-4 py-4 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-display text-sm text-amber shrink-0">
                   {c.nome.charAt(0).toUpperCase()}
                 </div>

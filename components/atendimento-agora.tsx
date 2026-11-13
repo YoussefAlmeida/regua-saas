@@ -7,7 +7,7 @@ import { avisar, erroDaResposta } from '@/components/aviso'
 import { formatBRL } from '@/lib/utils'
 
 /* O atendimento da vez: antes de começar, "Iniciar atendimento";
-   em andamento, cronômetro, ficha do cliente (visitas, último serviço,
+   em andamento, a hora em que começou, a ficha do cliente (visitas, último serviço,
    observação da equipe) e "Finalizar atendimento". */
 
 export interface AtendimentoFoco {
@@ -24,7 +24,6 @@ export interface AtendimentoFoco {
 interface Ficha { visitas: number; ultimo: { quando: string; servico: string | null } | null; nota: string | null }
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia' })
-const mmss = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
 export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar, onFaltou }: {
   ag: AtendimentoFoco
@@ -41,9 +40,9 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
   const emAndamento = !!ag.iniciado_em
 
   useEffect(() => {
-    const t = setInterval(() => setAgora(Date.now()), emAndamento ? 1000 : 30_000)
+    const t = setInterval(() => setAgora(Date.now()), 30_000)
     return () => clearInterval(t)
-  }, [emAndamento])
+  }, [])
 
   // Ficha do cliente: quem atende vê antes de começar
   useEffect(() => {
@@ -73,9 +72,6 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
 
   const faltam = Math.round((new Date(ag.inicio).getTime() - agora) / 60_000)
   const quando = faltam > 60 ? `às ${hora(ag.inicio)}` : faltam > 0 ? `em ${faltam} min` : faltam > -5 ? 'agora' : `atrasado ${-faltam} min`
-  const decorrido = emAndamento ? Math.max(0, Math.floor((agora - new Date(ag.iniciado_em!).getTime()) / 1000)) : 0
-  const previsto = (ag.servico?.duracao_min ?? 30) * 60
-  const passou = decorrido > previsto
   const iniciais = (ag.cliente?.nome ?? '?').split(' ').slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('')
 
   return (
@@ -91,11 +87,9 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
       </div>
 
       {emAndamento && (
-        <div className="rounded-button bg-surface-alt px-4 py-4 text-center">
-          <p className={`font-display text-[40px] leading-none font-semibold tabular-nums ${passou ? 'text-alerta' : 'text-amber'}`} role="timer" aria-live="off">{mmss(decorrido)}</p>
-          <p className="font-body text-xs text-fg-muted mt-1.5">de {ag.servico?.duracao_min ?? 30} minutos previstos · começou às {hora(ag.iniciado_em!)}</p>
-          <div className="h-1 rounded-full bg-line mt-3 overflow-hidden"><div className={`h-full rounded-full ${passou ? 'bg-alerta' : 'bg-amber'}`} style={{ width: `${Math.min(100, (decorrido / previsto) * 100)}%` }} /></div>
-        </div>
+        <p className="rounded-button bg-surface-alt px-3.5 py-2.5 font-body text-sm text-fg">
+          Atendimento iniciado às <strong className="font-display font-semibold text-amber tabular-nums">{hora(ag.iniciado_em!)}</strong>
+        </p>
       )}
 
       {ficha && (

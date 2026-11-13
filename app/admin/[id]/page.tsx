@@ -144,13 +144,13 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
     : []
   const um = <T,>(v: T | T[] | null): T | null => (Array.isArray(v) ? v[0] ?? null : v)
 
-  const card = 'bg-surface border border-line rounded-card p-4'
-  const rotulo = 'font-ui text-xs uppercase tracking-wider text-fg-muted'
+  const card = 'ds-card p-4'
+  const rotulo = 'ds-eyebrow'
 
   return (
     <div className="min-h-screen bg-bg px-4 py-6">
       <div className="max-w-3xl mx-auto space-y-5">
-        <Link href="/admin" className="inline-flex items-center gap-1 font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+        <Link href="/admin" className="inline-flex items-center gap-1 ds-eyebrow hover:text-fg">
           <ChevronLeft size={15} /> Todas as barbearias
         </Link>
 
@@ -293,7 +293,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
         </>)}
 
         {aba === 'config' && (
-          <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+          <ul className="ds-card divide-y divide-line">
             {checklist.map(c => (
               <li key={c.titulo} className="flex gap-3 px-4 py-3">
                 {c.nivel === 'ok' && <CheckCircle2 size={16} className="text-entrada shrink-0 mt-0.5" />}
@@ -317,7 +317,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           atividade.length === 0 ? (
             <p className="font-body text-sm text-fg-muted text-center py-8">Nada registrado ainda.</p>
           ) : (
-            <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+            <ul className="ds-card divide-y divide-line">
               {atividade.map(l => {
                 const u = um(l.usuario)
                 const { texto, alerta } = descreverAuditoria(l)
@@ -340,7 +340,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           agenda.length === 0 ? (
             <p className="font-body text-sm text-fg-muted text-center py-8">Nenhum agendamento ainda.</p>
           ) : (
-            <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+            <ul className="ds-card divide-y divide-line">
               {agenda.map(a => {
                 const cli = um(a.cliente as never) as { nome?: string } | null
                 const srv = um(a.servico as never) as { nome?: string } | null

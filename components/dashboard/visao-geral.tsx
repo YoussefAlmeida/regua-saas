@@ -32,7 +32,7 @@ function Variacao({ v }: { v: number | null }) {
   )
 }
 
-const card = 'bg-surface border border-line rounded-card'
+const card = 'ds-card'
 const rotulo = 'font-body text-xs text-fg-muted'
 
 export default function VisaoGeral({ d }: { d: DadosDashboard }) {
@@ -48,7 +48,7 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
     <div className="px-4 md:px-8 py-6 max-w-6xl mx-auto space-y-4">
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Dashboard</h1>
+          <h1 className="ds-titulo">Dashboard</h1>
           <p className="font-body text-sm text-fg-muted">Visão geral da sua barbearia</p>
         </div>
         <span className="font-body text-xs text-fg-muted border border-line rounded-button px-3 py-1.5">{d.periodo}</span>

@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Link from 'next/link'
 import { TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRight } from 'lucide-react'
@@ -80,7 +81,7 @@ export default function HojeClient({
   })
 
   async function atualizarStatus(id: string, status: Status, senha?: string) {
-    if (!senha && status === 'cancelado' && !confirm('Cancelar esse agendamento? O horário volta a ficar livre.')) return
+    if (!senha && status === 'cancelado' && !(await confirmar('Cancelar esse horário?', 'Ele volta a ficar livre na agenda. Lembre de avisar o cliente.', { rotulo: 'Cancelar horário', perigo: true }))) return
     setAtualizando(id)
     const res = await fetch(`/api/painel/agendamentos/${id}`, {
       method: 'PATCH',
@@ -117,7 +118,7 @@ export default function HojeClient({
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souBarbeiro && nome ? `Olá, ${nome}!` : 'Hoje'}</h1>
+        <h1 className="ds-titulo">{souBarbeiro && nome ? `Olá, ${nome}!` : 'Hoje'}</h1>
         <p className="font-body text-sm text-fg-muted first-letter:uppercase">{souBarbeiro ? `Sua agenda de hoje · ${dataFmt}` : dataFmt}</p>
       </div>
 
@@ -177,12 +178,12 @@ export default function HojeClient({
       {/* Cards de métricas */}
       {souBarbeiro ? (
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-surface border border-line rounded-card p-4">
+          <div className="ds-card p-4">
             <p className="font-mono text-xl font-semibold text-amber leading-tight">{ags.length}</p>
             <p className="font-body text-sm text-fg mt-1">Agendamento{ags.length !== 1 ? 's' : ''}</p>
             <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
           </div>
-          <Link href="/painel/mais/desempenho" className="block bg-surface border border-line rounded-card p-4 hover:border-amber/40 transition-colors">
+          <Link href="/painel/mais/desempenho" className="block ds-card p-4 hover:border-amber/40 transition-colors">
             <p className="font-mono text-xl font-semibold text-entrada leading-tight whitespace-nowrap">{formatBRL(faturadoReal)}</p>
             <p className="font-body text-sm text-fg mt-1">Feito hoje</p>
             <p className="flex items-center gap-0.5 font-body text-xs text-amber mt-0.5">Meu desempenho <ChevronRight size={12} aria-hidden /></p>
@@ -190,18 +191,18 @@ export default function HojeClient({
         </div>
       ) : (
       <div className="grid grid-cols-2 gap-3">
-        <div className="col-span-2 bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Faturado hoje</p>
+        <div className="col-span-2 ds-card p-4">
+          <p className="ds-eyebrow mb-1">Faturado hoje</p>
           <p className="font-mono text-[32px] leading-tight text-entrada whitespace-nowrap">{formatBRL((faturadoReal + entradasManuais))}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} concluído{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow mb-1">Atendimentos</p>
           <p className="font-mono text-xl text-fg">{ags.length}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">no total</p>
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Saídas</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow mb-1">Saídas</p>
           <p className="font-mono text-xl text-saida whitespace-nowrap">{formatBRL(saidasDia)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">lançadas hoje</p>
         </div>
@@ -234,7 +235,7 @@ export default function HojeClient({
               const st = STATUS_COR[ag.status]
               const isAtivo = atualizando === ag.id
               return (
-                <div key={ag.id} className={`bg-surface border border-line rounded-card px-4 py-3.5 transition-opacity ${ag.status === 'concluido' || ag.status === 'faltou' ? 'opacity-70' : ''} ${isAtivo ? 'opacity-50' : ''}`}>
+                <div key={ag.id} className={`ds-card px-4 py-3.5 transition-opacity ${ag.status === 'concluido' || ag.status === 'faltou' ? 'opacity-70' : ''} ${isAtivo ? 'opacity-50' : ''}`}>
                   <div className="flex items-start gap-4">
                     <div className="w-12 shrink-0 text-right">
                       <p className="font-mono text-[17px] font-semibold text-fg leading-tight">{hora(ag.inicio)}</p>
@@ -301,7 +302,7 @@ export default function HojeClient({
 
       {/* Resumo financeiro do dia */}
       {!souBarbeiro && (faturadoReal + entradasManuais - saidasDia) !== 0 && (
-        <div className="bg-surface border border-line rounded-card p-4 flex items-center justify-between">
+        <div className="ds-card p-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrendingUp size={16} className="text-fg-muted" />
             <span className="font-semibold font-ui text-sm text-fg-muted">Saldo do dia</span>

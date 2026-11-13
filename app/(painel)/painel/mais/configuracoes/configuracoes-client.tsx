@@ -70,13 +70,13 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
     setTimeout(() => setSalvo(false), 3000)
   }
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   return (
     <form onSubmit={salvar} className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-10 md:gap-y-8 md:items-start">
       <div className="flex items-center justify-between md:col-span-2">
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Configurações</h1>
+        <h1 className="ds-titulo">Configurações</h1>
         <button
           type="submit"
           disabled={salvando}

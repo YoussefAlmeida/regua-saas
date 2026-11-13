@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -82,7 +83,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
   }
 
   async function rejeitar(id: string) {
-    if (!confirm('Rejeitar este barbeiro?')) return
+    if (!(await confirmar('Rejeitar este barbeiro?', 'Ele não entra na equipe. Você pode mandar um convite novo depois.', { rotulo: 'Rejeitar', perigo: true }))) return
     const res = await fetch(`/api/painel/equipe/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -111,7 +112,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Equipe</h1>
+        <h1 className="ds-titulo">Equipe</h1>
         <button
           onClick={gerarLink}
           disabled={gerandoLink}
@@ -217,7 +218,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
           </h2>
           <div className="space-y-2">
             {ativos.map(b => (
-              <div key={b.id} className="bg-surface border border-line rounded-card px-4 py-4 flex items-center gap-3">
+              <div key={b.id} className="ds-card px-4 py-4 flex items-center gap-3">
                 <div className="font-semibold w-10 h-10 rounded-full bg-surface-alt flex items-center justify-center font-ui text-sm text-fg-muted shrink-0">
                   {b.nome.charAt(0)}
                 </div>
@@ -256,7 +257,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
           </h2>
           <div className="space-y-2">
             {inativos.map(b => (
-              <div key={b.id} className="bg-surface border border-line rounded-card px-4 py-3 flex items-center gap-3">
+              <div key={b.id} className="ds-card px-4 py-3 flex items-center gap-3">
                 <div className="font-semibold w-8 h-8 rounded-full bg-surface-alt flex items-center justify-center font-ui text-xs text-fg-muted shrink-0 opacity-50">
                   {b.nome.charAt(0)}
                 </div>

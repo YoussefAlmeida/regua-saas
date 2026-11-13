@@ -61,7 +61,7 @@ export default function ListaErros({ erros, barbearia_id, mostrarBarbearia = fal
           Marcar os {abertos.length} como resolvidos
         </button>
       )}
-      <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+      <ul className="ds-card divide-y divide-line">
         {erros.map(e => {
           const dica = e.codigo ? DICA[e.codigo] : undefined
           const exp = aberto === e.id
