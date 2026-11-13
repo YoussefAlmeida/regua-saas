@@ -1,3 +1,4 @@
+import { exigir } from '@/lib/permissoes-equipe'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
@@ -29,6 +30,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
   const leitura = await bloqueioSomenteLeitura(sessao.barbearia_id)
   if (leitura) return leitura
+  const semPermissao = await exigir(sessao, 'remarcar')
+  if (semPermissao) return semPermissao
 
   const parse = Schema.safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Escolha o dia e o horário novos' }, { status: 400 })

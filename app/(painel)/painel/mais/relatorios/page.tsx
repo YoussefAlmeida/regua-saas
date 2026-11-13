@@ -81,14 +81,14 @@ export default async function RelatoriosPage() {
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-6">
       <div className="flex items-baseline justify-between">
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Relatórios</h1>
+        <h1 className="ds-titulo">Relatórios</h1>
         <span className="font-body text-xs text-fg-muted inline-block first-letter:uppercase">{nomeMes}</span>
       </div>
 
       {/* Métricas principais */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow mb-1">Atendimentos</p>
           <p className="font-mono text-2xl text-fg">{totalAtendimentos}</p>
           {variacaoAts !== null && (
             <p className={`font-body text-xs mt-1 ${variacaoAts >= 0 ? 'text-entrada' : 'text-saida'}`}>
@@ -96,18 +96,18 @@ export default async function RelatoriosPage() {
             </p>
           )}
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
+        <div className="ds-card p-4">
           {/* Só serviços concluídos; venda de produto e outras entradas ficam no Financeiro ("Entrou") */}
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Em serviços</p>
+          <p className="ds-eyebrow mb-1">Em serviços</p>
           <p className="font-mono text-2xl text-entrada">{formatBRL(totalReceita)}</p>
           <Link href="/painel/financeiro" className="font-body text-xs text-fg-muted underline underline-offset-2 mt-1 inline-block">Caixa completo no Financeiro</Link>
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Ticket médio</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow mb-1">Ticket médio</p>
           <p className="font-mono text-2xl text-amber">{formatBRL(ticketMedio)}</p>
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Clientes únicos</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow mb-1">Clientes únicos</p>
           <p className="font-mono text-2xl text-fg">{clientesDoMes.size}</p>
         </div>
       </div>
@@ -122,8 +122,8 @@ export default async function RelatoriosPage() {
       <div className="grid md:grid-cols-2 gap-4 items-start">
       {/* Novos vs Retorno */}
       {avancado && clientesDoMes.size > 0 && (
-        <div className="bg-surface border border-line rounded-card p-4 space-y-3">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Clientes</p>
+        <div className="ds-card p-4 space-y-3">
+          <p className="ds-eyebrow">Clientes</p>
           <div className="flex gap-4">
             <div className="flex-1 text-center">
               <p className="font-mono text-xl text-entrada">{novos}</p>
@@ -150,8 +150,8 @@ export default async function RelatoriosPage() {
 
       {/* Ranking barbeiros */}
       {avancado && ranking.length > 0 && (
-        <div className="bg-surface border border-line rounded-card overflow-hidden">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted px-4 py-3 border-b border-line">
+        <div className="ds-card overflow-hidden">
+          <p className="ds-eyebrow px-4 py-3 border-b border-line">
             Ranking da equipe
           </p>
           <div className="divide-y divide-line">

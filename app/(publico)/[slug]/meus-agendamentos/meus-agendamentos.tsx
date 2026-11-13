@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CalendarPlus, Navigation, RotateCcw, CalendarX2 } from 'lucide-react'
+import { CalendarPlus, Navigation, RotateCcw, CalendarX2, Star } from 'lucide-react'
 import { clientePodeCancelar } from '@/lib/cancelamento'
 import NavCliente from '@/components/cliente/nav-cliente'
 
@@ -39,7 +39,9 @@ const ROTULO: Record<string, { t: string; c: string }> = {
   faltou: { t: 'Não compareceu', c: 'bg-saida/10 text-saida' },
 }
 
-export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais }: {
+export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais, notasIniciais = {}, podeAvaliar = false }: {
+  notasIniciais?: Record<string, number>
+  podeAvaliar?: boolean
   barbearia: { nome: string; slug: string; telefone: string | null; endereco?: string | null }
   nome: string | null
   agendamentosIniciais: MeuAgendamento[]
@@ -53,6 +55,27 @@ export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais
   const [confirmar, setConfirmar] = useState<MeuAgendamento | null>(null)
   const [cancelando, setCancelando] = useState(false)
   const [msg, setMsg] = useState<{ t: string; erro?: boolean } | null>(null)
+  // Avaliação com estrelas de um atendimento concluído
+  const [notas, setNotas] = useState(notasIniciais)
+  const [avaliar, setAvaliar] = useState<MeuAgendamento | null>(null)
+  const [nota, setNota] = useState(0)
+  const [comentario, setComentario] = useState('')
+  const [enviando, setEnviando] = useState(false)
+
+  async function enviarAvaliacao() {
+    if (!avaliar || nota < 1) return
+    setEnviando(true)
+    const res = await fetch('/api/cliente/avaliacoes', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agendamento_id: avaliar.id, nota, comentario: comentario.trim() || undefined }),
+    }).catch(() => null)
+    setEnviando(false)
+    const alvo = avaliar
+    setAvaliar(null)
+    if (!res?.ok) { setMsg({ t: res ? (await res.json().catch(() => ({}))).erro ?? 'Não deu pra enviar a avaliação' : 'Sem conexão. Tenta de novo.', erro: true }); return }
+    setNotas(n => ({ ...n, [alvo.id]: nota }))
+    setMsg({ t: 'Obrigado pela avaliação!' })
+  }
 
   const agora = Date.now()
   const proximos = ags.filter(a => (a.status === 'agendado' || a.status === 'confirmado') && new Date(a.fim).getTime() > agora)
@@ -159,6 +182,15 @@ export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais
                           <p className="font-display text-sm font-semibold text-fg truncate">{um(a.servico)?.nome ?? 'Atendimento'}</p>
                           <p className="font-body text-xs text-fg-muted truncate">{quando(a.inicio).data} · {um(a.profissional)?.nome ?? ''}</p>
                           <span className={`ds-tag mt-1.5 ${r.c}`}>{r.t}</span>
+                          {a.status === 'concluido' && (notas[a.id] ? (
+                            <span className="flex items-center gap-0.5 text-amber mt-2" aria-label={`Você deu ${notas[a.id]} de 5 estrelas`}>
+                              {Array.from({ length: 5 }, (_, k) => <Star key={k} size={13} fill={k < notas[a.id] ? 'currentColor' : 'none'} className={k < notas[a.id] ? '' : 'text-line'} aria-hidden />)}
+                            </span>
+                          ) : podeAvaliar && (
+                            <button onClick={() => { setAvaliar(a); setNota(0); setComentario('') }} className="flex items-center gap-1 font-body text-xs text-amber mt-2 hover:underline">
+                              <Star size={12} aria-hidden /> Avaliar atendimento
+                            </button>
+                          ))}
                         </div>
                         {a.servico_id && (
                           <Link href={denovo(a)} className="ds-tag border border-line text-fg hover:border-amber hover:text-amber !py-1.5 !px-2.5 shrink-0 transition-colors">
@@ -187,6 +219,34 @@ export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais
             <div className="flex gap-2">
               <button onClick={() => setConfirmar(null)} className="ds-btn-secondary flex-1">Manter</button>
               <button onClick={cancelar} disabled={cancelando} className="ds-btn-danger flex-1">{cancelando ? 'Cancelando…' : 'Cancelar horário'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {avaliar && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal aria-labelledby="t-avaliar">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setAvaliar(null)} />
+          <div className="relative w-full max-w-md bg-surface border border-line rounded-t-2xl sm:rounded-card p-6 space-y-4 animate-in slide-in-from-bottom-4 duration-200">
+            <div>
+              <h2 id="t-avaliar" className="font-display text-lg font-semibold text-fg">Como foi o atendimento?</h2>
+              <p className="font-body text-sm text-fg-muted">{um(avaliar.servico)?.nome} com {um(avaliar.profissional)?.nome ?? 'a equipe'}</p>
+            </div>
+            <div className="flex justify-center gap-1.5" role="radiogroup" aria-label="Nota de 1 a 5 estrelas">
+              {[1, 2, 3, 4, 5].map(n => (
+                <button key={n} type="button" role="radio" aria-checked={nota === n} aria-label={`${n} estrela${n > 1 ? 's' : ''}`} onClick={() => setNota(n)}
+                  className={`w-12 h-12 flex items-center justify-center rounded-button transition-transform active:scale-90 ${n <= nota ? 'text-amber' : 'text-line hover:text-fg-muted'}`}>
+                  <Star size={32} fill={n <= nota ? 'currentColor' : 'none'} aria-hidden />
+                </button>
+              ))}
+            </div>
+            <div>
+              <label className="ds-label" htmlFor="comentario">Quer contar como foi? <span className="text-fg-muted font-normal">(opcional)</span></label>
+              <textarea id="comentario" rows={3} maxLength={300} value={comentario} onChange={e => setComentario(e.target.value)} className="ds-input" placeholder="Seu comentário pode aparecer na página da barbearia, só com o seu primeiro nome." />
+            </div>
+            <div className="flex gap-2">
+              <button onClick={() => setAvaliar(null)} className="ds-btn-secondary flex-1">Agora não</button>
+              <button onClick={enviarAvaliacao} disabled={nota < 1 || enviando} className="ds-btn-primary flex-1">{enviando ? 'Enviando…' : 'Enviar avaliação'}</button>
             </div>
           </div>
         </div>

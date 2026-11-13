@@ -26,7 +26,7 @@ export default async function ErrosPage({ searchParams }: { searchParams: Promis
   return (
     <div className="min-h-screen bg-bg px-4 py-6">
       <div className="max-w-3xl mx-auto space-y-5">
-        <Link href="/admin" className="inline-flex items-center gap-1 font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+        <Link href="/admin" className="inline-flex items-center gap-1 ds-eyebrow hover:text-fg">
           <ChevronLeft size={15} /> Todas as barbearias
         </Link>
         <div>

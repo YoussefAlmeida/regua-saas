@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Star } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { todasAsLinhas } from '@/lib/paginar'
 import { extrasDosProfissionais } from '@/lib/extras'
+import { pode } from '@/lib/permissoes-equipe'
+import { resumoAvaliacoes, notaTexto } from '@/lib/avaliacoes'
 
 /* "Meu desempenho" — Módulo 5
    Só o próprio número: atendimentos feitos e valor gerado. Sem comparar
@@ -20,6 +22,15 @@ function inicioLocalUTC(y: number, m: number, d: number) {
 export default async function DesempenhoPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel === 'cliente') redirect('/entrar')
+
+  if (!(await pode(sessao, 'ver_valores'))) {
+    return (
+      <div className="px-4 py-16 max-w-lg mx-auto text-center space-y-2">
+        <h1 className="ds-titulo">Meu desempenho</h1>
+        <p className="font-body text-sm text-fg-muted">O dono da barbearia não liberou os valores pra equipe. Fala com ele se precisar ver seus números.</p>
+      </div>
+    )
+  }
 
   const db = criarClienteServico()
   const pedido = (await searchParams).p
@@ -77,6 +88,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   const nomeMesPassado = new Date(Date.UTC(y, m - 2, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
   const RAIO = 52, VOLTA = 2 * Math.PI * RAIO
 
+  const avaliacao = (await resumoAvaliacoes(db, sessao.barbearia_id))?.porProfissional[profissional_id] ?? null
+
   const faltasMes = (ags ?? []).filter(a => a.status === 'faltou' && new Date(a.inicio) >= mes).length
 
   // Últimos 7 dias
@@ -110,14 +123,14 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           <ChevronLeft size={20} />
         </Link>
         <div>
-          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{sessao.papel === 'dono' ? prof.nome : 'Meu desempenho'}</h1>
+          <h1 className="ds-titulo">{sessao.papel === 'dono' ? prof.nome : 'Meu desempenho'}</h1>
           {sessao.papel === 'dono' && <p className="font-body text-xs text-fg-muted">Desempenho do barbeiro</p>}
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6 md:gap-4 md:items-stretch">
       {/* Mês em andamento contra o mês passado inteiro */}
-      <section className="bg-surface border border-line rounded-card p-5 flex items-center gap-5">
+      <section className="ds-card p-5 flex items-center gap-5">
         <div className="relative w-[124px] h-[124px] shrink-0" role="img" aria-label={progresso === null ? 'Sem mês anterior pra comparar' : meta ? `${progresso}% da meta do mês` : `${progresso}% do valor de ${nomeMesPassado}`}>
           <svg viewBox="0 0 124 124" className="w-full h-full -rotate-90" aria-hidden>
             <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--surface-2-rgb))" strokeWidth="10" />
@@ -132,7 +145,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           </div>
         </div>
         <div className="min-w-0">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Em {nomeMes}</p>
+          <p className="ds-eyebrow">Em {nomeMes}</p>
           <p className="font-mono text-xl font-semibold text-fg whitespace-nowrap mt-1">{brl(periodos[2].valor)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{periodos[2].qtd} atendimento{periodos[2].qtd !== 1 ? 's' : ''}</p>
           {comissao && (
@@ -149,8 +162,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
       </section>
 
       {/* Hoje em destaque, semana e mês embaixo */}
-      <section className="bg-surface border border-line rounded-card p-5">
-        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Gerado hoje</p>
+      <section className="ds-card p-5">
+        <p className="ds-eyebrow">Gerado hoje</p>
         <p className="font-mono text-5xl text-entrada leading-tight mt-1">{brl(periodos[0].valor)}</p>
         <p className="font-body text-sm text-fg-muted mt-1">
           {periodos[0].qtd} atendimento{periodos[0].qtd !== 1 ? 's' : ''} concluído{periodos[0].qtd !== 1 ? 's' : ''}
@@ -160,8 +173,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
 
       <div className="grid grid-cols-2 gap-3">
         {periodos.slice(1).map(p => (
-          <div key={p.rotulo} className="bg-surface border border-line rounded-card p-4">
-            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">{p.rotulo === 'Mês' ? `Em ${nomeMes}` : 'Nesta semana'}</p>
+          <div key={p.rotulo} className="ds-card p-4">
+            <p className="ds-eyebrow">{p.rotulo === 'Mês' ? `Em ${nomeMes}` : 'Nesta semana'}</p>
             <p className="font-mono text-2xl text-fg mt-1">{brl(p.valor)}</p>
             <p className="font-body text-xs text-fg-muted mt-0.5">{p.qtd} atendimento{p.qtd !== 1 ? 's' : ''}</p>
           </div>
@@ -169,8 +182,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
       </div>
 
       {/* Últimos 7 dias */}
-      <section className="bg-surface border border-line rounded-card p-4">
-        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-4">Últimos 7 dias</p>
+      <section className="ds-card p-4">
+        <p className="ds-eyebrow mb-4">Últimos 7 dias</p>
         <div className="flex items-end gap-2 h-32" role="img" aria-label="Valor gerado por dia nos últimos 7 dias">
           {dias.map((x, i) => (
             <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
@@ -187,22 +200,32 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
       </section>
 
       <div className="grid grid-cols-2 gap-3">
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Faltas no mês</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow">Faltas no mês</p>
           <p className={`font-mono text-2xl mt-1 ${faltasMes ? 'text-saida' : 'text-fg'}`}>{faltasMes}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">cliente não apareceu</p>
         </div>
-        <div className="bg-surface border border-line rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Ticket médio</p>
+        <div className="ds-card p-4">
+          <p className="ds-eyebrow">Ticket médio</p>
           <p className="font-mono text-2xl text-fg mt-1">{periodos[2].qtd ? brl(periodos[2].valor / periodos[2].qtd) : '—'}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">por atendimento no mês</p>
         </div>
       </div>
 
+      {avaliacao && (
+        <section className="ds-card p-4 flex items-center gap-4">
+          <Star size={26} className="text-amber shrink-0" fill="currentColor" aria-hidden />
+          <div>
+            <p className="font-display text-xl font-semibold text-fg tabular-nums">{notaTexto(avaliacao.media)}</p>
+            <p className="font-body text-xs text-fg-muted">avaliação média · {avaliacao.total} avaliaç{avaliacao.total === 1 ? 'ão' : 'ões'} de clientes</p>
+          </div>
+        </section>
+      )}
+
       {top.length > 0 && (
         <section className="space-y-2">
           <h2 className="font-semibold font-ui text-sm text-fg-muted">Mais feitos em {nomeMes}</h2>
-          <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+          <ul className="ds-card divide-y divide-line">
             {top.map(([nome, qtd]) => (
               <li key={nome} className="flex items-center justify-between px-4 py-3">
                 <span className="font-body text-sm text-fg">{nome}</span>

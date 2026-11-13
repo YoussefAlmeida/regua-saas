@@ -93,6 +93,12 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     oQueFazer: migration('20261114000000_app_completo.sql'),
   })
   itens.push({
+    nome: 'Avaliações, galeria de fotos e permissões da equipe',
+    ok: !(await db.from('avaliacoes').select('id').limit(1)).error && !(await db.from('barbearias').select('galeria, permissoes').limit(1)).error,
+    grave: false,
+    oQueFazer: migration('20261115000000_avaliacoes_galeria_permissoes.sql'),
+  })
+  itens.push({
     nome: 'Aparência por barbearia (logo, capa e cores)',
     ok: info.colunas_barbearias
       ? info.colunas_barbearias.includes('cor_primaria')

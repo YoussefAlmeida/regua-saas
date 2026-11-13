@@ -165,6 +165,7 @@
 @layer components {
   .ds-eyebrow { @apply font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-muted; }
   .ds-card    { @apply bg-surface border border-line rounded-card; }
+  .ds-titulo  { @apply font-display text-[28px] font-semibold leading-tight text-fg; }
   .ds-btn     { @apply inline-flex items-center justify-center gap-2 rounded-button font-ui text-sm font-semibold transition-[background-color,border-color,transform] duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none; min-height: 44px; padding-inline: 1rem; }
   .ds-btn-primary   { @apply ds-btn bg-amber text-accent-fg hover:bg-accent-press; }
   .ds-btn-secondary { @apply ds-btn bg-surface border border-line text-fg hover:border-fg/40; }

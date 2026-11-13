@@ -8,6 +8,7 @@ import NavInferior from '@/components/nav-inferior'
 import NavLateral from '@/components/nav-lateral'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
+import Confirmar from '@/components/confirmar'
 import AvisoPlano from '@/components/aviso-plano'
 import PlanoDono from '@/components/plano-dono'
 import { planoDaBarbearia, agendaDoPlano } from '@/lib/plano-servidor'
@@ -83,6 +84,7 @@ export default async function PainelLayout({ children }: { children: React.React
       <NavInferior papel={papel} />
       <Avisos />
       <ConfirmarSenha />
+      <Confirmar />
       {souDono && !plano.somenteLeitura && (
         <PlanoDono aviso={mudanca?.aviso_mudanca ?? null} excedente={agenda.excedente} max={agenda.max} plano={plano.nome} />
       )}

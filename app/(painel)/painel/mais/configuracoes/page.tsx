@@ -25,6 +25,9 @@ export default async function ConfiguracoesPage() {
     .select('logo_url, capa_url, sobre, cor_primaria, cor_secundaria').eq('id', barbearia_id)
     .maybeSingle<{ logo_url: string | null; capa_url: string | null; sobre: string | null; cor_primaria: string | null; cor_secundaria: string | null }>()
 
+  const { data: g } = await criarClienteServico().from('barbearias').select('galeria').eq('id', barbearia_id).maybeSingle<{ galeria: unknown }>()
+  const galeria = Array.isArray(g?.galeria) ? (g!.galeria as unknown[]).filter((u): u is string => typeof u === 'string') : []
+
   return (
     <>
       <ConfiguracoesClient barbearia={barbearia ?? null} siteUrl={await urlDoSiteAtual()} />
@@ -34,7 +37,7 @@ export default async function ConfiguracoesPage() {
           marca={{
             nome: barbearia.nome, slug: barbearia.slug,
             logo_url: marca?.logo_url ?? null, capa_url: marca?.capa_url ?? null, sobre: marca?.sobre ?? null,
-            cor_primaria: marca?.cor_primaria ?? null, cor_secundaria: marca?.cor_secundaria ?? null,
+            cor_primaria: marca?.cor_primaria ?? null, cor_secundaria: marca?.cor_secundaria ?? null, galeria,
           }}
         />
       )}

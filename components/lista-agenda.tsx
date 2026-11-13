@@ -47,12 +47,12 @@ export default function ListaAgenda({ pessoas, max }: { pessoas: PessoaAgenda[];
   return (
     <>
       <div className="flex items-baseline justify-between mb-2">
-        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Na agenda</p>
+        <p className="ds-eyebrow">Na agenda</p>
         <p className={`font-ui text-xs uppercase tracking-wider ${max !== null && naAgenda > max ? 'text-saida' : 'text-fg-muted'}`}>
           {naAgenda}{max !== null ? ` de ${max}` : ''} {max === null && (naAgenda === 1 ? 'pessoa' : 'pessoas')}
         </p>
       </div>
-      <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+      <ul className="ds-card divide-y divide-line">
         {lista.map(p => {
           const travado = !p.naAgenda && cheio
           return (

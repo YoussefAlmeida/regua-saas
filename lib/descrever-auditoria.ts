@@ -52,6 +52,7 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
     case 'despesas_fixas:apagar': return { texto: `apagou a despesa fixa "${a.descricao}"`, alerta: true }
     case 'profissionais:ativar_agenda': return { texto: `colocou ${d.quem ?? 'alguém'} na agenda`, alerta: false }
     case 'profissionais:desativar_agenda': return { texto: `tirou ${d.quem ?? 'alguém'} da agenda${d.agendamentos_cancelados ? ` (${d.agendamentos_cancelados} horários cancelados)` : d.horarios_mantidos ? ` (${d.horarios_mantidos} horários marcados continuam)` : ''}`, alerta: !!d.agendamentos_cancelados }
+    case 'barbearias:permissoes': return { texto: 'mudou as permissões da equipe', alerta: true }
     case 'barbearias:aparencia': return { texto: 'mudou a aparência da página de agendamento', alerta: false }
     case 'barbearias:agendar_plano': return { texto: `pediu mudança pro plano ${d.para ?? ''}${d.em ? ` a partir de ${new Date(String(d.em)).toLocaleDateString('pt-BR')}` : ' (vale quando pagar)'}`, alerta: false }
     case 'barbearias:cancelar_mudanca_plano': return { texto: 'cancelou o pedido de mudança de plano', alerta: false }

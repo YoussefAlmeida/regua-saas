@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { extrasDosServicos } from '@/lib/extras'
+import { resumoAvaliacoes } from '@/lib/avaliacoes'
 
 /** Dados que a página pública mostra — sem passar pela própria API (evita depender de URL do site) */
 export const carregarBarbeariaPublica = cache(async (slug: string) => {
@@ -39,5 +40,12 @@ export const carregarBarbeariaPublica = cache(async (slug: string) => {
   // Foto e descrição de cada serviço (quando a atualização do banco já rodou)
   const comExtras = (servicos ?? []).map(sv => ({ ...sv, foto_url: extras.get(sv.id)?.foto_url ?? null, descricao: extras.get(sv.id)?.descricao ?? null }))
 
-  return { barbearia, profissionais: profissionais ?? [], servicos: comExtras }
+  // Avaliações e galeria (migração 20261115000000); sem ela, vêm vazias
+  const [avaliacoes, { data: g }] = await Promise.all([
+    resumoAvaliacoes(db, barbearia.id),
+    db.from('barbearias').select('galeria').eq('id', barbearia.id).maybeSingle<{ galeria: unknown }>(),
+  ])
+  const galeria = Array.isArray(g?.galeria) ? (g!.galeria as unknown[]).filter((u): u is string => typeof u === 'string').slice(0, 8) : []
+
+  return { barbearia, profissionais: profissionais ?? [], servicos: comExtras, avaliacoes, galeria }
 })

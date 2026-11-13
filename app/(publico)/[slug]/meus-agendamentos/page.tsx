@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
 import MeusAgendamentos, { type MeuAgendamento } from './meus-agendamentos'
 import { temaDaBarbearia } from '@/lib/tema'
+import { minhasAvaliacoes } from '@/lib/avaliacoes'
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -20,6 +21,7 @@ export default async function MeusAgendamentosPage({ params }: Props) {
 
   let nome: string | null = null
   let agendamentos: MeuAgendamento[] = []
+  let avaliacoes: { liberado: boolean; notas: Record<string, number> } = { liberado: false, notas: {} }
   if (logado) {
     const db = criarClienteServico()
     const [{ data: u }, { data: ags }] = await Promise.all([
@@ -36,6 +38,7 @@ export default async function MeusAgendamentosPage({ params }: Props) {
         .limit(100),
     ])
     nome = u?.nome ?? null
+    avaliacoes = await minhasAvaliacoes(db, sessao.usuario_id)
     agendamentos = (ags ?? []) as unknown as MeuAgendamento[]
   }
 
@@ -45,6 +48,8 @@ export default async function MeusAgendamentosPage({ params }: Props) {
       barbearia={{ nome: dados.barbearia.nome, slug: dados.barbearia.slug, telefone: dados.barbearia.telefone, endereco: dados.barbearia.endereco }}
       nome={logado ? nome : null}
       agendamentosIniciais={agendamentos}
+      notasIniciais={avaliacoes.notas}
+      podeAvaliar={avaliacoes.liberado}
     />
     </div>
   )

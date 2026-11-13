@@ -40,12 +40,12 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
   }
 
   const voltar = slug ? `/${slug}/meus-agendamentos` : '/entrar'
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const inputCls = 'ds-input'
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm space-y-6">
-        <Link href={voltar} className="inline-flex items-center gap-1 font-ui text-xs uppercase tracking-wider text-fg-muted hover:text-fg">
+        <Link href={voltar} className="inline-flex items-center gap-1 ds-eyebrow hover:text-fg">
           <ChevronLeft size={15} /> Voltar
         </Link>
         <div>
@@ -65,7 +65,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
                 ))}
               </div>
             )}
-            <form onSubmit={pedir} className="bg-surface border border-line rounded-card p-5 space-y-4">
+            <form onSubmit={pedir} className="ds-card p-5 space-y-4">
               <div>
                 <label htmlFor="v" className="font-ui text-sm font-medium text-fg block mb-1">
                   {tipo === 'email' ? 'E-mail da conta' : 'WhatsApp com DDD'}
@@ -90,7 +90,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
             <p className="font-body text-xs text-fg-muted">O link vale 1 hora e funciona uma vez só.</p>
           </div>
         ) : (
-          <div className="bg-surface border border-line rounded-card p-5 space-y-4">
+          <div className="ds-card p-5 space-y-4">
             <p className="font-body text-sm text-fg">
               {tipo === 'email'
                 ? 'Fala com o suporte do RÉGUA que a gente te manda um link pra criar a senha nova.'

@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ChevronLeft, MapPin, Instagram, Clock, Check, MessageCircle, Scissors, Sparkles, CalendarPlus, Navigation, LogOut, Plus } from 'lucide-react'
+import { ChevronLeft, MapPin, Instagram, Clock, Check, MessageCircle, Scissors, Sparkles, CalendarPlus, Navigation, LogOut, Plus, Star } from 'lucide-react'
 import { problemaNaSenha, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import NavCliente from '@/components/cliente/nav-cliente'
+import { notaTexto, type ResumoAvaliacoes } from '@/lib/avaliacoes'
 
 /* ================================================================
    Página pública de agendamento — a "loja" da barbearia.
@@ -36,6 +37,8 @@ interface Props {
   situacao?: { aberta: boolean; texto: string } | null
   /** Vindo de "Marcar de novo": já chega com serviço e profissional */
   pre?: { servico?: string; profissional?: string }
+  avaliacoes?: ResumoAvaliacoes | null
+  galeria?: string[]
 }
 
 type Dias = Record<string, string[]>
@@ -83,7 +86,7 @@ function Foto({ src, alt, className, children }: { src?: string | null; alt: str
   )
 }
 
-export default function AgendamentoPublico({ barbearia, profissionais, servicos, clienteLogado, aceitando, lembreteAtivo = false, situacao = null, pre }: Props) {
+export default function AgendamentoPublico({ barbearia, profissionais, servicos, clienteLogado, aceitando, lembreteAtivo = false, situacao = null, pre, avaliacoes = null, galeria = [] }: Props) {
   const soUm = profissionais.length === 1
   const dias = useMemo(proximosDias, [])
   const preServico = servicos.find(s => s.id === pre?.servico) ?? null
@@ -262,6 +265,12 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
               <h1 className="font-display text-2xl font-semibold text-fg mt-2.5 leading-tight break-words">{barbearia.nome}</h1>
               {barbearia.endereco && <p className="flex items-center gap-1 font-body text-xs text-fg-muted mt-1"><MapPin size={12} aria-hidden /> {barbearia.endereco}</p>}
               <div className="flex flex-wrap gap-1.5 mt-3">
+                {avaliacoes && (
+                  <span className="ds-tag border border-line text-fg">
+                    <Star size={11} className="text-amber" fill="currentColor" aria-hidden /> {notaTexto(avaliacoes.media)}
+                    <span className="text-fg-muted font-normal">({avaliacoes.total} avaliaç{avaliacoes.total === 1 ? 'ão' : 'ões'})</span>
+                  </span>
+                )}
                 {situacao && (
                   <span className="ds-tag border border-line text-fg-muted">
                     <span className={`w-1.5 h-1.5 rounded-full ${situacao.aberta ? 'bg-entrada' : 'bg-fg-muted'}`} aria-hidden /> {situacao.texto}
@@ -326,6 +335,34 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                     <div className="mt-4 space-y-3">
                       <p className="font-body text-sm text-fg leading-relaxed whitespace-pre-line break-words">{barbearia.sobre || 'A barbearia ainda não escreveu sobre ela.'}</p>
                       {mapa && <a href={mapa} target="_blank" rel="noopener noreferrer" className="ds-btn-secondary w-full"><Navigation size={15} aria-hidden /> Como chegar</a>}
+                      {galeria.length > 0 && (
+                        <section>
+                          <h2 className="ds-eyebrow mb-2 mt-5">Fotos</h2>
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {galeria.map(u => (
+                              <a key={u} href={u} target="_blank" rel="noopener noreferrer" className="relative aspect-square rounded-button overflow-hidden bg-surface-alt border border-line">
+                                <Image src={u} alt={`Foto da ${barbearia.nome}`} fill sizes="170px" className="object-cover" />
+                              </a>
+                            ))}
+                          </div>
+                        </section>
+                      )}
+                      {avaliacoes && avaliacoes.recentes.length > 0 && (
+                        <section>
+                          <h2 className="ds-eyebrow mb-2 mt-5">O que os clientes dizem</h2>
+                          <ul className="space-y-2">
+                            {avaliacoes.recentes.map((a, i) => (
+                              <li key={i} className="ds-card p-3">
+                                <p className="flex items-center gap-0.5 text-amber" aria-label={`${a.nota} de 5 estrelas`}>
+                                  {Array.from({ length: 5 }, (_, k) => <Star key={k} size={12} fill={k < a.nota ? 'currentColor' : 'none'} className={k < a.nota ? '' : 'text-line'} aria-hidden />)}
+                                </p>
+                                <p className="font-body text-sm text-fg mt-1.5 break-words">{a.comentario}</p>
+                                <p className="font-body text-xs text-fg-muted mt-1">{a.nome}</p>
+                              </li>
+                            ))}
+                          </ul>
+                        </section>
+                      )}
                     </div>
                   )}
 
@@ -363,6 +400,11 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                   <span className="flex-1 min-w-0">
                     <span className="block font-display text-[15px] font-semibold text-fg">{p.nome}</span>
                     {p.especialidade && <span className="block font-body text-xs text-fg-muted truncate">{p.especialidade}</span>}
+                    {avaliacoes?.porProfissional[p.id] && (
+                      <span className="flex items-center gap-1 font-body text-[11px] text-fg-muted mt-0.5">
+                        <Star size={10} className="text-amber" fill="currentColor" aria-hidden /> {notaTexto(avaliacoes.porProfissional[p.id].media)} ({avaliacoes.porProfissional[p.id].total})
+                      </span>
+                    )}
                     {agenda === null && !agendaErro
                       ? <span className="block ds-skeleton h-3 w-28 mt-1.5" />
                       : livre && <span className={`block font-body text-[11px] mt-1 ${livre.startsWith('Livre') ? 'text-entrada' : 'text-fg-muted'}`}>{livre}</span>}

@@ -35,12 +35,12 @@ export default async function PlanoPage() {
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Plano</h1>
+        <h1 className="ds-titulo">Plano</h1>
       </div>
 
       {/* Situação agora */}
       <section className={`rounded-card border p-5 space-y-3 ${plano.somenteLeitura ? 'border-saida/40 bg-saida/5' : 'border-line bg-surface'}`}>
-        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Seu plano</p>
+        <p className="ds-eyebrow">Seu plano</p>
         {plano.emTeste ? (
           <>
             <p className="font-display text-3xl text-amber">Teste grátis</p>
@@ -168,8 +168,8 @@ export default async function PlanoPage() {
         })}
       </section>
 
-      <section className="bg-surface border border-line rounded-card p-4 space-y-2">
-        <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Como funciona</p>
+      <section className="ds-card p-4 space-y-2">
+        <p className="ds-eyebrow">Como funciona</p>
         <ul className="space-y-1.5 font-body text-sm text-fg-muted list-disc pl-4">
           <li>Os 14 dias de teste têm tudo liberado, sem limite.</li>
           <li>Se o teste acabar sem plano, a conta fica só leitura na hora: nada se perde, mas pausa agenda e caixa.</li>

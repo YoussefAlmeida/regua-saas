@@ -33,7 +33,7 @@ export default function NovaSenha({ token, nome, minimo }: { token: string; nome
     router.replace(json.destino ?? '/entrar')
   }
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const inputCls = 'ds-input'
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center px-4 py-10">
@@ -46,7 +46,7 @@ export default function NovaSenha({ token, nome, minimo }: { token: string; nome
         {aviso ? (
           <p className="bg-surface border border-entrada/30 rounded-card p-5 font-body text-sm text-fg">{aviso}</p>
         ) : (
-          <form onSubmit={salvar} className="bg-surface border border-line rounded-card p-5 space-y-4">
+          <form onSubmit={salvar} className="ds-card p-5 space-y-4">
             <div>
               <label htmlFor="s1" className="font-ui text-sm font-medium text-fg block mb-1">Senha nova</label>
               <input id="s1" type="password" autoComplete="new-password" inputMode={minimo === 4 ? 'numeric' : undefined}

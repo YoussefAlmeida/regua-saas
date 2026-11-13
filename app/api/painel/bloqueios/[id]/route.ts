@@ -1,3 +1,4 @@
+import { exigir } from '@/lib/permissoes-equipe'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
@@ -8,6 +9,9 @@ import { falhaInterna } from '@/lib/erros'
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const sessao = await getSessao()
   if (!sessao) return NextResponse.json({ erro: 'Não autenticado' }, { status: 401 })
+
+  const semPermissao = await exigir(sessao, 'bloquear')
+  if (semPermissao) return semPermissao
 
   const { id } = await params
   const db = criarClienteServico()

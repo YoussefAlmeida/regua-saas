@@ -77,8 +77,8 @@ export default function CadastroBarbeariaPage() {
     }
   }
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-12">

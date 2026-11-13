@@ -1,5 +1,6 @@
 'use client'
 
+import { confirmar } from '@/components/confirmar'
 import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, Lock, Trash2, Plus, Check, AlertTriangle } from 'lucide-react'
@@ -181,15 +182,15 @@ export default function HorariosClient({
   }
 
   async function desbloquear(id: string) {
-    if (!confirm('Liberar esse horário de novo?')) return
+    if (!(await confirmar('Liberar esse horário de novo?', 'Os clientes voltam a conseguir marcar nele.', { rotulo: 'Liberar' }))) return
     const res = await fetch(`/api/painel/bloqueios/${id}`, { method: 'DELETE' }).catch(() => null)
     if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
     setBloqueios(b => b.filter(x => x.id !== id))
     avisar('Horário liberado.', 'sucesso')
   }
 
-  const inputCls = 'bg-surface border border-line rounded-button px-2.5 py-2 font-body text-sm text-fg focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   // O que o dono definiu: o limite de todos
   const cardFuncionamento = (
@@ -226,7 +227,7 @@ export default function HorariosClient({
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-8">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souDono ? 'Horários' : 'Meu horário'}</h1>
+        <h1 className="ds-titulo">{souDono ? 'Horários' : 'Meu horário'}</h1>
       </div>
 
       {/* Dono: o que vale pra barbearia toda x a agenda dele (se também corta) */}

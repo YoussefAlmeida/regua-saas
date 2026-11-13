@@ -61,8 +61,8 @@ export default function AcoesBarbearia({ barbearia: b, pedido }: Props) {
   const parado = b.status === 'leitura' || b.status === 'cancelado'
 
   return (
-    <section className="bg-surface border border-line rounded-card p-4 space-y-4">
-      <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Ações</p>
+    <section className="ds-card p-4 space-y-4">
+      <p className="ds-eyebrow">Ações</p>
 
       {msg && (
         <p role="status" className={`font-body text-sm rounded-button px-3 py-2 border ${msg.erro ? 'text-saida border-saida/30 bg-saida/5' : 'text-entrada border-entrada/30 bg-entrada/5'}`}>

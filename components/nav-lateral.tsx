@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, CalendarDays, Wallet, Users2, Users, Scissors, Clock,
-  BarChart3, ShieldCheck, Settings, CreditCard, LogOut, UserRound, Percent,
+  BarChart3, ShieldCheck, Settings, CreditCard, LogOut, UserRound, Percent, KeyRound,
 } from 'lucide-react'
 import { Marca } from '@/components/marca'
 
@@ -23,6 +23,7 @@ const DONO = [
   { href: '/painel/mais/comissoes', label: 'Comissões', icon: Percent },
   { href: '/painel/mais/relatorios', label: 'Relatórios', icon: BarChart3 },
   { href: '/painel/mais/historico', label: 'Histórico', icon: ShieldCheck },
+  { href: '/painel/mais/permissoes', label: 'Permissões', icon: KeyRound },
   { href: '/painel/mais/configuracoes', label: 'Configurações', icon: Settings },
   { href: '/painel/mais/plano', label: 'Plano', icon: CreditCard },
 ]

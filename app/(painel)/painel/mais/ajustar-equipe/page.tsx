@@ -24,7 +24,7 @@ export default async function AjustarEquipePage() {
     <div className="px-4 py-6 max-w-lg mx-auto space-y-5">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Quem fica na agenda</h1>
+        <h1 className="ds-titulo">Quem fica na agenda</h1>
       </div>
 
       {agenda.excedente === 0 ? (

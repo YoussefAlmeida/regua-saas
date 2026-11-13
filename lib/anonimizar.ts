@@ -35,6 +35,8 @@ export async function anonimizarCliente(usuario_id: string, barbearia_id: string
     await db.from('tentativas_login').delete().in('chave', [`id:${u.whatsapp}`, `id:rec:${u.whatsapp}`, `id:reauth:${u.id}`])
   }
   await db.from('dispositivos').delete().eq('usuario_id', u.id)
+  // As notas ficam (sem nome); o texto que a pessoa escreveu sai
+  await db.from('avaliacoes').update({ comentario: null }).eq('cliente_id', u.id)
   return { ok: true as const, cancelados: cancelados?.length ?? 0 }
 }
 

@@ -94,7 +94,7 @@ export default function ComecarClient({
   }
 
   const textoDivulgar = `Agora dá pra marcar horário na ${barbearia.nome} direto pelo celular, sem baixar app: ${linkPublico}`
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2.5 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
+  const inputCls = 'ds-input'
   const primario = 'font-semibold w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-40'
 
   return (
@@ -171,7 +171,7 @@ export default function ComecarClient({
           <p className="font-body text-sm text-fg-muted">Toca nos que vocês fazem e ajusta o preço. Dá pra mudar depois em Mais → Serviços.</p>
 
           {servicos.length > 0 && (
-            <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+            <ul className="ds-card divide-y divide-line">
               {servicos.map(s => (
                 <li key={s.id} className="flex items-center gap-3 px-4 py-3">
                   <Check size={14} className="text-entrada shrink-0" />

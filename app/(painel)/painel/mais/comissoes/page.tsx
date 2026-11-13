@@ -55,7 +55,7 @@ export default async function ComissoesPage({ searchParams }: { searchParams: Pr
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-5">
       <div className="flex items-end justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Comissões</h1>
+          <h1 className="ds-titulo">Comissões</h1>
           <p className="font-body text-sm text-fg-muted">Quanto cada profissional gerou e quanto recebe</p>
         </div>
         <div className="flex items-center gap-1">

@@ -1,3 +1,4 @@
+import { exigir } from '@/lib/permissoes-equipe'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
@@ -70,6 +71,8 @@ export async function POST(req: NextRequest) {
 
   const bloqueio = await bloqueioSomenteLeitura(sessao.barbearia_id)
   if (bloqueio) return bloqueio
+  const semPermissao = await exigir(sessao, 'marcar')
+  if (semPermissao) return semPermissao
 
   const body = await req.json().catch(() => null)
   const parse = SchemaPost.safeParse(body)

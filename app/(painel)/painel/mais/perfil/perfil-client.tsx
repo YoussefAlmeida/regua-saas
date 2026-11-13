@@ -39,14 +39,14 @@ export default function PerfilClient({ inicial }: { inicial: { nome: string; esp
     avisar('Perfil salvo.', 'sucesso')
   }
 
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
+  const inputCls = 'ds-input'
+  const labelCls = 'ds-label'
 
   return (
     <form onSubmit={salvar} className="px-4 py-6 max-w-lg mx-auto space-y-8">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Meu perfil</h1>
+        <h1 className="ds-titulo">Meu perfil</h1>
       </div>
 
       <div className="flex flex-col items-center gap-3">
