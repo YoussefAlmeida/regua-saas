@@ -41,8 +41,6 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
       const quando = (v: unknown) => new Date(String(v)).toLocaleString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
       return { texto: `remarcou um horário de ${quando(a.inicio)} para ${quando(d.inicio)}${a.profissional_id !== d.profissional_id ? ' (trocou o barbeiro)' : ''}`, alerta: false }
     }
-    case 'agendamentos:iniciar': return { texto: 'iniciou um atendimento', alerta: false }
-    case 'agendamentos:desfazer_inicio': return { texto: 'desfez o início de um atendimento', alerta: false }
     case 'profissionais:comissao_meta': return { texto: 'mudou a comissão ou a meta de um barbeiro', alerta: true }
     case 'agendamentos:criar':
       return { texto: `marcou um horário${d.origem === 'link' ? ' pelo link' : ''}`, alerta: false }

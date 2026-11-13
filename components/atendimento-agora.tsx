@@ -1,21 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Play, Check, Pencil } from 'lucide-react'
+import { Check, Pencil } from 'lucide-react'
 import ContatoCliente from '@/components/contato-cliente'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { formatBRL } from '@/lib/utils'
 
-/* O atendimento da vez: antes de começar, "Iniciar atendimento";
-   em andamento, a hora em que começou, a ficha do cliente (visitas, último serviço,
-   observação da equipe) e "Finalizar atendimento". */
+/* O atendimento da vez: quem é, a ficha do cliente (visitas, último
+   serviço, observação da equipe) e os dois desfechos: Concluir ou Faltou. */
 
 export interface AtendimentoFoco {
   id: string
   inicio: string
   fim: string
   valor_servico: number
-  iniciado_em?: string | null
   cliente: { id?: string; nome: string; whatsapp: string | null } | null
   servico: { nome: string; duracao_min: number } | null
   profissional: { nome: string } | null
@@ -25,10 +23,9 @@ interface Ficha { visitas: number; ultimo: { quando: string; servico: string | n
 
 const hora = (iso: string) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia' })
 
-export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar, onFaltou }: {
+export default function AtendimentoAgora({ ag, ocupado, onFinalizar, onFaltou }: {
   ag: AtendimentoFoco
   ocupado: boolean
-  onIniciado: (id: string, iniciado_em: string | null) => void
   onFinalizar: (id: string) => void
   onFaltou: (id: string) => void
 }) {
@@ -36,8 +33,6 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
   const [ficha, setFicha] = useState<Ficha | null>(null)
   const [editando, setEditando] = useState(false)
   const [nota, setNota] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const emAndamento = !!ag.iniciado_em
 
   useEffect(() => {
     const t = setInterval(() => setAgora(Date.now()), 30_000)
@@ -53,15 +48,6 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
     return () => { vivo = false }
   }, [ag.id, ag.cliente?.id])
 
-  async function iniciar(desfazer = false) {
-    setEnviando(true)
-    const res = await fetch(`/api/painel/agendamentos/${ag.id}/iniciar`, { method: desfazer ? 'DELETE' : 'POST' }).catch(() => null)
-    setEnviando(false)
-    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
-    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
-    onIniciado(ag.id, (await res.json()).iniciado_em)
-  }
-
   async function salvarNota() {
     if (!ag.cliente?.id) return
     const res = await fetch(`/api/painel/clientes/${ag.cliente.id}/resumo`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nota: nota.trim() || null }) }).catch(() => null)
@@ -75,22 +61,16 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
   const iniciais = (ag.cliente?.nome ?? '?').split(' ').slice(0, 2).map(p => p.charAt(0).toUpperCase()).join('')
 
   return (
-    <section className="ds-card border-amber p-4 space-y-3.5" aria-label={emAndamento ? 'Atendimento em andamento' : 'Próximo atendimento'}>
+    <section className="ds-card border-amber p-4 space-y-3.5" aria-label="Próximo atendimento">
       <div className="flex items-center gap-3">
         <span className="w-11 h-11 rounded-full bg-surface-alt border border-line flex items-center justify-center font-display text-sm font-semibold text-fg shrink-0" aria-hidden>{iniciais}</span>
         <div className="flex-1 min-w-0">
-          <p className="ds-eyebrow !text-amber">{emAndamento ? 'Em atendimento' : 'A seguir'}</p>
+          <p className="ds-eyebrow !text-amber">A seguir</p>
           <p className="font-display text-base font-semibold text-fg truncate">{ag.cliente?.nome ?? 'Cliente'}</p>
           <p className="font-body text-xs text-fg-muted truncate">{ag.servico?.nome} · {hora(ag.inicio)} – {hora(ag.fim)}{ag.profissional ? ` · ${ag.profissional.nome}` : ''}</p>
         </div>
-        {!emAndamento && <span className={`ds-tag border shrink-0 ${faltam < -5 ? 'border-alerta/50 text-alerta' : 'border-amber/40 text-amber'}`}>{quando}</span>}
+        <span className={`ds-tag border shrink-0 ${faltam < -5 ? 'border-alerta/50 text-alerta' : 'border-amber/40 text-amber'}`}>{quando}</span>
       </div>
-
-      {emAndamento && (
-        <p className="rounded-button bg-surface-alt px-3.5 py-2.5 font-body text-sm text-fg">
-          Atendimento iniciado às <strong className="font-display font-semibold text-amber tabular-nums">{hora(ag.iniciado_em!)}</strong>
-        </p>
-      )}
 
       {ficha && (
         <div className="rounded-button border border-line px-3.5 py-3 space-y-1.5">
@@ -113,20 +93,10 @@ export default function AtendimentoAgora({ ag, ocupado, onIniciado, onFinalizar,
         </div>
       )}
 
-      {emAndamento ? (
-        <div className="space-y-2">
-          <button onClick={() => onFinalizar(ag.id)} disabled={ocupado} className="ds-btn-primary w-full !min-h-[50px] text-[15px]"><Check size={17} aria-hidden /> Finalizar atendimento · {formatBRL(ag.valor_servico)}</button>
-          <button onClick={() => iniciar(true)} disabled={enviando} className="ds-btn-ghost w-full !min-h-[36px] text-xs">Ainda não comecei (desfazer)</button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <button onClick={() => iniciar()} disabled={enviando || ocupado} className="ds-btn-primary w-full !min-h-[50px] text-[15px]"><Play size={16} aria-hidden /> Iniciar atendimento</button>
-          <div className="flex gap-2">
-            <button onClick={() => onFinalizar(ag.id)} disabled={ocupado} className="ds-btn-secondary flex-1 !min-h-[38px] text-xs">Concluir direto</button>
-            <button onClick={() => onFaltou(ag.id)} disabled={ocupado} className="ds-btn-secondary flex-1 !min-h-[38px] text-xs">Faltou</button>
-          </div>
-        </div>
-      )}
+      <div className="flex gap-2">
+        <button onClick={() => onFinalizar(ag.id)} disabled={ocupado} className="ds-btn-primary flex-1 !min-h-[50px] text-[15px]"><Check size={17} aria-hidden /> Concluir · {formatBRL(ag.valor_servico)}</button>
+        <button onClick={() => onFaltou(ag.id)} disabled={ocupado} className="ds-btn-secondary !min-h-[50px] px-5">Faltou</button>
+      </div>
       <ContatoCliente whatsapp={ag.cliente?.whatsapp} mensagem={`Oi, ${ag.cliente?.nome?.split(' ')[0] ?? ''}! Sobre seu horário das ${hora(ag.inicio)}:`} />
     </section>
   )

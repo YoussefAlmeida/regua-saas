@@ -20,7 +20,6 @@ interface Agendamento {
   status: Status
   valor_servico: number
   profissional: { id: string; nome: string } | null
-  iniciado_em?: string | null
   cliente: { id?: string; nome: string; whatsapp: string | null } | null
   servico: { nome: string; duracao_min: number; cor: string } | null
 }
@@ -115,8 +114,8 @@ export default function HojeClient({
 
   // Próximo agendamento pendente
   const agora = new Date()
-  // O da vez: o que já começou; senão, o primeiro que ainda não terminou
-  const foco = pendentes.find(a => a.iniciado_em) ?? pendentes.find(a => new Date(a.fim) > agora) ?? null
+  // O da vez: o primeiro que ainda não terminou
+  const foco = pendentes.find(a => new Date(a.fim) > agora) ?? null
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-6">
@@ -217,7 +216,6 @@ export default function HojeClient({
         <AtendimentoAgora
           ag={foco}
           ocupado={atualizando === foco.id}
-          onIniciado={(id, iniciado_em) => setAgs(prev => prev.map(a => a.id === id ? { ...a, iniciado_em } : a))}
           onFinalizar={id => atualizarStatus(id, 'concluido')}
           onFaltou={id => atualizarStatus(id, 'faltou')}
         />

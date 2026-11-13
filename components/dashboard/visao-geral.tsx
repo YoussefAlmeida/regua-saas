@@ -15,7 +15,7 @@ export interface DadosDashboard {
   faltas: number
   porDia: PontoDia[]
   servicos: { nome: string; qtd: number; pct: number }[]
-  proximos: { id: string; hora: string; cliente: string; servico: string; barbeiro: string; emAtendimento?: boolean }[]
+  proximos: { id: string; hora: string; cliente: string; servico: string; barbeiro: string }[]
   ocupacao: { nome: string; pct: number | null }[]
 }
 
@@ -127,7 +127,6 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
                   <span className="font-body text-sm text-fg truncate flex-1 min-w-0">{a.cliente}</span>
                   <span className="font-body text-xs text-fg-muted truncate hidden sm:block w-36">{a.servico}</span>
                   <span className="font-body text-xs text-fg-muted truncate w-20 text-right">{a.barbeiro}</span>
-                  {a.emAtendimento && <span className="ds-tag bg-amber/15 text-amber shrink-0">Em atendimento</span>}
                 </li>
               ))}
             </ul>

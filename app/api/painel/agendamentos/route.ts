@@ -8,7 +8,6 @@ import { normalizarWhatsapp } from '@/lib/utils'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
-import { comInicio } from '@/lib/extras'
 
 const SchemaPost = z.object({
   profissional_id: z.string().uuid(),
@@ -60,7 +59,7 @@ export async function GET(req: NextRequest) {
   const { data: agendamentos, error } = await consulta
 
   if (error) return falhaInterna('painel/agendamentos', error, 'Erro ao buscar agendamentos')
-  return NextResponse.json(await comInicio(db, agendamentos ?? []))
+  return NextResponse.json(agendamentos)
 }
 
 export async function POST(req: NextRequest) {
