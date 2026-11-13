@@ -48,7 +48,10 @@ export default function HojeClient({
   data,
   souBarbeiro = false,
   pendencias = [],
+  nome = '',
 }: {
+  /** Primeiro nome de quem está logado (saudação do barbeiro) */
+  nome?: string
   pendencias?: { href: string; texto: string }[]
   souBarbeiro?: boolean
   agendamentosIniciais: Agendamento[]
@@ -111,8 +114,8 @@ export default function HojeClient({
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Hoje</h1>
-        <p className="font-body text-sm text-fg-muted first-letter:uppercase">{dataFmt}</p>
+        <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souBarbeiro && nome ? `Olá, ${nome}!` : 'Hoje'}</h1>
+        <p className="font-body text-sm text-fg-muted first-letter:uppercase">{souBarbeiro ? `Sua agenda de hoje · ${dataFmt}` : dataFmt}</p>
       </div>
 
       {pendencias.length > 0 && (
@@ -170,16 +173,18 @@ export default function HojeClient({
 
       {/* Cards de métricas */}
       {souBarbeiro ? (
-        <Link href="/painel/mais/desempenho" className="block bg-surface border border-line rounded-card p-4 hover:border-amber/40 transition-colors">
-          <div className="flex items-center justify-between mb-2">
-            <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Meu dia</p>
-            <span className="flex items-center gap-0.5 font-ui text-[10px] uppercase tracking-wider text-amber">Meu desempenho <ChevronRight size={12} /></span>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-surface border border-line rounded-card p-4">
+            <p className="font-mono text-xl font-semibold text-amber leading-tight">{ags.length}</p>
+            <p className="font-body text-sm text-fg mt-1">Agendamento{ags.length !== 1 ? 's' : ''}</p>
+            <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
           </div>
-          <p className="font-mono text-4xl text-entrada leading-none">{formatBRL(faturadoReal)}</p>
-          <p className="font-body text-xs text-fg-muted mt-2">
-            {concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente
-          </p>
-        </Link>
+          <Link href="/painel/mais/desempenho" className="block bg-surface border border-line rounded-card p-4 hover:border-amber/40 transition-colors">
+            <p className="font-mono text-xl font-semibold text-entrada leading-tight whitespace-nowrap">{formatBRL(faturadoReal)}</p>
+            <p className="font-body text-sm text-fg mt-1">Feito hoje</p>
+            <p className="flex items-center gap-0.5 font-body text-xs text-amber mt-0.5">Meu desempenho <ChevronRight size={12} aria-hidden /></p>
+          </Link>
+        </div>
       ) : (
       <div className="grid grid-cols-2 gap-3">
         <div className="col-span-2 bg-surface border border-line rounded-card p-4">
