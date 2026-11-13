@@ -172,24 +172,24 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
                     className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${h.ativo ? 'translate-x-[18px]' : 'translate-x-0.5'}`}
                   />
                 </button>
-                <span className={`font-ui text-xs uppercase tracking-wider w-7 shrink-0 ${h.ativo ? 'text-fg' : 'text-fg-muted'}`}>
+                <span className={`font-ui text-xs uppercase tracking-wider w-8 shrink-0 ${h.ativo ? 'text-fg' : 'text-fg-muted'}`}>
                   {dia}
                 </span>
 
                 {h.ativo ? (
-                  <div className="flex items-center gap-2 flex-1">
+                  <div className="flex items-center gap-1.5 min-[400px]:gap-2 flex-1 min-w-0">
                     <input
                       type="time"
                       value={h.inicio ?? '08:00'}
                       onChange={e => updateHorario(key, 'inicio', e.target.value)}
-                      className="bg-surface border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
                     />
                     <span className="text-fg-muted text-xs">–</span>
                     <input
                       type="time"
                       value={h.fim ?? '19:00'}
                       onChange={e => updateHorario(key, 'fim', e.target.value)}
-                      className="bg-surface border border-line rounded-button px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
+                      className="flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
                     />
                   </div>
                 ) : (

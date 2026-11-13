@@ -1,5 +1,6 @@
 'use client'
 
+import Cabe from '@/components/cabe'
 import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -186,7 +187,7 @@ export default function HojeClient({
             <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
           </div>
           {verValores && <Link href="/painel/mais/desempenho" className="block ds-card p-4 hover:border-amber/40 transition-colors">
-            <p className="font-mono text-xl font-semibold text-entrada leading-tight whitespace-nowrap">{formatBRL(faturadoReal)}</p>
+            <p className="font-mono text-xl font-semibold text-entrada leading-tight"><Cabe>{formatBRL(faturadoReal)}</Cabe></p>
             <p className="font-body text-sm text-fg mt-1">Feito hoje</p>
             <p className="flex items-center gap-0.5 font-body text-xs text-amber mt-0.5">Meu desempenho <ChevronRight size={12} aria-hidden /></p>
           </Link>}
@@ -255,7 +256,7 @@ export default function HojeClient({
 
                   {/* Ações rápidas */}
                   {(ag.status === 'agendado' || ag.status === 'confirmado') && (
-                    <div className="flex gap-2 mt-3 ml-16">
+                    <div className="flex gap-2 mt-3 min-[400px]:ml-16">
                       <button
                         onClick={() => atualizarStatus(ag.id, 'concluido')}
                         disabled={isAtivo}
@@ -281,7 +282,7 @@ export default function HojeClient({
                     </div>
                   )}
                   {(ag.status === 'agendado' || ag.status === 'confirmado') && ag.cliente?.whatsapp && (
-                    <div className="mt-3 ml-16">
+                    <div className="mt-3 min-[400px]:ml-16">
                       <ContatoCliente whatsapp={ag.cliente.whatsapp} compacto />
                     </div>
                   )}

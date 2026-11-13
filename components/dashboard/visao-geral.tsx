@@ -1,3 +1,4 @@
+import Cabe from '@/components/cabe'
 import Link from 'next/link'
 import { CalendarCheck, CircleDollarSign, Users2, Scissors, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react'
 import GraficoFaturamento, { type PontoDia } from './grafico-faturamento'
@@ -26,8 +27,8 @@ function Variacao({ v }: { v: number | null }) {
   const sobe = v >= 0
   const Icone = sobe ? ArrowUpRight : ArrowDownRight
   return (
-    <span className={`inline-flex items-center gap-0.5 font-body text-xs font-semibold ${sobe ? 'text-entrada' : 'text-saida'}`}>
-      <Icone size={13} aria-hidden /> {sobe ? '+' : ''}{v}% <span className="font-normal text-fg-muted">vs. 30 dias antes</span>
+    <span className={`inline-flex flex-wrap items-center gap-x-1 gap-y-0 font-body text-xs font-semibold ${sobe ? 'text-entrada' : 'text-saida'}`}>
+      <span className="inline-flex items-center gap-0.5 whitespace-nowrap"><Icone size={13} aria-hidden /> {sobe ? '+' : ''}{v}%</span> <span className="font-normal text-fg-muted whitespace-nowrap">vs. 30 dias antes</span>
     </span>
   )
 }
@@ -59,7 +60,7 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
         {indicadores.map(({ icone: Icone, rotulo: r, valor, variacao }) => (
           <div key={r} className={`${card} p-4`}>
             <Icone size={20} className="text-amber" aria-hidden />
-            <p className="font-mono text-lg md:text-xl font-semibold text-fg mt-3 truncate">{valor}</p>
+            <p className="font-mono text-lg md:text-xl font-semibold text-fg mt-3"><Cabe>{valor}</Cabe></p>
             <p className={rotulo}>{r}</p>
             {variacao !== undefined && <p className="mt-1.5"><Variacao v={variacao} /></p>}
           </div>
