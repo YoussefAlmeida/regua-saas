@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import Link from 'next/link'
-import { LayoutDashboard, Percent, Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut, Clock, ShieldCheck, Lock } from 'lucide-react'
+import { LayoutDashboard, Percent, KeyRound, Scissors, Users, Users2, Settings, CreditCard, BarChart3, LogOut, Clock, ShieldCheck, Lock } from 'lucide-react'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 
 export default async function MaisPage() {
@@ -17,6 +17,7 @@ export default async function MaisPage() {
     { href: '/painel/mais/comissoes', label: 'Comissões', desc: 'Quanto cada um gerou e recebe', icon: Percent },
     { href: '/painel/mais/relatorios', label: 'Relatórios', desc: 'Desempenho e métricas', icon: BarChart3 },
     { href: '/painel/mais/historico', label: 'Histórico', desc: 'Quem lançou, apagou ou mudou valor', icon: ShieldCheck, bloqueado: !plano.recursos.historico },
+    { href: '/painel/mais/permissoes', label: 'Permissões', desc: 'O que a equipe pode fazer', icon: KeyRound },
     { href: '/painel/mais/configuracoes', label: 'Configurações', desc: 'Horários e dados da barbearia', icon: Settings },
     { href: '/painel/mais/plano', label: 'Plano', desc: plano.emTeste ? `Teste grátis · ${plano.diasTeste} dia${plano.diasTeste === 1 ? '' : 's'}` : plano.nome, icon: CreditCard },
   ]

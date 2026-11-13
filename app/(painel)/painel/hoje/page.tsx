@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import HojeClient from './hoje-client'
 import { comInicio } from '@/lib/extras'
+import { permissoesDaEquipe } from '@/lib/permissoes-equipe'
 
 export default async function HojePage() {
   const h = await headers()
@@ -92,6 +93,7 @@ export default async function HojePage() {
       movimentacoesHoje={movHoje ?? []}
       data={hoje}
       souBarbeiro={souBarbeiro}
+      verValores={!souBarbeiro || (await permissoesDaEquipe(barbearia_id)).ver_valores}
       nome={eu?.nome?.split(' ')[0] ?? ''}
     />
   )

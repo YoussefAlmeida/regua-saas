@@ -52,7 +52,10 @@ export default function HojeClient({
   souBarbeiro = false,
   pendencias = [],
   nome = '',
+  verValores = true,
 }: {
+  /** Barbeiro só vê o valor do dia se o dono liberou */
+  verValores?: boolean
   /** Primeiro nome de quem está logado (saudação do barbeiro) */
   nome?: string
   pendencias?: { href: string; texto: string }[]
@@ -183,11 +186,11 @@ export default function HojeClient({
             <p className="font-body text-sm text-fg mt-1">Agendamento{ags.length !== 1 ? 's' : ''}</p>
             <p className="font-body text-xs text-fg-muted mt-0.5">{concluidos.length} feito{concluidos.length !== 1 ? 's' : ''} · {pendentes.length} pela frente</p>
           </div>
-          <Link href="/painel/mais/desempenho" className="block ds-card p-4 hover:border-amber/40 transition-colors">
+          {verValores && <Link href="/painel/mais/desempenho" className="block ds-card p-4 hover:border-amber/40 transition-colors">
             <p className="font-mono text-xl font-semibold text-entrada leading-tight whitespace-nowrap">{formatBRL(faturadoReal)}</p>
             <p className="font-body text-sm text-fg mt-1">Feito hoje</p>
             <p className="flex items-center gap-0.5 font-body text-xs text-amber mt-0.5">Meu desempenho <ChevronRight size={12} aria-hidden /></p>
-          </Link>
+          </Link>}
         </div>
       ) : (
       <div className="grid grid-cols-2 gap-3">

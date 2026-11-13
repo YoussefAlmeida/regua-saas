@@ -1,3 +1,4 @@
+import { exigir } from '@/lib/permissoes-equipe'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
@@ -85,6 +86,8 @@ export async function POST(req: NextRequest) {
   const parse = SchemaPost.safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
   const { profissional_id, todos, inicio, fim, motivo } = parse.data
+  const semPermissao = await exigir(sessao, 'bloquear')
+  if (semPermissao) return semPermissao
   const daBarbearia = !!todos
 
   if (daBarbearia) {

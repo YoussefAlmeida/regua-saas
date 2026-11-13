@@ -18,6 +18,7 @@ export interface Marca {
   sobre: string | null
   cor_primaria: string | null
   cor_secundaria: string | null
+  galeria?: string[]
 }
 
 export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; liberada: boolean }) {
@@ -25,6 +26,20 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
   const [capa, setCapa] = useState(marca.capa_url)
   const [primaria, setPrimaria] = useState(marca.cor_primaria ?? PRIMARIA_PADRAO)
   const [sobre, setSobre] = useState(marca.sobre ?? '')
+  const [galeria, setGaleria] = useState<string[]>(marca.galeria ?? [])
+  const [enviandoGaleria, setEnviandoGaleria] = useState(false)
+  const inputGaleria = useRef<HTMLInputElement>(null)
+  async function fotoGaleria(arquivo?: File, remover?: string) {
+    setEnviandoGaleria(true)
+    const fd = new FormData(); if (arquivo) fd.append('arquivo', arquivo)
+    const res = await (remover
+      ? fetch(`/api/painel/barbearia/galeria?url=${encodeURIComponent(remover)}`, { method: 'DELETE' })
+      : fetch('/api/painel/barbearia/galeria', { method: 'POST', body: fd })).catch(() => null)
+    setEnviandoGaleria(false)
+    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    setGaleria((await res.json()).galeria)
+  }
   const [enviando, setEnviando] = useState<'logo' | 'capa' | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
@@ -120,6 +135,28 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
               {logo && <button type="button" className={btnSec} disabled={!!enviando} onClick={() => remover('logo')}><Trash2 size={13} aria-hidden /> Tirar logo</button>}
             </div>
             <p className="font-body text-xs text-fg-muted mt-2">JPG, PNG ou WEBP, até 2 MB. A capa fica melhor deitada; o logo, quadrado.</p>
+          </div>
+
+          {/* Galeria */}
+          <div>
+            <span className={labelCls}>Galeria de fotos <span className="text-fg-muted font-normal">({galeria.length} de 8)</span></span>
+            <div className="grid grid-cols-4 gap-2">
+              {galeria.map(u => (
+                <div key={u} className="relative aspect-square rounded-button overflow-hidden border border-line bg-surface-alt">
+                  <Image src={u} alt="" fill sizes="120px" className="object-cover" />
+                  <button type="button" onClick={() => fotoGaleria(undefined, u)} disabled={enviandoGaleria} aria-label="Tirar esta foto"
+                    className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/70 text-fg flex items-center justify-center hover:bg-saida transition-colors"><Trash2 size={12} aria-hidden /></button>
+                </div>
+              ))}
+              {galeria.length < 8 && (
+                <button type="button" onClick={() => inputGaleria.current?.click()} disabled={enviandoGaleria}
+                  className="aspect-square rounded-button border border-dashed border-line text-fg-muted hover:border-amber hover:text-amber flex flex-col items-center justify-center gap-1 transition-colors disabled:opacity-50">
+                  <ImagePlus size={18} aria-hidden /><span className="font-body text-[11px]">{enviandoGaleria ? 'Enviando…' : 'Adicionar'}</span>
+                </button>
+              )}
+            </div>
+            <input ref={inputGaleria} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { fotoGaleria(e.target.files?.[0]); e.target.value = '' }} />
+            <p className="font-body text-xs text-fg-muted mt-2">Cortes, o ambiente, a equipe. Aparecem na aba Sobre da sua página.</p>
           </div>
 
           {/* Cor de destaque */}

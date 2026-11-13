@@ -79,6 +79,8 @@ export default async function AgendamentoPublicoPage({ params, searchParams }: P
       aceitando={aceitando}
       lembreteAtivo={whatsappConfigurado()}
       situacao={situacao}
+      avaliacoes={dados.avaliacoes}
+      galeria={dados.galeria}
       pre={{ servico: pre.servico, profissional: pre.profissional }}
     />
     </div>

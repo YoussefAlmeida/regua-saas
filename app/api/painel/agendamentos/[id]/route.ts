@@ -1,3 +1,4 @@
+import { exigir } from '@/lib/permissoes-equipe'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
@@ -43,6 +44,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // Barbeiro só pode atualizar agendamentos dos seus próprios horários
   if (sessao.papel === 'barbeiro' && sessao.profissional_id !== ag.profissional_id) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  }
+
+  if (parse.data.status === 'cancelado') {
+    const semPermissao = await exigir(sessao, 'cancelar')
+    if (semPermissao) return semPermissao
   }
 
   const statusAntes = ag.status

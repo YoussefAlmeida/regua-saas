@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Star } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { todasAsLinhas } from '@/lib/paginar'
 import { extrasDosProfissionais } from '@/lib/extras'
+import { pode } from '@/lib/permissoes-equipe'
+import { resumoAvaliacoes, notaTexto } from '@/lib/avaliacoes'
 
 /* "Meu desempenho" — Módulo 5
    Só o próprio número: atendimentos feitos e valor gerado. Sem comparar
@@ -20,6 +22,15 @@ function inicioLocalUTC(y: number, m: number, d: number) {
 export default async function DesempenhoPage({ searchParams }: { searchParams: Promise<{ p?: string }> }) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel === 'cliente') redirect('/entrar')
+
+  if (!(await pode(sessao, 'ver_valores'))) {
+    return (
+      <div className="px-4 py-16 max-w-lg mx-auto text-center space-y-2">
+        <h1 className="ds-titulo">Meu desempenho</h1>
+        <p className="font-body text-sm text-fg-muted">O dono da barbearia não liberou os valores pra equipe. Fala com ele se precisar ver seus números.</p>
+      </div>
+    )
+  }
 
   const db = criarClienteServico()
   const pedido = (await searchParams).p
@@ -76,6 +87,8 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
     : totalMesPassado > 0 ? Math.round((periodos[2].valor / totalMesPassado) * 100) : null
   const nomeMesPassado = new Date(Date.UTC(y, m - 2, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
   const RAIO = 52, VOLTA = 2 * Math.PI * RAIO
+
+  const avaliacao = (await resumoAvaliacoes(db, sessao.barbearia_id))?.porProfissional[profissional_id] ?? null
 
   const faltasMes = (ags ?? []).filter(a => a.status === 'faltou' && new Date(a.inicio) >= mes).length
 
@@ -198,6 +211,16 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           <p className="font-body text-xs text-fg-muted mt-0.5">por atendimento no mês</p>
         </div>
       </div>
+
+      {avaliacao && (
+        <section className="ds-card p-4 flex items-center gap-4">
+          <Star size={26} className="text-amber shrink-0" fill="currentColor" aria-hidden />
+          <div>
+            <p className="font-display text-xl font-semibold text-fg tabular-nums">{notaTexto(avaliacao.media)}</p>
+            <p className="font-body text-xs text-fg-muted">avaliação média · {avaliacao.total} avaliaç{avaliacao.total === 1 ? 'ão' : 'ões'} de clientes</p>
+          </div>
+        </section>
+      )}
 
       {top.length > 0 && (
         <section className="space-y-2">
