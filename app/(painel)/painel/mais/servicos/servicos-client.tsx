@@ -117,7 +117,7 @@ export default function ServicosClient({
   const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Serviços</h1>
         <button
@@ -138,7 +138,7 @@ export default function ServicosClient({
           </button>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3">
           {servicos.map(s => (
             <div
               key={s.id}

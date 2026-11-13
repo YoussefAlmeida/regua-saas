@@ -1,5 +1,7 @@
 'use client'
 
+import GraficoBarras from '@/components/dashboard/grafico-barras'
+
 import { useMemo, useState } from 'react'
 import { Plus, Trash2, X, ChevronLeft, ChevronRight, Download, Pencil, TrendingUp, TrendingDown, Repeat, Scissors } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
@@ -122,6 +124,18 @@ export default function FinanceiroClient({
     }
     return [...mapa.entries()].sort((a, b) => b[1].v - a[1].v)
   }, [movs])
+
+  // Entradas por dia do mês aberto (gráfico de evolução)
+  const porDiaDoMes = useMemo(() => {
+    const [y, m] = mes.split('-').map(Number)
+    const dias = new Date(Date.UTC(y, m, 0)).getUTCDate()
+    const soma = new Map<string, number>()
+    for (const x of movs) if (x.tipo === 'entrada') soma.set(x.data, (soma.get(x.data) ?? 0) + Number(x.valor))
+    return Array.from({ length: dias }, (_, i) => {
+      const dd = String(i + 1).padStart(2, '0')
+      return { rotulo: `${dd}/${String(m).padStart(2, '0')}`, valor: Math.round((soma.get(`${mes}-${dd}`) ?? 0) * 100) / 100 }
+    })
+  }, [movs, mes])
 
   const filtradas = movs.filter(m =>
     (filtroTipo === 'tudo' || m.tipo === filtroTipo) && (!filtroProf || m.profissional_id === filtroProf))
@@ -300,9 +314,9 @@ export default function FinanceiroClient({
   const catsDoTipo = categorias.filter(c => c.tipo === novo.tipo)
 
   return (
-    <div className="flex flex-col max-w-lg mx-auto pb-24">
+    <div className="flex flex-col max-w-lg md:max-w-5xl mx-auto pb-24">
       {/* Abas */}
-      <div className="flex border-b border-line bg-surface sticky top-[57px] z-10" role="tablist">
+      <div className="flex border-b border-line bg-surface sticky top-[57px] z-10 md:rounded-b-card md:border-x" role="tablist">
         {(['resumo', 'extrato', 'fixas'] as Tab[]).map(t => (
           <button
             key={t}
@@ -316,9 +330,9 @@ export default function FinanceiroClient({
         ))}
       </div>
 
-      <div className="px-4 py-4">
+      <div className="px-4 md:px-0 py-4">
         {tab !== 'fixas' && (
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between md:justify-start md:gap-2 mb-4">
             <button onClick={() => mudarMes(mesVizinho(mes, -1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Mês anterior"><ChevronLeft size={18} /></button>
             <p className="font-semibold font-ui text-sm text-fg">{mesLabel(mes)}</p>
             <button onClick={() => mudarMes(mesVizinho(mes, 1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Próximo mês"><ChevronRight size={18} /></button>
@@ -334,13 +348,14 @@ export default function FinanceiroClient({
             {/* ── RESUMO ── */}
             {tab === 'resumo' && (
               <div className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-3 md:gap-4">
                 <div className="bg-surface border border-line rounded-card p-5">
                   <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Sobrou no mês</p>
-                  <p className={`font-mono text-5xl leading-tight mt-1 ${saldo >= 0 ? 'text-entrada' : 'text-saida'}`}>{brl(saldo)}</p>
+                  <p className={`font-mono text-5xl md:text-2xl leading-tight mt-1 whitespace-nowrap ${saldo >= 0 ? 'text-entrada' : 'text-saida'}`}>{brl(saldo)}</p>
                   <p className="font-body text-xs text-fg-muted mt-1">o que entrou menos o que saiu</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="md:col-span-2 grid grid-cols-2 gap-3 md:gap-4">
                   {[
                     { rot: 'Entrou', v: entradas, cor: 'text-entrada', vari: varEnt, bomSubir: true },
                     { rot: 'Saiu', v: saidas, cor: 'text-saida', vari: varSai, bomSubir: false },
@@ -357,12 +372,23 @@ export default function FinanceiroClient({
                   ))}
                 </div>
 
+                </div>
+
+                {porDiaDoMes.some(b => b.valor > 0) && (
+                  <section className="bg-surface border border-line rounded-card p-4">
+                    <h2 className="font-ui text-sm font-semibold text-fg">Evolução do faturamento</h2>
+                    <p className="font-body text-xs text-fg-muted mb-8">Entradas no caixa por dia de {mesLabel(mes)}</p>
+                    <GraficoBarras barras={porDiaDoMes} descricao={`Entradas no caixa por dia de ${mesLabel(mes)}`} />
+                  </section>
+                )}
+
                 {varSai && varSai.sobe && saiAnt > 0 && saidas > saiAnt * 1.2 && (
                   <p className="bg-saida/5 border border-saida/30 rounded-card px-4 py-3 font-body text-sm text-fg">
                     As saídas estão <strong className="text-saida">{varSai.txt}</strong> acima do mês passado. Confere no extrato o que pesou.
                   </p>
                 )}
 
+                <div className="grid md:grid-cols-2 gap-4 items-start">
                 {porBarbeiro.length > 0 && (
                   <section className="bg-surface border border-line rounded-card p-4">
                     <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-3">Entradas por barbeiro</p>
@@ -390,6 +416,8 @@ export default function FinanceiroClient({
                     </ul>
                   </section>
                 )}
+
+                </div>
 
                 {movs.length === 0 && (
                   <p className="font-body text-sm text-fg-muted text-center py-6">
@@ -519,8 +547,8 @@ export default function FinanceiroClient({
 
       {/* Botões de lançar — sempre à mão */}
       {tab !== 'fixas' && (
-        <div className="fixed bottom-20 inset-x-0 z-20 pointer-events-none">
-          <div className="max-w-lg mx-auto px-4 flex gap-2 justify-end">
+        <div className="fixed bottom-20 md:bottom-6 inset-x-0 md:left-60 z-20 pointer-events-none">
+          <div className="max-w-lg md:max-w-5xl mx-auto px-4 md:px-0 flex gap-2 justify-end">
             <button onClick={() => abrirNovo('entrada')} className="font-semibold pointer-events-auto flex items-center gap-1.5 bg-surface-alt border border-entrada/40 text-entrada font-ui text-sm px-4 py-3 rounded-full shadow-lg shadow-black/40">
               <Plus size={14} /> Entrada
             </button>
@@ -533,7 +561,7 @@ export default function FinanceiroClient({
 
       {/* Modal: novo lançamento */}
       {modalNovo && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal>
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" role="dialog" aria-modal>
           <div className="absolute inset-0 bg-black/60" onClick={() => setModalNovo(false)} />
           <form onSubmit={salvarNovo} className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4 max-h-[90dvh] overflow-y-auto">
             <div className="flex items-center justify-between">
@@ -627,7 +655,7 @@ export default function FinanceiroClient({
 
       {/* Modal: detalhe do lançamento */}
       {aberto && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal>
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" role="dialog" aria-modal>
           <div className="absolute inset-0 bg-black/60" onClick={() => { setAberto(null); setEdit(null) }} />
           <div className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4">
             <div className="flex items-start justify-between gap-3">
@@ -695,7 +723,7 @@ export default function FinanceiroClient({
 
       {/* Modal: despesa fixa */}
       {modalFixa && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal>
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center" role="dialog" aria-modal>
           <div className="absolute inset-0 bg-black/60" onClick={() => setModalFixa(null)} />
           <form onSubmit={salvarFixa} className="relative w-full max-w-md bg-surface rounded-t-card border border-line p-6 z-10 space-y-4">
             <div className="flex items-center justify-between">

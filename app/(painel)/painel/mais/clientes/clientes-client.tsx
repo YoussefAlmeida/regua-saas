@@ -48,14 +48,14 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
   })
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Clientes</h1>
         <span className="font-mono text-sm text-fg-muted">{lista.length}</span>
       </div>
 
       {clientesIniciais.length > 0 && (
-        <div className="relative mb-4">
+        <div className="relative mb-4 md:max-w-sm">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-muted" />
           <input
             type="text"
@@ -80,7 +80,7 @@ export default function ClientesClient({ clientesIniciais }: { clientesIniciais:
           )}
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid md:grid-cols-2 gap-2 md:gap-3">
           {filtrados.map(c => {
             const totalCortes = c.agendamentos.filter(a => a.status === 'concluido').length
             const ultimo = ultimoCorte(c.agendamentos)

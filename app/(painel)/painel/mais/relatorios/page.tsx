@@ -79,14 +79,14 @@ export default async function RelatoriosPage() {
   const nomeMes = new Date(`${mesAtual}-15T12:00:00Z`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-6">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-6">
       <div className="flex items-baseline justify-between">
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Relatórios</h1>
         <span className="font-body text-xs text-fg-muted inline-block first-letter:uppercase">{nomeMes}</span>
       </div>
 
       {/* Métricas principais */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-surface border border-line rounded-card p-4">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Atendimentos</p>
           <p className="font-mono text-2xl text-fg">{totalAtendimentos}</p>
@@ -119,6 +119,7 @@ export default async function RelatoriosPage() {
         />
       )}
 
+      <div className="grid md:grid-cols-2 gap-4 items-start">
       {/* Novos vs Retorno */}
       {avancado && clientesDoMes.size > 0 && (
         <div className="bg-surface border border-line rounded-card p-4 space-y-3">
@@ -167,6 +168,8 @@ export default async function RelatoriosPage() {
           </div>
         </div>
       )}
+
+      </div>
 
       {totalAtendimentos === 0 && (
         <p className="font-body text-sm text-fg-muted text-center py-8">
