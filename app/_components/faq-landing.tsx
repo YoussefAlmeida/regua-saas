@@ -10,7 +10,7 @@ const PERGUNTAS = [
   },
   {
     q: 'E se meu cliente não souber usar a internet?',
-    r: 'Você também pode criar agendamentos manualmente pelo painel. O cliente só precisa de WhatsApp para receber a confirmação.',
+    r: 'O cadastro pelo link pede só nome, WhatsApp e uma senha curta, e leva menos de um minuto. Depois do primeiro, você também consegue marcar pra ele pelo painel, usando o WhatsApp dele.',
   },
   {
     q: 'Posso cancelar quando quiser?',

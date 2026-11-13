@@ -7,6 +7,7 @@ import { situacaoPlano } from '@/lib/planos'
 import AgendamentoPublico from './agendamento-publico'
 import { urlDoSiteFixa } from '@/lib/site-url'
 import { temaDaBarbearia } from '@/lib/tema'
+import { whatsappConfigurado } from '@/lib/whatsapp'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -64,6 +65,7 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
       servicos={dados.servicos}
       clienteLogado={clienteLogado}
       aceitando={aceitando}
+      lembreteAtivo={whatsappConfigurado()}
     />
     </div>
     </>

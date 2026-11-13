@@ -48,7 +48,7 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
     itens: [
       '1 profissional na agenda',
       'Link de agendamento sem app',
-      'Lembrete no WhatsApp',
+      'Página com sua logo e suas cores',
       'Financeiro: entradas e saídas',
       'Resumo do mês',
       'Suporte 2 vezes por mês',

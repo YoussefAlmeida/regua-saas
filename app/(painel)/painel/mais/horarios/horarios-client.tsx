@@ -223,7 +223,7 @@ export default function HorariosClient({
   }
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-5xl mx-auto space-y-8">
       <div className="flex items-center gap-3">
         <Link href="/painel/mais" className="text-fg-muted hover:text-fg" aria-label="Voltar"><ChevronLeft size={20} /></Link>
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">{souDono ? 'Horários' : 'Meu horário'}</h1>
@@ -231,7 +231,7 @@ export default function HorariosClient({
 
       {/* Dono: o que vale pra barbearia toda x a agenda dele (se também corta) */}
       {souDono && (
-        <div className="flex rounded-button border border-line overflow-hidden">
+        <div className="flex rounded-button border border-line overflow-hidden md:max-w-sm">
           {([['barbearia', 'Barbearia'], ...(profissionais.length ? [['minha', 'Minha agenda']] : [])] as [typeof aba, string][]).map(([v, t]) => (
             <button
               key={v}
@@ -253,7 +253,7 @@ export default function HorariosClient({
       {carregando ? (
         <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse text-center py-12">Carregando…</p>
       ) : (
-        <>
+        <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 md:items-start">
           {naBarbearia && <section>{cardFuncionamento}</section>}
 
           {/* ── Semana de trabalho ───────────────────────── */}
@@ -312,7 +312,7 @@ export default function HorariosClient({
                           onClick={() => mudarDia(i, { ativo: !d.ativo })}
                           className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${d.ativo ? 'bg-amber' : 'bg-line'}`}
                         >
-                          <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${d.ativo ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                          <span className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${d.ativo ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
                         </button>
                         <span className={`font-ui text-sm font-semibold w-12 shrink-0 ${d.ativo ? 'text-fg' : 'text-fg-muted'}`}>{DIAS[i].slice(0, 3)}</span>
                         {d.ativo ? (
@@ -462,7 +462,7 @@ export default function HorariosClient({
               <p className="font-body text-xs text-fg-muted text-center py-2">Nenhum bloqueio marcado.</p>
             )}
           </section>
-        </>
+        </div>
       )}
     </div>
   )

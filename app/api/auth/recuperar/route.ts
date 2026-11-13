@@ -5,7 +5,7 @@ import { normalizarWhatsapp } from '@/lib/utils'
 import { ipDa, segundosBloqueado, registrarFalha, textoEspera } from '@/lib/limite-login'
 import { gerarTokenNovaSenha, textoLinkNovaSenha } from '@/lib/recuperacao'
 import { emailConfigurado, enviarEmail } from '@/lib/email'
-import { enviarTexto } from '@/lib/whatsapp'
+import { enviarTexto, whatsappConfigurado } from '@/lib/whatsapp'
 import { urlDoSiteAtual } from '@/lib/site-url'
 
 /* "Esqueci minha senha"
@@ -19,7 +19,6 @@ const Schema = z.discriminatedUnion('tipo', [
 ])
 
 const VALIDADE_H = 1
-const whatsappConfigurado = () => !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID)
 
 export async function POST(req: NextRequest) {
   const parse = Schema.safeParse(await req.json().catch(() => null))
