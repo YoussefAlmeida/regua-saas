@@ -4,7 +4,6 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { todasAsLinhas } from '@/lib/paginar'
 import { limitesDoDia, somarDias, minutosDeExpediente, dataHoraLocal } from '@/lib/disponibilidade'
 import VisaoGeral, { type DadosDashboard } from '@/components/dashboard/visao-geral'
-import { comInicio } from '@/lib/extras'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -47,7 +46,6 @@ export default async function DashboardPage() {
       .order('inicio').limit(6),
   ])
 
-  const proximosComInicio = await comInicio(db, proximos ?? [])
   const um = <T,>(v: T | T[] | null | undefined): T | null => (Array.isArray(v) ? v[0] ?? null : v ?? null)
   const todos = ags ?? []
   const noAtual = todos.filter(a => new Date(a.inicio).getTime() >= corte)
@@ -105,9 +103,8 @@ export default async function DashboardPage() {
     faltas: noAtual.filter(a => a.status === 'faltou').length,
     porDia,
     servicos,
-    proximos: proximosComInicio.map(a => ({
+    proximos: (proximos ?? []).map(a => ({
       id: a.id,
-      emAtendimento: !!a.iniciado_em,
       hora: dataHoraLocal(a.inicio).hora,
       cliente: um(a.cliente as { nome: string } | { nome: string }[] | null)?.nome ?? 'Cliente',
       servico: um(a.servico as { nome: string } | { nome: string }[] | null)?.nome ?? 'Serviço',

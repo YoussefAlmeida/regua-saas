@@ -87,8 +87,8 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     oQueFazer: migration('20261015010000_lgpd_indicacao.sql'),
   })
   itens.push({
-    nome: 'App completo (foto do serviço, comissão, meta, iniciar atendimento)',
-    ok: !(await db.from('agendamentos').select('iniciado_em').limit(1)).error && !(await db.from('servicos').select('foto_url').limit(1)).error,
+    nome: 'App completo (foto do serviço, comissão, meta, observação do cliente)',
+    ok: !(await db.from('servicos').select('foto_url').limit(1)).error && !(await db.from('profissionais').select('comissao_pct').limit(1)).error,
     grave: false,
     oQueFazer: migration('20261114000000_app_completo.sql'),
   })
