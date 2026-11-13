@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Pencil, Trash2, Clock, Check, X } from 'lucide-react'
+import Image from 'next/image'
+import { Plus, Pencil, Trash2, Clock, Check, X, ImagePlus } from 'lucide-react'
+import { avisar, erroDaResposta } from '@/components/aviso'
 import { formatBRL } from '@/lib/utils'
 
 interface Servico {
@@ -11,12 +13,14 @@ interface Servico {
   duracao_min: number
   cor: string
   ativo: boolean
+  foto_url?: string | null
+  descricao?: string | null
 }
 
-interface FormData { nome: string; preco: string; duracao_min: string; cor: string }
+interface FormData { nome: string; preco: string; duracao_min: string; cor: string; descricao: string }
 
-const CORES = ['#C5A46D', '#6FB08E', '#C97B84', '#8AB4DC', '#B5B26A', '#A9A59D']
-const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#C5A46D' }
+const CORES = ['#F5D900', '#3DDC84', '#C97B84', '#4DA3FF', '#B5B26A', '#9B9B9B']
+const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#F5D900', descricao: '' }
 
 export default function ServicosClient({
   servicosIniciais,
@@ -31,6 +35,20 @@ export default function ServicosClient({
   const [erro, setErro] = useState('')
   const [salvando, setSalvando] = useState(false)
 
+  const [enviandoFoto, setEnviandoFoto] = useState<string | null>(null)
+  async function enviarFoto(s: Servico, arquivo: File | undefined) {
+    if (!arquivo) return
+    setEnviandoFoto(s.id)
+    const fd = new FormData(); fd.append('arquivo', arquivo)
+    const res = await fetch(`/api/painel/servicos/${s.id}/foto`, { method: 'POST', body: fd }).catch(() => null)
+    setEnviandoFoto(null)
+    if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
+    if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
+    const { url } = await res.json()
+    setServicos(prev => prev.map(x => x.id === s.id ? { ...x, foto_url: url } : x))
+    avisar('Foto do serviço atualizada.', 'sucesso')
+  }
+
   function abrirNovo() {
     setForm(FORM_VAZIO)
     setEditando(null)
@@ -39,7 +57,7 @@ export default function ServicosClient({
   }
 
   function abrirEditar(s: Servico) {
-    setForm({ nome: s.nome, preco: String(s.preco), duracao_min: String(s.duracao_min), cor: s.cor })
+    setForm({ nome: s.nome, preco: String(s.preco), duracao_min: String(s.duracao_min), cor: s.cor, descricao: s.descricao ?? '' })
     setEditando(s)
     setErro('')
     setModal('editar')
@@ -57,7 +75,9 @@ export default function ServicosClient({
     if (isNaN(preco) || preco < 0) { setErro('Preço inválido'); setSalvando(false); return }
     if (isNaN(duracao_min) || duracao_min < 5) { setErro('Duração mínima: 5 min'); setSalvando(false); return }
 
-    const payload = { nome: form.nome.trim(), preco, duracao_min, cor: form.cor }
+    // A descrição só vai quando foi preenchida ou já existia (coluna nova no banco)
+    const descricao = form.descricao.trim()
+    const payload = { nome: form.nome.trim(), preco, duracao_min, cor: form.cor, ...(descricao || editando?.descricao ? { descricao: descricao || null } : {}) }
 
     let res: Response
     if (editando) {
@@ -146,12 +166,17 @@ export default function ServicosClient({
                 s.ativo ? 'border-line' : 'border-line opacity-50'
               }`}
             >
-              <div
-                className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: s.cor }}
-              />
+              <label className="relative w-14 h-14 rounded-button overflow-hidden bg-surface-alt border border-line flex items-center justify-center cursor-pointer shrink-0 hover:border-amber/60 transition-colors" title={s.foto_url ? 'Trocar a foto' : 'Colocar uma foto'}>
+                {s.foto_url
+                  ? <Image src={s.foto_url} alt="" fill sizes="56px" className={`object-cover ${enviandoFoto === s.id ? 'opacity-40' : ''}`} />
+                  : <ImagePlus size={17} className={`text-fg-muted ${enviandoFoto === s.id ? 'animate-pulse' : ''}`} aria-hidden />}
+                <span className="absolute left-1 top-1 w-2.5 h-2.5 rounded-full border border-bg" style={{ backgroundColor: s.cor }} aria-hidden />
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label={`Foto de ${s.nome}`}
+                  onChange={e => { enviarFoto(s, e.target.files?.[0]); e.target.value = '' }} />
+              </label>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold font-ui text-sm text-fg truncate">{s.nome}</p>
+                {s.descricao && <p className="font-body text-xs text-fg-muted truncate">{s.descricao}</p>}
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className="font-mono text-sm text-amber">{formatBRL(s.preco)}</span>
                   <span className="flex items-center gap-1 font-body text-xs text-fg-muted">
@@ -208,6 +233,19 @@ export default function ServicosClient({
                   required
                   className={inputCls}
                 />
+              </div>
+
+              <div>
+                <label className={labelCls}>Descrição curta <span className="text-fg-muted font-normal">(opcional)</span></label>
+                <input
+                  type="text"
+                  value={form.descricao}
+                  onChange={e => setForm(f => ({ ...f, descricao: e.target.value }))}
+                  placeholder="tesoura e máquina, com acabamento"
+                  maxLength={140}
+                  className={inputCls}
+                />
+                <p className="font-body text-xs text-fg-muted mt-1">Aparece na página de agendamento, ao lado da foto. A foto você coloca tocando no quadrado do serviço, na lista.</p>
               </div>
 
               <div className="flex gap-3">

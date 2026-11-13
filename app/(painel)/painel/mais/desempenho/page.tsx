@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { todasAsLinhas } from '@/lib/paginar'
+import { extrasDosProfissionais } from '@/lib/extras'
 
 /* "Meu desempenho" — Módulo 5
    Só o próprio número: atendimentos feitos e valor gerado. Sem comparar
@@ -67,7 +68,12 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   // Mês passado inteiro: referência pro anel de progresso do mês
   const doMesPassado = feitos.filter(a => { const t = new Date(a.inicio); return t >= mesPassado && t < mes })
   const totalMesPassado = doMesPassado.reduce((s, a) => s + Number(a.valor_servico), 0)
-  const progresso = totalMesPassado > 0 ? Math.round((periodos[2].valor / totalMesPassado) * 100) : null
+  // Com meta definida pelo dono, o anel mostra a meta; sem ela, compara com o mês passado
+  const meu = (await extrasDosProfissionais(db, sessao.barbearia_id)).mapa.get(profissional_id)
+  const meta = meu?.meta_mensal && meu.meta_mensal > 0 ? meu.meta_mensal : null
+  const comissao = meu?.comissao_pct != null ? { pct: meu.comissao_pct, valor: periodos[2].valor * meu.comissao_pct / 100 } : null
+  const progresso = meta ? Math.round((periodos[2].valor / meta) * 100)
+    : totalMesPassado > 0 ? Math.round((periodos[2].valor / totalMesPassado) * 100) : null
   const nomeMesPassado = new Date(Date.UTC(y, m - 2, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
   const RAIO = 52, VOLTA = 2 * Math.PI * RAIO
 
@@ -112,25 +118,30 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
       <div className="grid md:grid-cols-2 gap-6 md:gap-4 md:items-stretch">
       {/* Mês em andamento contra o mês passado inteiro */}
       <section className="bg-surface border border-line rounded-card p-5 flex items-center gap-5">
-        <div className="relative w-[124px] h-[124px] shrink-0" role="img" aria-label={progresso === null ? 'Sem mês anterior pra comparar' : `${progresso}% do valor de ${nomeMesPassado}`}>
+        <div className="relative w-[124px] h-[124px] shrink-0" role="img" aria-label={progresso === null ? 'Sem mês anterior pra comparar' : meta ? `${progresso}% da meta do mês` : `${progresso}% do valor de ${nomeMesPassado}`}>
           <svg viewBox="0 0 124 124" className="w-full h-full -rotate-90" aria-hidden>
             <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--surface-2-rgb))" strokeWidth="10" />
             {progresso !== null && progresso > 0 && (
-              <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--verde-rgb))" strokeWidth="10" strokeLinecap="round"
+              <circle cx="62" cy="62" r={RAIO} fill="none" stroke="rgb(var(--accent-rgb))" strokeWidth="10" strokeLinecap="round"
                 strokeDasharray={`${(Math.min(progresso, 100) / 100) * VOLTA} ${VOLTA}`} />
             )}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="font-mono text-xl font-semibold text-fg leading-none">{progresso === null ? '—' : `${progresso}%`}</span>
-            <span className="font-body text-[11px] text-fg-muted mt-1">de {nomeMesPassado}</span>
+            <span className="font-body text-[11px] text-fg-muted mt-1">{meta ? 'da meta' : `de ${nomeMesPassado}`}</span>
           </div>
         </div>
         <div className="min-w-0">
           <p className="font-ui text-xs uppercase tracking-wider text-fg-muted">Em {nomeMes}</p>
           <p className="font-mono text-xl font-semibold text-fg whitespace-nowrap mt-1">{brl(periodos[2].valor)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{periodos[2].qtd} atendimento{periodos[2].qtd !== 1 ? 's' : ''}</p>
+          {comissao && (
+            <p className="font-body text-sm text-fg mt-2">Comissão: <strong className="font-display font-semibold text-amber tabular-nums">{brl(comissao.valor)}</strong> <span className="text-fg-muted">({String(comissao.pct).replace('.', ',')}%)</span></p>
+          )}
           <p className="font-body text-xs text-fg-muted mt-2">
-            {progresso === null
+            {meta
+              ? `Meta do mês: ${brl(meta)}.`
+              : progresso === null
               ? 'Sem atendimento concluído no mês passado pra comparar.'
               : `${nomeMesPassado[0].toUpperCase()}${nomeMesPassado.slice(1)} inteiro fechou em ${brl(totalMesPassado)}.`}
           </p>

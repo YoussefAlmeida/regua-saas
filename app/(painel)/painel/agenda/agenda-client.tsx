@@ -63,7 +63,9 @@ function segundaDe(data: string): string {
 }
 const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`
 
-type Visao = 'dia' | 'semana'
+type Visao = 'dia' | 'semana' | 'mes'
+/** Primeira segunda-feira mostrada na grade do mês desse dia */
+const inicioDoMes = (data: string) => segundaDe(`${data.slice(0, 7)}-01`)
 
 export default function AgendaClient({
   profissionaisIniciais,
@@ -115,8 +117,8 @@ export default function AgendaClient({
   // Na semana, carrega de segunda a domingo de uma vez
   const buscarAgendamentos = useCallback(async (d: string, v: Visao = 'dia') => {
     setCarregando(true)
-    const de = v === 'semana' ? segundaDe(d) : d, dias = v === 'semana' ? 7 : 1
-    buscarBloqueios(de, dias)
+    const de = v === 'semana' ? segundaDe(d) : v === 'mes' ? inicioDoMes(d) : d, dias = v === 'semana' ? 7 : v === 'mes' ? 42 : 1
+    buscarBloqueios(de, Math.min(dias, 7))
     const res = await fetch(`/api/painel/agendamentos?data=${de}&dias=${dias}`).catch(() => null)
     setCarregando(false)
     if (!res?.ok) { avisar('Não deu pra carregar a agenda. Confere a internet.', 'erro'); return }
@@ -124,7 +126,9 @@ export default function AgendaClient({
   }, [buscarBloqueios])
 
   function navegar(n: number) {
-    const nova = somarDias(data, visao === 'semana' ? n * 7 : n)
+    const nova = visao === 'mes'
+      ? (() => { const d = new Date(`${data.slice(0, 7)}-15T12:00:00`); d.setMonth(d.getMonth() + n); return `${d.toLocaleDateString('sv-SE').slice(0, 7)}-01` })()
+      : somarDias(data, visao === 'semana' ? n * 7 : n)
     setData(nova)
     buscarAgendamentos(nova, visao)
   }
@@ -287,7 +291,7 @@ export default function AgendaClient({
           ini, fim: ini + Math.max(15, Math.round((new Date(a.fim).getTime() - new Date(a.inicio).getTime()) / 60_000)),
           titulo: a.cliente?.nome ?? '—',
           detalhe: a.servico?.nome ?? '',
-          cor: a.servico?.cor ?? '#C5A46D',
+          cor: a.servico?.cor ?? '#F5D900',
           estado: a.status === 'concluido' ? 'concluido' : a.status === 'faltou' ? 'faltou' : 'aberto',
         }
       })
@@ -315,6 +319,7 @@ export default function AgendaClient({
 
   const rotuloPeriodo = visao === 'dia'
     ? formatarData(data)
+    : visao === 'mes' ? new Date(`${data.slice(0, 7)}-15T12:00:00`).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
     : `${semana[0].slice(8, 10)}/${semana[0].slice(5, 7)} a ${semana[6].slice(8, 10)}/${semana[6].slice(5, 7)}`
 
   const inputCls = 'w-full bg-surface border border-line rounded-button px-3 py-2 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
@@ -330,14 +335,14 @@ export default function AgendaClient({
           </button>
           <div className="text-center min-w-[6.5rem] md:min-w-[7.5rem]">
             <p className="font-semibold font-ui text-sm text-fg first-letter:uppercase">{rotuloPeriodo}</p>
-            {(visao === 'dia' ? data === hoje : semana.includes(hoje)) && (
-              <span className="font-body text-xs text-amber">{visao === 'dia' ? 'Hoje' : 'Esta semana'}</span>
+            {(visao === 'dia' ? data === hoje : visao === 'mes' ? data.slice(0, 7) === hoje.slice(0, 7) : semana.includes(hoje)) && (
+              <span className="font-body text-xs text-amber">{visao === 'dia' ? 'Hoje' : visao === 'mes' ? 'Este mês' : 'Esta semana'}</span>
             )}
           </div>
           <button onClick={() => navegar(1)} className="p-1.5 text-fg-muted hover:text-fg transition-colors" aria-label={visao === 'dia' ? 'Próximo dia' : 'Próxima semana'}>
             <ChevronRight size={18} />
           </button>
-          {!(visao === 'dia' ? data === hoje : semana.includes(hoje)) && (
+          {!(visao === 'dia' ? data === hoje : visao === 'mes' ? data.slice(0, 7) === hoje.slice(0, 7) : semana.includes(hoje)) && (
             <button
               onClick={() => { setData(hoje); buscarAgendamentos(hoje, visao) }}
               className="font-ui text-xs uppercase tracking-wider text-amber hover:underline px-2"
@@ -349,7 +354,7 @@ export default function AgendaClient({
 
         <div className="flex items-center gap-2">
           <div className="flex rounded-button border border-line overflow-hidden" role="tablist" aria-label="Visão da agenda">
-            {(['dia', 'semana'] as const).map(v => (
+            {(['dia', 'semana', 'mes'] as const).map(v => (
               <button
                 key={v}
                 role="tab"
@@ -357,7 +362,7 @@ export default function AgendaClient({
                 onClick={() => trocarVisao(v)}
                 className={`px-3 py-1.5 font-ui text-xs font-semibold capitalize transition-colors ${visao === v ? 'bg-amber text-accent-fg' : 'text-fg-muted hover:text-fg'}`}
               >
-                {v}
+                {v === 'mes' ? 'mês' : v}
               </button>
             ))}
           </div>
@@ -373,7 +378,7 @@ export default function AgendaClient({
 
       {/* Tabs de profissionais */}
       {profissionais.length > 0 && (
-        <div className={`${visao === 'dia' ? 'flex md:hidden' : 'flex'} border-b border-line bg-surface shrink-0 overflow-x-auto`}>
+        <div className={`${visao === 'dia' ? 'flex md:hidden' : visao === 'mes' ? 'hidden' : 'flex'} border-b border-line bg-surface shrink-0 overflow-x-auto`}>
           {profissionais.map((p, i) => {
             const total = agendamentos.filter(a => a.profissional?.id === p.id && a.status !== 'faltou').length
             return (
@@ -399,7 +404,7 @@ export default function AgendaClient({
 
       {/* Grade: semana (sempre) e dia no computador */}
       {profissionais.length > 0 && (
-        <div className={`flex-1 min-h-0 bg-bg ${visao === 'dia' ? 'hidden md:block' : ''} ${carregando ? 'opacity-50' : ''}`} aria-busy={carregando}>
+        <div className={`flex-1 min-h-0 bg-bg ${visao === 'dia' ? 'hidden md:block' : visao === 'mes' ? 'hidden' : ''} ${carregando ? 'opacity-50' : ''}`} aria-busy={carregando}>
           <GradeAgenda
             colunas={grade.colunas}
             eventos={grade.eventos}
@@ -415,6 +420,32 @@ export default function AgendaClient({
               ? (profissionais.find(p => p.id === coluna)?.ativo ? abrirNovo(coluna, data, min) : avisar('Esse barbeiro está fora da agenda e não recebe horário novo.', 'info'))
               : (profAtual?.ativo ? abrirNovo(profAtual.id, coluna, min) : avisar('Esse barbeiro está fora da agenda e não recebe horário novo.', 'info'))}
           />
+        </div>
+      )}
+
+      {/* Mês: quantos horários em cada dia; tocar num dia abre a agenda dele */}
+      {visao === 'mes' && (
+        <div className={`flex-1 overflow-y-auto p-3 md:p-5 ${carregando ? 'opacity-50' : ''}`} aria-busy={carregando}>
+          <div className="grid grid-cols-7 gap-1 md:gap-2 max-w-4xl mx-auto">
+            {['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'].map(d => <p key={d} className="ds-eyebrow text-center pb-1">{d}</p>)}
+            {Array.from({ length: 42 }, (_, i) => somarDias(inicioDoMes(data), i)).map(d => {
+              const doDia = agendamentos.filter(a => dataLocal(a.inicio) === d && a.status !== 'faltou')
+              const fora = d.slice(0, 7) !== data.slice(0, 7)
+              return (
+                <button key={d} onClick={() => { setData(d); setVisao('dia'); buscarAgendamentos(d, 'dia') }}
+                  aria-label={`${d.slice(8, 10)}/${d.slice(5, 7)}: ${doDia.length} horário${doDia.length === 1 ? '' : 's'}`}
+                  className={`min-h-[64px] md:min-h-[92px] rounded-button border p-1.5 md:p-2.5 text-left transition-colors hover:border-fg/40 ${d === hoje ? 'border-amber' : 'border-line'} ${fora ? 'opacity-35' : 'bg-surface'}`}>
+                  <span className={`font-display text-sm font-semibold tabular-nums ${d === hoje ? 'text-amber' : 'text-fg'}`}>{d.slice(8, 10)}</span>
+                  {doDia.length > 0 && (
+                    <>
+                      <span className="block font-body text-[11px] text-fg-muted mt-1"><span className="font-semibold text-fg">{doDia.length}</span><span className="hidden md:inline"> horário{doDia.length === 1 ? '' : 's'}</span></span>
+                      <span className="block h-1 rounded-full bg-surface-alt mt-1.5 overflow-hidden"><span className="block h-full rounded-full bg-amber" style={{ width: `${Math.min(100, doDia.length * 10)}%` }} /></span>
+                    </>
+                  )}
+                </button>
+              )
+            })}
+          </div>
         </div>
       )}
 
@@ -471,7 +502,7 @@ export default function AgendaClient({
                 <div className="flex items-start gap-3">
                   <div
                     className="w-3 h-3 rounded-full shrink-0 mt-1"
-                    style={{ backgroundColor: ag.servico?.cor ?? '#C5A46D' }}
+                    style={{ backgroundColor: ag.servico?.cor ?? '#F5D900' }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">

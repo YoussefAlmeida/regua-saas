@@ -3,306 +3,196 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Plus, MessageCircle, LogOut, CalendarX, Download, Trash2 } from 'lucide-react'
+import { CalendarPlus, Navigation, RotateCcw, CalendarX2 } from 'lucide-react'
 import { clientePodeCancelar } from '@/lib/cancelamento'
+import NavCliente from '@/components/cliente/nav-cliente'
 
-type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
+/* Meus horários: o próximo em destaque (cancelar, como chegar) e o
+   histórico, com "Marcar de novo" pra repetir serviço e profissional. */
 
 export interface MeuAgendamento {
   id: string
   inicio: string
   fim: string
-  status: Status
+  status: 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
   valor_servico: number
   cancelado_por: string | null
-  profissional: { nome: string } | null
-  servico: { nome: string; duracao_min: number } | null
+  servico_id?: string
+  profissional_id?: string
+  profissional: { nome: string } | { nome: string }[] | null
+  servico: { nome: string; duracao_min: number } | { nome: string; duracao_min: number }[] | null
 }
 
-const ROTULO: Record<Status, { t: string; cls: string }> = {
-  agendado:   { t: 'Marcado',    cls: 'text-amber' },
-  confirmado: { t: 'Confirmado', cls: 'text-entrada' },
-  concluido:  { t: 'Feito',      cls: 'text-fg-muted' },
-  cancelado:  { t: 'Cancelado',  cls: 'text-saida' },
-  faltou:     { t: 'Faltou',     cls: 'text-fg-muted' },
-}
-
-const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const um = <T,>(v: T | T[] | null): T | null => (Array.isArray(v) ? v[0] ?? null : v)
 const quando = (iso: string) => {
   const d = new Date(iso)
   return {
-    dia: d.toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', weekday: 'long', day: '2-digit', month: 'long' }),
-    hora: d.toLocaleTimeString('pt-BR', { timeZone: 'America/Bahia', hour: '2-digit', minute: '2-digit' }),
-    curto: d.toLocaleDateString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: 'short', year: '2-digit' }),
+    semana: d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Bahia' }).replace('.', ''),
+    dia: d.toLocaleDateString('pt-BR', { day: '2-digit', timeZone: 'America/Bahia' }),
+    data: d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', timeZone: 'America/Bahia' }).replace('.', ''),
+    hora: d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia' }),
   }
 }
-const waLink = (tel: string, txt: string) => {
-  const d = tel.replace(/\D/g, '')
-  return `https://wa.me/${d.startsWith('55') ? d : `55${d}`}?text=${encodeURIComponent(txt)}`
+const ROTULO: Record<string, { t: string; c: string }> = {
+  concluido: { t: 'Feito', c: 'bg-entrada/10 text-entrada' },
+  cancelado: { t: 'Cancelado', c: 'bg-surface-alt text-fg-muted' },
+  faltou: { t: 'Não compareceu', c: 'bg-saida/10 text-saida' },
 }
 
-export default function MeusAgendamentos({
-  barbearia,
-  nome,
-  agendamentosIniciais,
-}: {
-  barbearia: { nome: string; slug: string; telefone: string | null }
+export default function MeusAgendamentos({ barbearia, nome, agendamentosIniciais }: {
+  barbearia: { nome: string; slug: string; telefone: string | null; endereco?: string | null }
   nome: string | null
   agendamentosIniciais: MeuAgendamento[]
 }) {
   const router = useRouter()
   const [ags, setAgs] = useState(agendamentosIniciais)
-  const [cancelando, setCancelando] = useState<string | null>(null)
-  const [msg, setMsg] = useState<{ t: string; erro?: boolean } | null>(null)
-
-  // login
   const [whatsapp, setWhatsapp] = useState('')
   const [senha, setSenha] = useState('')
   const [entrando, setEntrando] = useState(false)
-  const [erroLogin, setErroLogin] = useState('')
-
-  // LGPD: apagar a própria conta
-  const [apagando, setApagando] = useState(false)
-  const [senhaApagar, setSenhaApagar] = useState('')
-  const [erroApagar, setErroApagar] = useState('')
-  const [ocupadoApagar, setOcupadoApagar] = useState(false)
-
-  async function apagarConta(e: React.FormEvent) {
-    e.preventDefault()
-    setErroApagar('')
-    setOcupadoApagar(true)
-    const res = await fetch('/api/cliente/meus-dados', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ senha: senhaApagar }),
-    }).catch(() => null)
-    setOcupadoApagar(false)
-    if (!res) { setErroApagar('Sem conexão. Tenta de novo.'); return }
-    const json = await res.json().catch(() => ({}))
-    if (!res.ok) { setErroApagar(json.erro ?? 'Não deu pra apagar'); return }
-    alert('Pronto: sua conta e seus dados foram apagados.')
-    router.push(`/${barbearia.slug}`)
-  }
+  const [erro, setErro] = useState('')
+  const [confirmar, setConfirmar] = useState<MeuAgendamento | null>(null)
+  const [cancelando, setCancelando] = useState(false)
+  const [msg, setMsg] = useState<{ t: string; erro?: boolean } | null>(null)
 
   const agora = Date.now()
-  const proximos = ags
-    .filter(a => (a.status === 'agendado' || a.status === 'confirmado') && new Date(a.fim).getTime() > agora)
+  const proximos = ags.filter(a => (a.status === 'agendado' || a.status === 'confirmado') && new Date(a.fim).getTime() > agora)
     .sort((a, b) => a.inicio.localeCompare(b.inicio))
   const historico = ags.filter(a => !proximos.includes(a))
+  const mapa = barbearia.endereco ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${barbearia.nome} ${barbearia.endereco}`)}` : null
+  const denovo = (a: MeuAgendamento) => `/${barbearia.slug}?${new URLSearchParams({ ...(a.servico_id ? { servico: a.servico_id } : {}), ...(a.profissional_id ? { profissional: a.profissional_id } : {}) })}`
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault()
-    setErroLogin('')
-    setEntrando(true)
+    setErro(''); setEntrando(true)
     const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ tipo: 'cliente', whatsapp, senha, slug: barbearia.slug }),
     }).catch(() => null)
     setEntrando(false)
-    if (!res) { setErroLogin('Sem conexão. Tenta de novo.'); return }
-    const json = await res.json().catch(() => ({}))
-    if (!res.ok) { setErroLogin(json.erro ?? 'Não deu pra entrar'); return }
-    if (json.papel !== 'cliente') { router.push(json.destino ?? '/painel/hoje'); return }
-    if (json.destino && json.destino !== `/${barbearia.slug}/meus-agendamentos`) { router.push(json.destino); return }
+    if (!res) { setErro('Sem conexão. Tenta de novo.'); return }
+    if (!res.ok) { setErro((await res.json().catch(() => ({}))).erro ?? 'WhatsApp ou senha incorretos'); return }
     router.refresh()
   }
 
-  async function sair() {
-    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null)
-    router.refresh()
-  }
-
-  async function cancelar(a: MeuAgendamento) {
-    if (!confirm(`Cancelar ${a.servico?.nome ?? 'o horário'} de ${quando(a.inicio).dia} às ${quando(a.inicio).hora}?`)) return
-    setCancelando(a.id)
-    setMsg(null)
-    const res = await fetch(`/api/cliente/agendamentos/${a.id}/cancelar`, { method: 'POST' }).catch(() => null)
-    setCancelando(null)
+  async function cancelar() {
+    if (!confirmar) return
+    setCancelando(true); setMsg(null)
+    const res = await fetch(`/api/cliente/agendamentos/${confirmar.id}/cancelar`, { method: 'POST' }).catch(() => null)
+    setCancelando(false)
+    const alvo = confirmar
+    setConfirmar(null)
     if (!res) { setMsg({ t: 'Sem conexão. Tenta de novo.', erro: true }); return }
-    const json = await res.json().catch(() => ({}))
-    if (!res.ok) { setMsg({ t: json.erro ?? 'Não deu pra cancelar', erro: true }); return }
-    setAgs(prev => prev.map(x => x.id === a.id ? { ...x, status: 'cancelado', cancelado_por: 'cliente' } : x))
-    setMsg({ t: 'Cancelado. A barbearia já foi avisada. Quer outro horário? Toca em Marcar.' })
+    if (!res.ok) { setMsg({ t: (await res.json().catch(() => ({}))).erro ?? 'Não deu pra cancelar', erro: true }); return }
+    setAgs(prev => prev.map(x => x.id === alvo.id ? { ...x, status: 'cancelado', cancelado_por: 'cliente' } : x))
+    setMsg({ t: 'Horário cancelado. Quer outro? Toca em Agendar.' })
   }
-
-  const inputCls = 'w-full bg-surface border border-line rounded-button px-4 py-3 font-body text-base text-fg placeholder:text-fg-muted focus:outline-none focus:ring-1 focus:ring-amber'
-  const labelCls = 'font-ui text-sm font-medium text-fg block mb-1.5'
 
   return (
     <div className="min-h-screen bg-bg">
-      <header className="bg-surface border-b border-line px-4 py-4">
-        <div className="max-w-lg mx-auto flex items-center gap-3">
-          <Link href={`/${barbearia.slug}`} className="-ml-1 p-1 text-fg-muted hover:text-fg" aria-label="Voltar">
-            <ChevronLeft size={20} />
-          </Link>
-          <div className="flex-1 min-w-0">
-            <p className="font-display text-xl text-amber leading-tight line-clamp-2 break-words">{barbearia.nome}</p>
-            <p className="font-ui text-sm font-semibold text-fg-muted">Meus horários</p>
-            {nome && (
-              <button onClick={sair} className="mt-1 flex items-center gap-1.5 font-ui text-sm text-fg-muted hover:text-saida py-1">
-                <LogOut size={14} /> Sair
-              </button>
-            )}
-          </div>
-        </div>
-      </header>
+      <div className="max-w-lg mx-auto px-4 pt-6 pb-28">
+        <p className="ds-eyebrow">{barbearia.nome}</p>
+        <h1 className="font-display text-2xl font-semibold text-fg mt-0.5">{nome ? `Olá, ${nome.split(' ')[0]}` : 'Meus horários'}</h1>
 
-      <main className="max-w-lg mx-auto px-4 py-6 pb-16 space-y-8">
         {!nome ? (
-          <section>
-            <h1 className="font-semibold font-ui text-lg text-fg mb-1">Entrar</h1>
-            <p className="font-body text-sm text-fg-muted mb-5">Use o WhatsApp e a senha que você criou ao agendar.</p>
-            <form onSubmit={entrar} className="bg-surface border border-line rounded-card p-5 space-y-4">
-              <div>
-                <label className={labelCls} htmlFor="wa">WhatsApp com DDD</label>
-                <input id="wa" type="tel" inputMode="tel" autoComplete="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="(75) 99999-0000" required className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls} htmlFor="senha">Senha</label>
-                <input id="senha" type="password" autoComplete="current-password" value={senha} onChange={e => setSenha(e.target.value)} required className={inputCls} />
-              </div>
-              {erroLogin && <p className="font-body text-sm text-saida" role="alert">{erroLogin}</p>}
-              <button type="submit" disabled={entrando} className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50">
-                {entrando ? 'Entrando…' : 'Entrar'}
-              </button>
-            </form>
-            <p className="font-body text-sm text-fg-muted text-center mt-6">
-              Nunca agendou pelo link?{' '}
-              <Link href={`/${barbearia.slug}`} className="text-amber hover:underline">Marcar meu primeiro horário</Link>
-            </p>
-            <p className="font-body text-xs text-fg-muted text-center mt-3">
-              <Link href={`/recuperar-senha?b=${barbearia.slug}`} className="text-amber hover:underline">Esqueci minha senha</Link>
-            </p>
-          </section>
+          <form onSubmit={entrar} className="ds-card p-5 mt-6 space-y-4">
+            <p className="font-body text-sm text-fg-muted">Entre com o WhatsApp e a senha que você criou ao marcar o primeiro horário.</p>
+            <div>
+              <label className="ds-label" htmlFor="wa">WhatsApp com DDD</label>
+              <input id="wa" type="tel" inputMode="tel" autoComplete="tel" value={whatsapp} onChange={e => setWhatsapp(e.target.value)} required placeholder="(75) 99999-0000" className="ds-input !text-base" />
+            </div>
+            <div>
+              <label className="ds-label" htmlFor="senha">Senha</label>
+              <input id="senha" type="password" autoComplete="current-password" value={senha} onChange={e => setSenha(e.target.value)} required className="ds-input !text-base" />
+            </div>
+            {erro && <p className="font-body text-sm text-saida" role="alert">{erro}</p>}
+            <button type="submit" disabled={entrando} className="ds-btn-primary w-full">{entrando ? 'Entrando…' : 'Entrar'}</button>
+            <div className="flex justify-between font-body text-xs">
+              <Link href={`/recuperar-senha?b=${barbearia.slug}`} className="text-fg-muted underline underline-offset-2 hover:text-fg">Esqueci minha senha</Link>
+              <Link href={`/${barbearia.slug}`} className="text-amber">Primeira vez? Marcar horário</Link>
+            </div>
+          </form>
         ) : (
           <>
-            <div className="flex items-center justify-between">
-              <h1 className="font-semibold font-ui text-lg text-fg">Oi, {nome.split(' ')[0]}</h1>
-              <Link href={`/${barbearia.slug}`} className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-4 py-2 rounded-button transition-colors">
-                <Plus size={13} /> Marcar
-              </Link>
-            </div>
+            {msg && <p className={`mt-4 ds-card px-4 py-3 font-body text-sm ${msg.erro ? 'text-saida border-saida/40' : 'text-fg'}`} role="status">{msg.t}</p>}
 
-            {msg && (
-              <p role="status" className={`font-body text-sm rounded-button px-4 py-3 border ${msg.erro ? 'text-saida border-saida/30 bg-saida/5' : 'text-entrada border-entrada/30 bg-entrada/5'}`}>
-                {msg.t}
-              </p>
-            )}
-
-            <section className="space-y-3">
-              <h2 className="font-semibold font-ui text-sm text-fg-muted">Próximos</h2>
-              {proximos.length === 0 ? (
-                <div className="text-center py-10 bg-surface border border-line rounded-card">
-                  <CalendarX size={28} strokeWidth={1.5} className="mx-auto text-fg-muted opacity-50 mb-2" />
-                  <p className="font-body text-sm text-fg-muted">Nenhum horário marcado.</p>
-                </div>
-              ) : proximos.map(a => {
-                const q = quando(a.inicio)
-                const podeCancelar = clientePodeCancelar(a.inicio, a.status)
-                return (
-                  <article key={a.id} className="bg-surface border border-amber/30 rounded-card p-4 space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="font-body text-sm text-fg first-letter:uppercase">{q.dia}</p>
-                        <p className="font-mono text-3xl text-amber leading-tight">{q.hora}</p>
-                        <p className="font-body text-sm text-fg-muted mt-1">{a.servico?.nome} · {a.profissional?.nome}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className={`font-ui text-[10px] uppercase tracking-wider ${ROTULO[a.status].cls}`}>{ROTULO[a.status].t}</span>
-                        <p className="font-mono text-sm text-fg mt-1">{brl(a.valor_servico)}</p>
-                      </div>
+            <h2 className="ds-eyebrow mt-7 mb-2">{proximos.length > 1 ? 'Próximos' : 'Próximo'}</h2>
+            {proximos.length === 0 ? (
+              <div className="ds-card p-6 text-center ds-grade">
+                <CalendarX2 size={28} className="mx-auto text-fg-muted" strokeWidth={1.5} aria-hidden />
+                <p className="font-display font-semibold text-fg mt-3">Nenhum horário marcado</p>
+                <p className="font-body text-sm text-fg-muted mt-1">Leva menos de um minuto.</p>
+                <Link href={`/${barbearia.slug}`} className="ds-btn-primary mt-4"><CalendarPlus size={15} aria-hidden /> Marcar horário</Link>
+              </div>
+            ) : proximos.map((a, i) => {
+              const q = quando(a.inicio), pode = clientePodeCancelar(a.inicio, a.status)
+              return (
+                <article key={a.id} className={`ds-card p-4 mb-2 ${i === 0 ? 'border-amber' : ''}`}>
+                  <div className="flex gap-3.5">
+                    <div className="w-12 text-center shrink-0">
+                      <p className="font-body text-[10px] font-semibold uppercase tracking-wider text-amber">{q.semana}</p>
+                      <p className="font-display text-2xl font-semibold text-fg leading-none tabular-nums mt-0.5">{q.dia}</p>
                     </div>
-                    {podeCancelar ? (
-                      <button
-                        onClick={() => cancelar(a)}
-                        disabled={cancelando === a.id}
-                        className="font-semibold w-full border border-saida/30 text-saida hover:bg-saida/5 font-ui text-sm py-2.5 rounded-button transition-colors disabled:opacity-50"
-                      >
-                        {cancelando === a.id ? 'Cancelando…' : 'Cancelar horário'}
-                      </button>
-                    ) : (
-                      <p className="font-body text-xs text-fg-muted">
-                        Falta menos de 1 hora — pra desmarcar agora,{' '}
-                        {barbearia.telefone
-                          ? <a className="text-amber hover:underline" href={waLink(barbearia.telefone, `Oi! Não vou conseguir ir no horário das ${q.hora}.`)}>avisa a barbearia</a>
-                          : 'avisa a barbearia'}.
-                      </p>
-                    )}
-                  </article>
-                )
-              })}
-            </section>
+                    <div className="min-w-0">
+                      <p className="font-display text-[15px] font-semibold text-fg truncate">{um(a.servico)?.nome ?? 'Atendimento'}</p>
+                      <p className="font-body text-xs text-fg-muted">{q.hora} · com {um(a.profissional)?.nome ?? 'a equipe'}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-3.5">
+                    {pode
+                      ? <button onClick={() => setConfirmar(a)} className="ds-btn-secondary flex-1 !min-h-[38px] text-xs">Cancelar</button>
+                      : <span className="flex-1 font-body text-xs text-fg-muted self-center">Falta menos de 1h: pra cancelar, fala com a barbearia.</span>}
+                    {mapa && <a href={mapa} target="_blank" rel="noopener noreferrer" className="ds-btn-secondary flex-1 !min-h-[38px] text-xs"><Navigation size={13} aria-hidden /> Como chegar</a>}
+                  </div>
+                </article>
+              )
+            })}
 
             {historico.length > 0 && (
-              <section className="space-y-2">
-                <h2 className="font-semibold font-ui text-sm text-fg-muted">Histórico</h2>
-                <ul className="bg-surface border border-line rounded-card divide-y divide-line">
+              <>
+                <h2 className="ds-eyebrow mt-7 mb-2">Histórico</h2>
+                <ul className="space-y-2">
                   {historico.map(a => {
-                    const q = quando(a.inicio)
+                    const r = ROTULO[a.status] ?? ROTULO.cancelado
                     return (
-                      <li key={a.id} className="flex items-center gap-3 px-4 py-3">
+                      <li key={a.id} className="ds-card p-3 flex items-center gap-3">
                         <div className="flex-1 min-w-0">
-                          <p className="font-body text-sm text-fg truncate">{a.servico?.nome} · {a.profissional?.nome}</p>
-                          <p className="font-body text-xs text-fg-muted">{q.curto} · {q.hora}</p>
+                          <p className="font-display text-sm font-semibold text-fg truncate">{um(a.servico)?.nome ?? 'Atendimento'}</p>
+                          <p className="font-body text-xs text-fg-muted truncate">{quando(a.inicio).data} · {um(a.profissional)?.nome ?? ''}</p>
+                          <span className={`ds-tag mt-1.5 ${r.c}`}>{r.t}</span>
                         </div>
-                        <span className={`font-ui text-[10px] uppercase tracking-wider ${ROTULO[a.status].cls}`}>{ROTULO[a.status].t}</span>
+                        {a.servico_id && (
+                          <Link href={denovo(a)} className="ds-tag border border-line text-fg hover:border-amber hover:text-amber !py-1.5 !px-2.5 shrink-0 transition-colors">
+                            <RotateCcw size={11} aria-hidden /> Marcar de novo
+                          </Link>
+                        )}
                       </li>
                     )
                   })}
                 </ul>
-              </section>
+              </>
             )}
-
-            {barbearia.telefone && (
-              <a href={waLink(barbearia.telefone, 'Oi!')} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 font-body text-xs text-fg-muted hover:text-fg">
-                <MessageCircle size={13} /> Falar com a barbearia
-              </a>
-            )}
-
-            {/* Seus dados (LGPD) */}
-            <section className="border-t border-line pt-6 space-y-3">
-              <h2 className="font-semibold font-ui text-sm text-fg-muted">Seus dados</h2>
-              <p className="font-body text-xs text-fg-muted">
-                Veja como cuidamos deles na <Link href="/privacidade" className="text-amber hover:underline">Política de Privacidade</Link>.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <a href="/api/cliente/meus-dados" download
-                  className="font-semibold flex items-center gap-1.5 border border-line text-fg font-ui text-[11px] px-3 py-2.5 rounded-button hover:border-amber/50">
-                  <Download size={13} /> Baixar meus dados
-                </a>
-                {!apagando && (
-                  <button onClick={() => setApagando(true)}
-                    className="font-semibold flex items-center gap-1.5 border border-line text-saida font-ui text-[11px] px-3 py-2.5 rounded-button hover:border-saida/50">
-                    <Trash2 size={13} /> Apagar minha conta
-                  </button>
-                )}
-              </div>
-              {apagando && (
-                <form onSubmit={apagarConta} className="bg-saida/5 border border-saida/30 rounded-card p-4 space-y-3">
-                  <p className="font-body text-sm text-fg">
-                    Isso apaga seu nome, WhatsApp e senha, e cancela os horários marcados. <strong>Não dá pra desfazer.</strong>
-                  </p>
-                  <div>
-                    <label className={labelCls} htmlFor="senha-apagar">Sua senha</label>
-                    <input id="senha-apagar" type="password" autoComplete="current-password" value={senhaApagar}
-                      onChange={e => setSenhaApagar(e.target.value)} required className={inputCls} />
-                  </div>
-                  {erroApagar && <p className="font-body text-sm text-saida" role="alert">{erroApagar}</p>}
-                  <div className="flex gap-2">
-                    <button type="button" onClick={() => { setApagando(false); setSenhaApagar(''); setErroApagar('') }}
-                      className="font-semibold flex-1 border border-line text-fg font-ui text-sm py-3 rounded-button">Voltar</button>
-                    <button type="submit" disabled={ocupadoApagar}
-                      className="font-semibold flex-1 bg-saida text-bg font-ui text-sm py-3 rounded-button disabled:opacity-50">
-                      {ocupadoApagar ? 'Apagando…' : 'Apagar de vez'}
-                    </button>
-                  </div>
-                </form>
-              )}
-            </section>
           </>
         )}
-      </main>
+      </div>
+
+      {/* Confirmação de cancelamento (no lugar do aviso do navegador) */}
+      {confirmar && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal aria-labelledby="t-cancelar">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setConfirmar(null)} />
+          <div className="relative w-full max-w-md bg-surface border border-line rounded-t-2xl sm:rounded-card p-6 space-y-4 animate-in slide-in-from-bottom-4 duration-200">
+            <h2 id="t-cancelar" className="font-display text-lg font-semibold text-fg">Cancelar esse horário?</h2>
+            <p className="font-body text-sm text-fg-muted">
+              {um(confirmar.servico)?.nome} em {quando(confirmar.inicio).data} às {quando(confirmar.inicio).hora}. O horário volta a ficar livre pra outra pessoa.
+            </p>
+            <div className="flex gap-2">
+              <button onClick={() => setConfirmar(null)} className="ds-btn-secondary flex-1">Manter</button>
+              <button onClick={cancelar} disabled={cancelando} className="ds-btn-danger flex-1">{cancelando ? 'Cancelando…' : 'Cancelar horário'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <NavCliente slug={barbearia.slug} ativo="horarios" />
     </div>
   )
 }

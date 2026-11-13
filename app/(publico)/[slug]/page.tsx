@@ -8,9 +8,11 @@ import AgendamentoPublico from './agendamento-publico'
 import { urlDoSiteFixa } from '@/lib/site-url'
 import { temaDaBarbearia } from '@/lib/tema'
 import { whatsappConfigurado } from '@/lib/whatsapp'
+import { funcionamentoDoDia, paraHora } from '@/lib/disponibilidade'
 
 interface Props {
   params: Promise<{ slug: string }>
+  searchParams?: Promise<{ servico?: string; profissional?: string }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -25,8 +27,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function AgendamentoPublicoPage({ params }: Props) {
+export default async function AgendamentoPublicoPage({ params, searchParams }: Props) {
   const { slug } = await params
+  const pre = (await searchParams) ?? {}
   const dados = await carregarBarbeariaPublica(slug)
   if (!dados) notFound()
 
@@ -40,6 +43,15 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
 
   // Teste vencido ou suspensa: a página fica no ar, mas pausa o agendamento
   const aceitando = !situacaoPlano(dados.barbearia).somenteLeitura
+
+  // "Aberta até 19:00" / "Fechada agora", pelo funcionamento que o dono definiu
+  const agoraLocal = new Date().toLocaleString('sv-SE', { timeZone: 'America/Bahia' })
+  const funcionamento = funcionamentoDoDia({ id: dados.barbearia.id, horario_funcionamento: dados.barbearia.horario_funcionamento, dias_fechados: dados.barbearia.dias_fechados }, agoraLocal.slice(0, 10))
+  const minutoAgora = Number(agoraLocal.slice(11, 13)) * 60 + Number(agoraLocal.slice(14, 16))
+  const situacao = !funcionamento ? { aberta: false, texto: 'Fechada hoje' }
+    : minutoAgora < funcionamento.inicio ? { aberta: false, texto: `Abre às ${paraHora(funcionamento.inicio)}` }
+    : minutoAgora >= funcionamento.fim ? { aberta: false, texto: 'Fechada agora' }
+    : { aberta: true, texto: `Aberta até ${paraHora(funcionamento.fim)}` }
 
   // Dados estruturados: o Google entende que é uma barbearia (SEO local)
   const site = urlDoSiteFixa()
@@ -66,6 +78,8 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
       clienteLogado={clienteLogado}
       aceitando={aceitando}
       lembreteAtivo={whatsappConfigurado()}
+      situacao={situacao}
+      pre={{ servico: pre.servico, profissional: pre.profissional }}
     />
     </div>
     </>

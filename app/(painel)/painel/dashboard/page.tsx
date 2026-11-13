@@ -4,6 +4,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { todasAsLinhas } from '@/lib/paginar'
 import { limitesDoDia, somarDias, minutosDeExpediente, dataHoraLocal } from '@/lib/disponibilidade'
 import VisaoGeral, { type DadosDashboard } from '@/components/dashboard/visao-geral'
+import { comInicio } from '@/lib/extras'
 
 export const metadata = { title: 'Dashboard' }
 
@@ -42,10 +43,11 @@ export default async function DashboardPage() {
     db.from('agendamentos')
       .select('id, inicio, cliente:usuarios!cliente_id(nome), servico:servicos!servico_id(nome), profissional:profissionais!profissional_id(nome)')
       .eq('barbearia_id', b).in('status', ['agendado', 'confirmado'])
-      .gte('inicio', new Date().toISOString()).lt('inicio', hojeFim)
+      .gte('fim', new Date().toISOString()).lt('inicio', hojeFim)
       .order('inicio').limit(6),
   ])
 
+  const proximosComInicio = await comInicio(db, proximos ?? [])
   const um = <T,>(v: T | T[] | null | undefined): T | null => (Array.isArray(v) ? v[0] ?? null : v ?? null)
   const todos = ags ?? []
   const noAtual = todos.filter(a => new Date(a.inicio).getTime() >= corte)
@@ -103,8 +105,9 @@ export default async function DashboardPage() {
     faltas: noAtual.filter(a => a.status === 'faltou').length,
     porDia,
     servicos,
-    proximos: (proximos ?? []).map(a => ({
+    proximos: proximosComInicio.map(a => ({
       id: a.id,
+      emAtendimento: !!a.iniciado_em,
       hora: dataHoraLocal(a.inicio).hora,
       cliente: um(a.cliente as { nome: string } | { nome: string }[] | null)?.nome ?? 'Cliente',
       servico: um(a.servico as { nome: string } | { nome: string }[] | null)?.nome ?? 'Serviço',

@@ -26,7 +26,7 @@ export default async function MeusAgendamentosPage({ params }: Props) {
       db.from('usuarios').select('nome').eq('id', sessao.usuario_id).maybeSingle(),
       db.from('agendamentos')
         .select(`
-          id, inicio, fim, status, valor_servico, cancelado_por,
+          id, inicio, fim, status, valor_servico, cancelado_por, servico_id, profissional_id,
           profissional:profissionais!profissional_id(nome),
           servico:servicos!servico_id(nome, duracao_min)
         `)
@@ -42,7 +42,7 @@ export default async function MeusAgendamentosPage({ params }: Props) {
   return (
     <div style={temaDaBarbearia(dados.barbearia).vars as React.CSSProperties}>
     <MeusAgendamentos
-      barbearia={{ nome: dados.barbearia.nome, slug: dados.barbearia.slug, telefone: dados.barbearia.telefone }}
+      barbearia={{ nome: dados.barbearia.nome, slug: dados.barbearia.slug, telefone: dados.barbearia.telefone, endereco: dados.barbearia.endereco }}
       nome={logado ? nome : null}
       agendamentosIniciais={agendamentos}
     />

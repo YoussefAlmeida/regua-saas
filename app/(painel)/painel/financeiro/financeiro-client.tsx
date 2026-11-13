@@ -118,7 +118,7 @@ export default function FinanceiroClient({
     for (const m of movs) {
       if (m.tipo !== 'saida') continue
       const nome = m.categoria?.nome ?? 'Sem categoria'
-      const atual = mapa.get(nome) ?? { v: 0, cor: m.categoria?.cor ?? '#A9A59D' }
+      const atual = mapa.get(nome) ?? { v: 0, cor: m.categoria?.cor ?? '#9B9B9B' }
       atual.v += Number(m.valor)
       mapa.set(nome, atual)
     }

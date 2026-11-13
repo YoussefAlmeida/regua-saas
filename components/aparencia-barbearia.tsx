@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { Check, ImagePlus, Trash2, AlertTriangle, ExternalLink } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
-import { temaDaBarbearia, PRIMARIA_PADRAO, SECUNDARIA_PADRAO } from '@/lib/tema'
+import { temaDaBarbearia, PRIMARIA_PADRAO } from '@/lib/tema'
 
 /* Aparência da página de agendamento: logo, capa, cores e texto "sobre".
    As cores passam pelo mesmo ajuste de contraste que a página usa, então
@@ -24,15 +24,14 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
   const [logo, setLogo] = useState(marca.logo_url)
   const [capa, setCapa] = useState(marca.capa_url)
   const [primaria, setPrimaria] = useState(marca.cor_primaria ?? PRIMARIA_PADRAO)
-  const [secundaria, setSecundaria] = useState(marca.cor_secundaria ?? SECUNDARIA_PADRAO)
   const [sobre, setSobre] = useState(marca.sobre ?? '')
   const [enviando, setEnviando] = useState<'logo' | 'capa' | null>(null)
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
   const inputLogo = useRef<HTMLInputElement>(null), inputCapa = useRef<HTMLInputElement>(null)
 
-  const tema = temaDaBarbearia({ cor_primaria: primaria, cor_secundaria: secundaria })
-  const padrao = primaria.toUpperCase() === PRIMARIA_PADRAO && secundaria.toUpperCase() === SECUNDARIA_PADRAO
+  const tema = temaDaBarbearia({ cor_primaria: primaria })
+  const padrao = primaria.toUpperCase() === PRIMARIA_PADRAO
 
   async function enviar(tipo: 'logo' | 'capa', arquivo: File | undefined) {
     if (!arquivo) return
@@ -64,7 +63,6 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
       body: JSON.stringify({
         // Paleta oficial = sem cor própria gravada
         cor_primaria: primaria.toUpperCase() === PRIMARIA_PADRAO ? null : primaria,
-        cor_secundaria: secundaria.toUpperCase() === SECUNDARIA_PADRAO ? null : secundaria,
         sobre: sobre.trim() || null,
       }),
     }).catch(() => null)
@@ -124,19 +122,15 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
             <p className="font-body text-xs text-fg-muted mt-2">JPG, PNG ou WEBP, até 2 MB. A capa fica melhor deitada; o logo, quadrado.</p>
           </div>
 
-          {/* Cores */}
-          <div className="grid grid-cols-2 gap-3">
-            {([['Cor principal', primaria, setPrimaria, 'Botões, destaques e horário escolhido'], ['Cor secundária', secundaria, setSecundaria, 'Botão de confirmar e aviso de sucesso']] as const).map(([rotulo, valor, set, ajuda]) => (
-              <label key={rotulo} className="block bg-surface border border-line rounded-card p-3 cursor-pointer">
-                <span className="font-ui text-sm font-medium text-fg block">{rotulo}</span>
-                <span className="flex items-center gap-2 mt-2">
-                  <input type="color" value={valor} onChange={e => set(e.target.value.toUpperCase())} className="w-9 h-9 rounded-button bg-transparent border border-line cursor-pointer p-0.5" />
-                  <span className="font-mono text-sm text-fg-muted">{valor.toUpperCase()}</span>
-                </span>
-                <span className="font-body text-xs text-fg-muted block mt-2">{ajuda}</span>
-              </label>
-            ))}
-          </div>
+          {/* Cor de destaque */}
+          <label className="flex items-center gap-3 bg-surface border border-line rounded-card p-3 cursor-pointer">
+            <input type="color" value={primaria} onChange={e => setPrimaria(e.target.value.toUpperCase())} className="w-11 h-11 rounded-button bg-transparent border border-line cursor-pointer p-0.5 shrink-0" />
+            <span className="flex-1 min-w-0">
+              <span className="font-ui text-sm font-medium text-fg block">Cor de destaque</span>
+              <span className="font-body text-xs text-fg-muted block">Botões, horário escolhido e detalhes da sua página</span>
+            </span>
+            <span className="font-mono text-sm text-fg-muted shrink-0">{primaria.toUpperCase()}</span>
+          </label>
 
           {/* Prévia com as cores já ajustadas */}
           <div className="rounded-card border border-line bg-bg p-4 space-y-3" style={tema.vars as React.CSSProperties} aria-label="Prévia das cores">
@@ -147,7 +141,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
             </div>
             <div className="flex gap-2">
               <span className="flex-1 text-center bg-amber text-accent-fg font-ui text-sm font-semibold py-2.5 rounded-button">Continuar</span>
-              <span className="flex-1 text-center bg-verde text-verde-fg font-ui text-sm font-semibold py-2.5 rounded-button">Confirmar horário</span>
+              <span className="flex-1 text-center border border-amber text-amber font-ui text-sm font-semibold py-2.5 rounded-button">10:30</span>
             </div>
           </div>
           {tema.ajustada && (
@@ -157,8 +151,8 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
             </p>
           )}
           {!padrao && (
-            <button type="button" onClick={() => { setPrimaria(PRIMARIA_PADRAO); setSecundaria(SECUNDARIA_PADRAO) }} className="font-body text-xs text-fg-muted underline underline-offset-2 hover:text-fg">
-              Voltar pras cores padrão do RÉGUA
+            <button type="button" onClick={() => setPrimaria(PRIMARIA_PADRAO)} className="font-body text-xs text-fg-muted underline underline-offset-2 hover:text-fg">
+              Voltar pro amarelo padrão do RÉGUA
             </button>
           )}
 
@@ -173,7 +167,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
           </div>
 
           <button type="button" onClick={salvar} disabled={salvando} className="font-semibold w-full flex items-center justify-center gap-2 bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors disabled:opacity-50">
-            {salvo ? <><Check size={14} /> Salvo</> : salvando ? 'Salvando…' : 'Salvar cores e texto'}
+            {salvo ? <><Check size={14} /> Salvo</> : salvando ? 'Salvando…' : 'Salvar cor e texto'}
           </button>
         </>
       )}

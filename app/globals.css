@@ -4,81 +4,77 @@
 
 /* ================================================================
    RÉGUA — Design Tokens
-   Identidade oficial "premium dark": preto carvão, grafite, dourado
-   fosco, off-white e verde.
-     Preto carvão  #17191D  fundo
-     Grafite       #25282E  cartões e superfícies
-     Dourado fosco #C5A46D  ação principal e destaque (com parcimônia)
-     Off-white     #F2EFE9  texto
-     Verde         #477A60  confirmação e indicadores positivos
-   O verde oficial é escuro demais pra TEXTO sobre o carvão (contraste
-   3,5:1); o token "entrada" usa um tom mais claro da mesma cor (6,9:1)
-   e o oficial fica em --verde, pra preenchimentos.
-   (os nomes amber/accent ficaram por compatibilidade: hoje são o dourado)
+   Identidade "Tech Futurista — Black & Electric Yellow".
+     Preto     #101010  fundo
+     Carvão    #181818  cartões
+     Grafite   #252525  superfície elevada, campos, hover
+     Borda     #333333
+     Branco    #FFFFFF  texto
+     Cinza     #9B9B9B  texto secundário (o #777777 da paleta reprova no
+                        contraste pra texto; fica pra ícone inativo e borda)
+     Amarelo   #F5D900  ação principal e destaque — nunca fundo de área grande
+   Semânticas: sucesso #3DDC84 · erro #FF5C5C · informação #4DA3FF · alerta #FF9F1C
+   (os nomes amber/entrada/saida ficaram por compatibilidade com as telas)
    ================================================================ */
 @layer base {
   :root {
     color-scheme: dark;
 
     /* ── shadcn/ui — sistema HSL ──────────────────────────────── */
-    --background:          220 12% 10%;   /* #17191D */
-    --foreground:          40 26% 93%;    /* #F2EFE9 */
-    --card:                220 10% 16%;   /* #25282E */
-    --card-foreground:     40 26% 93%;
-    --popover:             220 10% 16%;
-    --popover-foreground:  40 26% 93%;
-    --primary:             38 43% 60%;    /* #C5A46D — dourado fosco */
-    --primary-foreground:  220 12% 10%;
-    --secondary:           218 10% 20%;
-    --secondary-foreground: 40 26% 93%;
-    --muted:               218 10% 20%;
-    --muted-foreground:    40 7% 64%;     /* #A9A59D */
-    --accent:              38 43% 60%;
-    --accent-foreground:   220 12% 10%;
-    --destructive:         5 70% 66%;     /* #E5746A */
-    --destructive-foreground: 220 12% 10%;
-    --border:              220 10% 24%;   /* #373B43 */
-    --input:               220 6% 48%;
-    --ring:                38 43% 60%;
+    --background:          0 0% 6%;
+    --foreground:          0 0% 100%;
+    --card:                0 0% 9%;
+    --card-foreground:     0 0% 100%;
+    --popover:             0 0% 9%;
+    --popover-foreground:  0 0% 100%;
+    --primary:             53 100% 48%;
+    --primary-foreground:  0 0% 6%;
+    --secondary:           0 0% 15%;
+    --secondary-foreground: 0 0% 100%;
+    --muted:               0 0% 15%;
+    --muted-foreground:    0 0% 61%;
+    --accent:              53 100% 48%;
+    --accent-foreground:   0 0% 6%;
+    --destructive:         0 100% 68%;
+    --destructive-foreground: 0 0% 6%;
+    --border:              0 0% 20%;
+    --input:               0 0% 47%;
+    --ring:                53 100% 48%;
     --radius:              0.75rem;
 
     /* ── RÉGUA custom tokens ──────────────────────────────────── */
-    --bg:            #17191D;   /* preto carvão */
-    --surface:       #25282E;   /* grafite: cartões */
-    --surface-2:     #2E3239;   /* áreas recuadas, chips */
-    --line:          #373B43;   /* divisórias discretas */
-    --line-forte:    #737882;   /* borda de campo (contraste 3:1) */
-    --fg:            #F2EFE9;   /* off-white */
-    --fg-muted:      #A9A59D;
-    --regua-accent:  #C5A46D;   /* dourado fosco */
-    --accent-press:  #B39258;
-    --accent-fg:     #17191D;   /* texto sobre o dourado */
-    --verde:         #477A60;   /* verde oficial (preenchimentos) */
+    --bg:            #101010;
+    --surface:       #181818;
+    --surface-2:     #252525;
+    --line:          #333333;
+    --line-forte:    #777777;   /* borda de campo (contraste 3:1) */
+    --fg:            #FFFFFF;
+    --fg-muted:      #9B9B9B;
+    --regua-accent:  #F5D900;
+    --accent-press:  #D9C000;
+    --accent-fg:     #101010;   /* texto sobre o amarelo */
 
-    /* Semântica financeira — NUNCA usar pra success/error */
-    --entrada:  #6FB08E;
-    --saida:    #E5746A;
-    --info:     #8AB4DC;
+    --entrada:  #3DDC84;        /* sucesso / entrada */
+    --saida:    #FF5C5C;        /* erro / saída */
+    --info:     #4DA3FF;
+    --alerta:   #FF9F1C;
 
-    /* Mesmas cores em canais RGB — o Tailwind usa pra transparência
-       (bg-entrada/10, border-amber/30…). Mudou a cor acima? Mude aqui. */
-    --bg-rgb:           23 25 29;
-    --surface-rgb:      37 40 46;
-    --surface-2-rgb:    46 50 57;
-    --line-rgb:         55 59 67;
-    --fg-rgb:           242 239 233;
-    --fg-muted-rgb:     169 165 157;
-    --accent-rgb:       197 164 109;
-    --accent-press-rgb: 179 146 88;
-    --accent-fg-rgb:    23 25 29;
-    --verde-rgb:        71 122 96;
-    --verde-fg-rgb:     242 239 233;
-    --entrada-rgb:      111 176 142;
-    --saida-rgb:        229 116 106;
-    --info-rgb:         138 180 220;
-
-    /* Tipografia: --font-display e --font-body vêm do next/font (app/layout.tsx).
-       Não redefinir aqui — o :root sobrescrevia a fonte carregada. */
+    /* Mesmas cores em canais RGB — o Tailwind usa pra transparência */
+    --bg-rgb:           16 16 16;
+    --surface-rgb:      24 24 24;
+    --surface-2-rgb:    37 37 37;
+    --line-rgb:         51 51 51;
+    --fg-rgb:           255 255 255;
+    --fg-muted-rgb:     155 155 155;
+    --accent-rgb:       245 217 0;
+    --accent-press-rgb: 217 192 0;
+    --accent-fg-rgb:    16 16 16;
+    --verde-rgb:        61 220 132;
+    --verde-fg-rgb:     16 16 16;
+    --entrada-rgb:      61 220 132;
+    --saida-rgb:        255 92 92;
+    --info-rgb:         77 163 255;
+    --alerta-rgb:       255 159 28;
   }
 }
 
@@ -130,7 +126,8 @@
   }
 
   ::selection {
-    background: rgb(var(--accent-rgb) / 0.3);
+    background: rgb(var(--accent-rgb) / 0.35);
+    color: #fff;
   }
 
   :focus-visible {
@@ -160,4 +157,28 @@
     @apply flex flex-col items-center justify-center gap-3 py-12 text-center;
     color: var(--fg-muted);
   }
+}
+
+/* ================================================================
+   Design System — peças de base (use nas telas novas)
+   ================================================================ */
+@layer components {
+  .ds-eyebrow { @apply font-body text-[11px] font-semibold uppercase tracking-[0.14em] text-fg-muted; }
+  .ds-card    { @apply bg-surface border border-line rounded-card; }
+  .ds-btn     { @apply inline-flex items-center justify-center gap-2 rounded-button font-ui text-sm font-semibold transition-[background-color,border-color,transform] duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none; min-height: 44px; padding-inline: 1rem; }
+  .ds-btn-primary   { @apply ds-btn bg-amber text-accent-fg hover:bg-accent-press; }
+  .ds-btn-secondary { @apply ds-btn bg-surface border border-line text-fg hover:border-fg/40; }
+  .ds-btn-ghost     { @apply ds-btn text-fg-muted hover:text-fg hover:bg-surface-alt; }
+  .ds-btn-danger    { @apply ds-btn bg-saida/10 border border-saida/40 text-saida hover:bg-saida/20; }
+  .ds-input   { @apply w-full bg-surface-alt border border-line rounded-button px-3.5 py-3 font-body text-sm text-fg placeholder:text-fg-muted focus:outline-none focus:border-amber; }
+  .ds-label   { @apply font-ui text-sm font-medium text-fg block mb-1.5; }
+  .ds-tag     { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-body text-[11px] font-semibold; }
+  .ds-skeleton { @apply rounded-button bg-surface-alt animate-pulse; }
+}
+
+/* Fundo técnico discreto (áreas vazias e página de vendas) */
+.ds-grade { background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px); background-size: 22px 22px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

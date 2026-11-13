@@ -85,7 +85,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       id, inicio, fim, status, valor_servico, observacao, cancelado_por,
       profissional_id,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .single()

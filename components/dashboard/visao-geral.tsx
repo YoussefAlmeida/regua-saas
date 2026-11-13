@@ -15,7 +15,7 @@ export interface DadosDashboard {
   faltas: number
   porDia: PontoDia[]
   servicos: { nome: string; qtd: number; pct: number }[]
-  proximos: { id: string; hora: string; cliente: string; servico: string; barbeiro: string }[]
+  proximos: { id: string; hora: string; cliente: string; servico: string; barbeiro: string; emAtendimento?: boolean }[]
   ocupacao: { nome: string; pct: number | null }[]
 }
 
@@ -126,7 +126,8 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
                   <span className="font-mono text-sm font-semibold text-amber bg-amber/10 rounded-button px-2 py-1 shrink-0">{a.hora}</span>
                   <span className="font-body text-sm text-fg truncate flex-1 min-w-0">{a.cliente}</span>
                   <span className="font-body text-xs text-fg-muted truncate hidden sm:block w-36">{a.servico}</span>
-                  <span className="font-body text-xs text-fg-muted truncate w-24 text-right">{a.barbeiro}</span>
+                  <span className="font-body text-xs text-fg-muted truncate w-20 text-right">{a.barbeiro}</span>
+                  {a.emAtendimento && <span className="ds-tag bg-amber/15 text-amber shrink-0">Em atendimento</span>}
                 </li>
               ))}
             </ul>
@@ -148,7 +149,7 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
                     <span className="font-mono text-sm text-fg-muted shrink-0">{o.pct === null ? 'folga' : `${o.pct}%`}</span>
                   </div>
                   <div className="h-2 rounded-full bg-surface-alt overflow-hidden">
-                    <div className="h-full rounded-full bg-verde" style={{ width: `${o.pct ?? 0}%` }} />
+                    <div className="h-full rounded-full bg-fg" style={{ width: `${o.pct ?? 0}%` }} />
                   </div>
                 </li>
               ))}

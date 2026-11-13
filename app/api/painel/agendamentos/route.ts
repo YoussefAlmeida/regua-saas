@@ -7,6 +7,7 @@ import { normalizarWhatsapp } from '@/lib/utils'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { falhaInterna } from '@/lib/erros'
+import { comInicio } from '@/lib/extras'
 
 const SchemaPost = z.object({
   profissional_id: z.string().uuid(),
@@ -32,8 +33,8 @@ export async function GET(req: NextRequest) {
   // Bahia = UTC-3: dia local começa às 03:00 UTC
   const [y, m, d] = data.split('-').map(Number)
   const inicio_gte = new Date(Date.UTC(y, m - 1, d, 3, 0, 0)).toISOString()
-  // ?dias=7 → a semana a partir de "data" (visão semanal da agenda)
-  const dias = Math.min(7, Math.max(1, Number(req.nextUrl.searchParams.get('dias') ?? 1) || 1))
+  // ?dias=7 → a semana a partir de "data"; ?dias=42 → as seis semanas da visão do mês
+  const dias = Math.min(42, Math.max(1, Number(req.nextUrl.searchParams.get('dias') ?? 1) || 1))
   const inicio_lt  = new Date(Date.UTC(y, m - 1, d + dias, 3, 0, 0)).toISOString()
 
   const db = criarClienteServico()
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .eq('barbearia_id', sessao.barbearia_id)
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
   const { data: agendamentos, error } = await consulta
 
   if (error) return falhaInterna('painel/agendamentos', error, 'Erro ao buscar agendamentos')
-  return NextResponse.json(agendamentos)
+  return NextResponse.json(await comInicio(db, agendamentos ?? []))
 }
 
 export async function POST(req: NextRequest) {
@@ -182,7 +183,7 @@ export async function POST(req: NextRequest) {
     .select(`
       id, inicio, fim, status, valor_servico, observacao,
       profissional:profissionais!profissional_id(id, nome),
-      cliente:usuarios!cliente_id(nome, whatsapp),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
       servico:servicos!servico_id(nome, duracao_min, cor)
     `)
     .single()

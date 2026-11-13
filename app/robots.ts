@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [{
       userAgent: '*',
       allow: '/',
-      disallow: ['/painel', '/admin', '/api', '/entrar', '/convite', '/nova-senha', '/recuperar-senha', '/*/meus-agendamentos'],
+      disallow: ['/painel', '/admin', '/api', '/entrar', '/convite', '/nova-senha', '/recuperar-senha', '/*/meus-agendamentos', '/*/perfil'],
     }],
     sitemap: `${site}/sitemap.xml`,
     host: site,

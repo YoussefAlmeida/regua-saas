@@ -1,21 +1,13 @@
 import type { Metadata, Viewport } from "next"
-import { Outfit, Instrument_Sans } from "next/font/google"
+import { Space_Grotesk, Inter } from "next/font/google"
 import "./globals.css"
 import { urlDoSiteFixa } from "@/lib/site-url"
 
-// Títulos: sans geométrica, moderna (direção premium dark)
-const titulos = Outfit({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-})
+// Títulos e números: geométrica com caráter técnico
+const titulos = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" })
 
-// Interface e texto: sans limpa e humana; valores usam algarismos tabulares
-const instrument = Instrument_Sans({
-  subsets: ["latin"],
-  variable: "--font-body",
-  display: "swap",
-})
+// Interface e texto
+const corpo = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap" })
 
 export const metadata: Metadata = {
   title: {
@@ -33,14 +25,14 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#17191D",
+  themeColor: "#101010",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="pt-BR"
-      className={`${titulos.variable} ${instrument.variable}`}
+      className={`${titulos.variable} ${corpo.variable}`}
     >
       <body className="bg-bg text-fg font-body antialiased min-h-screen">
         {children}

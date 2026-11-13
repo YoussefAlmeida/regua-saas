@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Clock, TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRight } from 'lucide-react'
+import { TrendingUp, Scissors, Check, X, Undo2, AlertTriangle, ChevronRight } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import ContatoCliente from '@/components/contato-cliente'
 import { pedirSenha } from '@/components/confirmar-senha'
 import { mensagemStatus } from '@/lib/status-agendamento'
 import { formatBRL } from '@/lib/utils'
+import AtendimentoAgora from '@/components/atendimento-agora'
 
 type Status = 'agendado' | 'confirmado' | 'concluido' | 'cancelado' | 'faltou'
 
@@ -18,7 +19,8 @@ interface Agendamento {
   status: Status
   valor_servico: number
   profissional: { id: string; nome: string } | null
-  cliente: { nome: string; whatsapp: string | null } | null
+  iniciado_em?: string | null
+  cliente: { id?: string; nome: string; whatsapp: string | null } | null
   servico: { nome: string; duracao_min: number; cor: string } | null
 }
 
@@ -109,7 +111,8 @@ export default function HojeClient({
 
   // Próximo agendamento pendente
   const agora = new Date()
-  const proximo = pendentes.find(a => new Date(a.inicio) > agora)
+  // O da vez: o que já começou; senão, o primeiro que ainda não terminou
+  const foco = pendentes.find(a => a.iniciado_em) ?? pendentes.find(a => new Date(a.fim) > agora) ?? null
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-6">
@@ -205,20 +208,15 @@ export default function HojeClient({
       </div>
       )}
 
-      {/* Próximo agendamento */}
-      {proximo && (
-        <div className="bg-surface border border-amber/30 rounded-card p-4">
-          <p className="font-ui text-xs uppercase tracking-wider text-amber mb-2 flex items-center gap-1.5">
-            <Clock size={11} /> Próximo
-          </p>
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: proximo.servico?.cor ?? '#C5A46D' }} />
-            <div className="flex-1">
-              <p className="font-semibold font-ui text-sm text-fg">{proximo.cliente?.nome ?? '—'}</p>
-              <p className="font-body text-xs text-fg-muted">{proximo.servico?.nome} · {hora(proximo.inicio)} · {proximo.profissional?.nome}</p>
-            </div>
-          </div>
-        </div>
+      {/* O atendimento da vez */}
+      {foco && (
+        <AtendimentoAgora
+          ag={foco}
+          ocupado={atualizando === foco.id}
+          onIniciado={(id, iniciado_em) => setAgs(prev => prev.map(a => a.id === id ? { ...a, iniciado_em } : a))}
+          onFinalizar={id => atualizarStatus(id, 'concluido')}
+          onFaltou={id => atualizarStatus(id, 'faltou')}
+        />
       )}
 
       {/* Lista completa do dia */}
