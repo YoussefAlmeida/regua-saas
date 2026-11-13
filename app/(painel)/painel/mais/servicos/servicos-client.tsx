@@ -15,8 +15,8 @@ interface Servico {
 
 interface FormData { nome: string; preco: string; duracao_min: string; cor: string }
 
-const CORES = ['#C5A46D', '#6FB08E', '#C97B84', '#8AB4DC', '#B5B26A', '#A9A59D']
-const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#C5A46D' }
+const CORES = ['#F5D900', '#3DDC84', '#C97B84', '#4DA3FF', '#B5B26A', '#9B9B9B']
+const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#F5D900' }
 
 export default function ServicosClient({
   servicosIniciais,

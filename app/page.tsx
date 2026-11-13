@@ -29,15 +29,6 @@ const JSON_LD = {
   offers: LISTA_PLANOS.map(p => ({ '@type': 'Offer', name: p.nome, price: p.preco.toFixed(2), priceCurrency: 'BRL' })),
 }
 
-/* Paleta só da página de vendas: fundo mais profundo e dourado mais vivo que o
-   do painel, pra dar contraste e destaque aos botões. Como são as mesmas
-   variáveis do sistema, todos os componentes acompanham. */
-const PALETA = {
-  '--bg-rgb': '11 12 15', '--surface-rgb': '21 23 28', '--surface-2-rgb': '30 33 40', '--line-rgb': '43 47 56',
-  '--fg-rgb': '247 245 240', '--fg-muted-rgb': '165 163 158',
-  '--accent-rgb': '228 180 96', '--accent-press-rgb': '206 156 70', '--accent-fg-rgb': '17 18 22', '--regua-accent': '#E4B460',
-} as React.CSSProperties
-
 const DORES = [
   [MessageCircle, '“Tem horário hoje?” o dia inteiro', 'Você para o corte pra responder mensagem, e quem não foi respondido marca em outro lugar.'],
   [CalendarX2, 'Dois clientes no mesmo horário', 'Agenda no caderno ou de cabeça uma hora falha, e alguém fica esperando irritado.'],
@@ -72,7 +63,7 @@ const PLANOS = LISTA_PLANOS.map(p => ({
   id: p.id, label: p.nome, desc: p.resumo, preco: p.preco, destaque: !!p.destaque, funcionalidades: p.itens,
 }))
 
-const btnOuro = 'inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-[#F0CB82] to-[#D6A54C] text-[#111216] font-semibold shadow-[0_12px_40px_-12px_rgb(228_180_96/0.65)] hover:brightness-105 transition'
+const btnOuro = 'inline-flex items-center justify-center gap-2 rounded-xl bg-amber text-accent-fg font-semibold shadow-[0_12px_40px_-14px_rgb(245_217_0/0.6)] hover:bg-accent-press transition-colors'
 const btnLinha = 'inline-flex items-center justify-center gap-2 rounded-xl border border-fg/20 text-fg font-semibold hover:border-fg/50 transition-colors'
 const olho = 'text-sm font-semibold uppercase tracking-[0.14em] text-amber'
 const titulo = 'font-display text-[32px] sm:text-[44px] leading-[1.08] font-semibold text-fg'
@@ -83,7 +74,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
   const cadastro = ref && /^[a-z0-9-]{1,60}$/.test(ref) ? `/cadastro-barbearia?ref=${ref}` : '/cadastro-barbearia'
 
   return (
-    <div className="min-h-screen bg-bg text-fg overflow-x-clip" style={PALETA}>
+    <div className="min-h-screen bg-bg text-fg overflow-x-clip ds-grade">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD).replace(/</g, '\\u003c') }} />
 
       {/* ── Topo ─────────────────────────────────────────────── */}
@@ -104,11 +95,11 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* ── Abertura ─────────────────────────────────────────── */}
       <section className="relative">
-        <div className="pointer-events-none absolute inset-x-0 -top-24 h-[620px] bg-[radial-gradient(60%_60%_at_50%_0%,rgb(228_180_96/0.16),transparent_70%)]" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 -top-24 h-[620px] bg-[radial-gradient(60%_60%_at_50%_0%,rgb(245_217_0/0.09),transparent_70%)]" aria-hidden />
         <div className="relative max-w-6xl mx-auto px-5 pt-16 md:pt-24 text-center">
           <p className={olho}>Agendamento e gestão para barbearias</p>
           <h1 className="font-display mt-5 text-[40px] leading-[1.05] sm:text-6xl lg:text-[72px] font-semibold text-fg max-w-4xl mx-auto">
-            Agenda cheia e caixa organizado, <span className="block bg-gradient-to-r from-[#F3D595] to-[#D6A54C] bg-clip-text text-transparent pb-1">sem viver no WhatsApp.</span>
+            Agenda cheia e caixa organizado, <span className="block text-amber">sem viver no WhatsApp.</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-fg-muted max-w-2xl mx-auto leading-relaxed">
             Seu cliente marca sozinho pelo seu link, em menos de 1 minuto. Você acompanha a agenda da equipe e o dinheiro do dia pelo celular.
@@ -191,7 +182,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         <ol className="mt-12 grid md:grid-cols-3 gap-4">
           {PASSOS.map(([n, t, d]) => (
             <li key={n} className="relative rounded-2xl border border-line bg-surface p-7">
-              <span className="font-display text-5xl font-semibold bg-gradient-to-b from-[#F3D595] to-[#D6A54C]/30 bg-clip-text text-transparent tabular-nums" aria-hidden>{n}</span>
+              <span className="font-display text-5xl font-semibold text-amber tabular-nums" aria-hidden>{n}</span>
               <h3 className="mt-4 text-lg font-semibold text-fg">{t}</h3>
               <p className="mt-2 text-sm text-fg-muted leading-relaxed">{d}</p>
             </li>
@@ -213,7 +204,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="mt-14 grid md:grid-cols-3 gap-5 items-stretch">
             {PLANOS.map(p => (
               <article key={p.id} className={`relative flex flex-col rounded-2xl p-7 ${
-                p.destaque ? 'bg-bg border-2 border-amber shadow-[0_30px_80px_-30px_rgb(228_180_96/0.5)]' : 'bg-bg border border-line'}`}>
+                p.destaque ? 'bg-bg border-2 border-amber shadow-[0_30px_80px_-30px_rgb(245_217_0/0.35)]' : 'bg-bg border border-line'}`}>
                 {p.destaque && (
                   <span className="absolute -top-3 left-7 px-3 py-1 rounded-full bg-amber text-accent-fg text-xs font-semibold">Mais escolhido por equipes</span>
                 )}
@@ -265,7 +256,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       {/* ── Fechamento ──────────────────────────────────────── */}
       <section className="px-5 pb-24">
         <div className="relative max-w-6xl mx-auto rounded-3xl border border-amber/30 bg-surface px-6 py-16 sm:px-14 sm:py-20 text-center overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgb(228_180_96/0.18),transparent_70%)]" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgb(245_217_0/0.10),transparent_70%)]" aria-hidden />
           <div className="relative">
             <h2 className="font-display text-[32px] sm:text-[48px] leading-[1.08] font-semibold max-w-2xl mx-auto">
               Cadastre hoje. Amanhã seu cliente já marca pelo link.

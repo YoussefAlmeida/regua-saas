@@ -8,10 +8,11 @@
    Sem imports: roda no servidor, no navegador e no teste.
    ================================================================ */
 
-export const FUNDO = '#17191D'
-export const CLARO = '#F2EFE9'
-export const PRIMARIA_PADRAO = '#C5A46D'
-export const SECUNDARIA_PADRAO = '#477A60'
+export const FUNDO = '#101010'
+export const CLARO = '#FFFFFF'
+export const PRIMARIA_PADRAO = '#F5D900'
+/** Não é mais escolhida pela barbearia (uma cor de destaque só); fica o verde de sucesso */
+export const SECUNDARIA_PADRAO = '#3DDC84'
 export const HEX = /^#[0-9a-fA-F]{6}$/
 
 type RGB = [number, number, number]
@@ -66,20 +67,18 @@ const valida = (c: string | null | undefined): c is string => !!c && HEX.test(c)
 
 export function temaDaBarbearia(cores: { cor_primaria?: string | null; cor_secundaria?: string | null } | null | undefined): TemaBarbearia {
   const p0 = valida(cores?.cor_primaria) ? cores!.cor_primaria! : PRIMARIA_PADRAO
-  const s0 = valida(cores?.cor_secundaria) ? cores!.cor_secundaria! : SECUNDARIA_PADRAO
+  const s0 = SECUNDARIA_PADRAO
   // A principal vira texto e ícone (4,5:1); a secundária só preenche botão e selo (3:1)
   const primaria = legivelNoFundo(p0, 4.5)
   const secundaria = legivelNoFundo(s0, 3)
   return {
     primaria, secundaria,
-    ajustada: primaria !== p0.toUpperCase() || secundaria !== s0.toUpperCase(),
+    ajustada: primaria !== p0.toUpperCase(),
     vars: {
       '--regua-accent': primaria,
       '--accent-rgb': canais(primaria),
       '--accent-press-rgb': canais(misturar(primaria, '#000000', 0.12)),
       '--accent-fg-rgb': canais(textoSobre(primaria)),
-      '--verde-rgb': canais(secundaria),
-      '--verde-fg-rgb': canais(textoSobre(secundaria)),
     },
   }
 }

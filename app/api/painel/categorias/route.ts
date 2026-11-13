@@ -4,7 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { falhaInterna } from '@/lib/erros'
 
-const PALETA = ['#6FB08E', '#E5746A', '#C5A46D', '#8AB4DC', '#A9A59D']
+const PALETA = ['#3DDC84', '#FF5C5C', '#F5D900', '#4DA3FF', '#9B9B9B']
 
 export async function GET() {
   const sessao = await getSessao()

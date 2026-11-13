@@ -83,6 +83,7 @@ const config: Config = {
         entrada: "rgb(var(--entrada-rgb) / <alpha-value>)",
         saida: "rgb(var(--saida-rgb) / <alpha-value>)",
         info: "rgb(var(--info-rgb) / <alpha-value>)",
+        alerta: "rgb(var(--alerta-rgb) / <alpha-value>)",
       },
 
       // ── Tipografia ────────────────────────────────────────────
@@ -113,7 +114,7 @@ const config: Config = {
         DEFAULT: "8px",
         md:   "8px",
         lg:   "12px",  // cards
-        button: "8px",   // rounded-button (usado no app todo)
+        button: "10px",  // rounded-button (usado no app todo)
         card:   "12px",  // rounded-card
         xl:   "16px",
         full: "9999px",
