@@ -5,6 +5,12 @@ function formatarNumero(whatsapp: string): string {
   return digits.startsWith('55') ? digits : `55${digits}`
 }
 
+/** As mensagens automáticas só saem com o número da Meta configurado.
+    As telas usam isto pra não prometer confirmação e lembrete que não vão chegar. */
+export function whatsappConfigurado(): boolean {
+  return !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID)
+}
+
 async function enviar(body: unknown): Promise<boolean> {
   if (!process.env.WHATSAPP_TOKEN || !process.env.WHATSAPP_PHONE_ID) return false
   try {

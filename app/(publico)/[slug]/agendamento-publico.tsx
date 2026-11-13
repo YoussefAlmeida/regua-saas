@@ -22,6 +22,8 @@ interface Props {
   servicos: Servico[]
   clienteLogado: { nome: string } | null
   aceitando: boolean
+  /** WhatsApp automático ligado: só então a tela promete confirmação e lembrete */
+  lembreteAtivo?: boolean
 }
 
 const DIAS_A_FRENTE = 21
@@ -45,7 +47,7 @@ function proximosDias(): { iso: string; semana: string; dia: string; mes: string
   })
 }
 
-export default function AgendamentoPublico({ barbearia, profissionais, servicos, clienteLogado, aceitando }: Props) {
+export default function AgendamentoPublico({ barbearia, profissionais, servicos, clienteLogado, aceitando, lembreteAtivo = false }: Props) {
   const soUmBarbeiro = profissionais.length === 1
   const [etapa, setEtapa] = useState<Etapa>('servico')
   const [servico, setServico] = useState<Servico | null>(null)
@@ -495,8 +497,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                       </button>
                       <p className="font-body text-[11px] text-fg-muted text-center leading-relaxed">
                         Ao confirmar, você aceita os <Link href="/termos" target="_blank" className="underline hover:text-fg">Termos</Link> e
-                        a <Link href="/privacidade" target="_blank" className="underline hover:text-fg">Privacidade</Link>, e recebe a confirmação
-                        e o lembrete deste horário no WhatsApp. Não precisa baixar nenhum app.
+                        a <Link href="/privacidade" target="_blank" className="underline hover:text-fg">Privacidade</Link>
+                        {lembreteAtivo ? ', e recebe a confirmação e o lembrete deste horário no WhatsApp' : ''}. Não precisa baixar nenhum app.
                       </p>
                     </form>
                   </>
@@ -517,7 +519,9 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                   <p className="font-body text-sm text-fg inline-block first-letter:uppercase pt-1">{dataFormatada} · <span className="font-mono text-amber">{horario}</span></p>
                 </div>
                 <p className="font-body text-sm text-fg-muted max-w-xs mx-auto">
-                  A gente te lembra pelo WhatsApp 2 horas antes. Se precisar cancelar, dá pra fazer até 1 hora antes.
+                  {lembreteAtivo
+                    ? 'A gente te lembra pelo WhatsApp 2 horas antes. Se precisar cancelar, dá pra fazer até 1 hora antes.'
+                    : 'Anota o dia e o horário. Se precisar cancelar, dá pra fazer até 1 hora antes, em Meus horários.'}
                 </p>
                 {semAcesso && (
                   <p className="font-body text-sm text-fg bg-surface border border-line rounded-card p-4 max-w-xs mx-auto text-left">
