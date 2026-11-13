@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { bloqueioSomenteLeitura } from '@/lib/conta'
-import { hashSenha } from '@/lib/auth'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { podeMexerNaAgendaDe } from '@/lib/profissional-acesso'
 import { registrarAuditoria } from '@/lib/auditoria'
@@ -14,7 +13,6 @@ const SchemaPost = z.object({
   servico_id: z.string().uuid(),
   inicio: z.string(),
   cliente_id: z.string().uuid().optional(),
-  cliente_nome: z.string().min(1).max(100).optional(),
   cliente_whatsapp: z.string().min(8).max(20).optional(),
   observacao: z.string().max(500).optional(),
 })
@@ -133,49 +131,38 @@ export async function POST(req: NextRequest) {
     if (!cli) return NextResponse.json({ erro: 'Cliente não encontrado' }, { status: 404 })
   }
 
-  // Cria cliente se não veio cliente_id
+  // O painel só marca pra quem JÁ se cadastrou pelo link de agendamento.
+  // A equipe não cria cadastro de cliente: quem é novo recebe o link e marca sozinho
+  // (assim todo cadastro nasce com a pessoa aceitando os Termos e criando a própria senha).
   if (!cliente_id) {
-    const { cliente_nome } = parse.data
     const cliente_whatsapp = parse.data.cliente_whatsapp ? normalizarWhatsapp(parse.data.cliente_whatsapp) : ''
-    if (!cliente_nome || !cliente_whatsapp) {
-      return NextResponse.json({ erro: 'Informe o nome e o WhatsApp do cliente' }, { status: 400 })
+    if (!cliente_whatsapp) {
+      return NextResponse.json({ erro: 'Informe o WhatsApp do cliente' }, { status: 400 })
     }
     if (cliente_whatsapp.length < 10 || cliente_whatsapp.length > 11) {
       return NextResponse.json({ erro: 'WhatsApp inválido. Use DDD + número.' }, { status: 400 })
     }
 
-    // Busca ou cria cliente — o mesmo número pode ser cliente em outras barbearias
     const { data: existente } = await db
       .from('usuarios')
-      .select('id, papel')
+      .select('id, papel, ativo')
       .eq('whatsapp', cliente_whatsapp)
       .eq('barbearia_id', sessao.barbearia_id)
       .maybeSingle()
 
-    if (existente) {
-      if (existente.papel !== 'cliente') {
-        return NextResponse.json({ erro: 'Esse WhatsApp é de alguém da equipe. Use o número do cliente.' }, { status: 409 })
-      }
-      cliente_id = existente.id
-    } else {
-      const senha_hash = await hashSenha(crypto.randomUUID())
-      const { data: novoCliente, error: errCliente } = await db
-        .from('usuarios')
-        .insert({
-          barbearia_id: sessao.barbearia_id,
-          nome: cliente_nome,
-          whatsapp: cliente_whatsapp,
-          senha_hash,
-          papel: 'cliente',
-          status: 'aprovado',
-          senha_definida: false, // cliente escolhe a senha no primeiro agendamento pelo link
-        })
-        .select('id')
-        .single()
-
-      if (errCliente) return falhaInterna('painel/agendamentos', errCliente, 'Erro ao criar cliente')
-      cliente_id = novoCliente.id
+    if (existente && existente.papel !== 'cliente') {
+      return NextResponse.json({ erro: 'Esse WhatsApp é de alguém da equipe. Use o número do cliente.' }, { status: 409 })
     }
+    if (!existente || !existente.ativo) {
+      const { data: b } = await db.from('barbearias').select('slug').eq('id', sessao.barbearia_id).maybeSingle()
+      return NextResponse.json({
+        erro: 'Esse WhatsApp ainda não tem cadastro aqui. Mande o link de agendamento pra pessoa marcar o horário.',
+        semCadastro: true,
+        whatsapp: cliente_whatsapp,
+        slug: b?.slug ?? null,
+      }, { status: 404 })
+    }
+    cliente_id = existente.id
   }
 
   const { data: agendamento, error } = await db

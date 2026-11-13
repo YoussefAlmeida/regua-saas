@@ -109,7 +109,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
   }
 
   return (
-    <div className="px-4 py-6 max-w-lg mx-auto space-y-8">
+    <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-3xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-[28px] font-semibold leading-tight text-fg">Equipe</h1>
         <button
