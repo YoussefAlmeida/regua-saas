@@ -95,11 +95,12 @@ export default function AgendaClient({
     servico_id: '',
     dia: dataInicial,
     inicio: '',
-    cliente_nome: '',
     cliente_whatsapp: '',
     observacao: '',
   })
   const [novoErro, setNovoErro] = useState('')
+  // WhatsApp sem cadastro: mostra o atalho pra mandar o link de agendamento
+  const [convidar, setConvidar] = useState<{ whatsapp: string; slug: string } | null>(null)
   const [novoSalvando, setNovoSalvando] = useState(false)
 
   const [bloqueios, setBloqueios] = useState<Bloqueio[]>([])
@@ -136,6 +137,7 @@ export default function AgendaClient({
 
   function abrirNovo(profissional_id?: string, dia = data, minuto?: number) {
     setNovoErro('')
+    setConvidar(null)
     setNovoForm(f => ({
       ...f,
       profissional_id: profissional_id ?? (f.profissional_id || (profissionais.find(p => p.ativo)?.id ?? '')),
@@ -207,6 +209,7 @@ export default function AgendaClient({
   async function criarAgendamento(e: React.FormEvent) {
     e.preventDefault()
     setNovoErro('')
+    setConvidar(null)
     if (!novoForm.profissional_id || !novoForm.servico_id || !novoForm.inicio) {
       setNovoErro('Preencha profissional, serviço e horário')
       return
@@ -223,7 +226,6 @@ export default function AgendaClient({
         profissional_id: novoForm.profissional_id,
         servico_id: novoForm.servico_id,
         inicio: inicioDate.toISOString(),
-        cliente_nome: novoForm.cliente_nome || undefined,
         cliente_whatsapp: novoForm.cliente_whatsapp || undefined,
         observacao: novoForm.observacao || undefined,
       }),
@@ -232,7 +234,11 @@ export default function AgendaClient({
     const json = await res.json()
     setNovoSalvando(false)
 
-    if (!res.ok) { setNovoErro(json.erro || 'Erro ao criar agendamento'); return }
+    if (!res.ok) {
+      setNovoErro(json.erro || 'Erro ao criar agendamento')
+      if (json.semCadastro && json.slug) setConvidar({ whatsapp: json.whatsapp, slug: json.slug })
+      return
+    }
     // Só entra na tela se cair no período que está aberto
     const diaCriado = dataLocal(json.inicio)
     if (visao === 'dia' ? diaCriado === data : diaCriado >= segundaDe(data) && diaCriado <= somarDias(segundaDe(data), 6)) {
@@ -240,7 +246,7 @@ export default function AgendaClient({
     }
     setModalNovo(false)
     avisar(`Agendado às ${formatarHora(json.inicio)}.`, 'sucesso')
-    setNovoForm({ profissional_id: profissionaisIniciais.find(p => p.ativo)?.id ?? '', servico_id: '', dia: data, inicio: '', cliente_nome: '', cliente_whatsapp: '', observacao: '' })
+    setNovoForm({ profissional_id: profissionaisIniciais.find(p => p.ativo)?.id ?? '', servico_id: '', dia: data, inicio: '', cliente_whatsapp: '', observacao: '' })
   }
 
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
@@ -694,25 +700,16 @@ export default function AgendaClient({
               </div>
 
               <div>
-                <label className={labelCls}>Nome do cliente</label>
-                <input
-                  type="text"
-                  value={novoForm.cliente_nome}
-                  onChange={e => setNovoForm(f => ({ ...f, cliente_nome: e.target.value }))}
-                  placeholder="João Silva"
-                  className={inputCls}
-                />
-              </div>
-
-              <div>
                 <label className={labelCls}>WhatsApp do cliente</label>
                 <input
                   type="tel"
                   value={novoForm.cliente_whatsapp}
                   onChange={e => setNovoForm(f => ({ ...f, cliente_whatsapp: e.target.value }))}
                   placeholder="(71) 99999-0000"
+                  required
                   className={inputCls}
                 />
+                <p className="font-body text-xs text-fg-muted mt-1">Do cliente que já se cadastrou pelo seu link. Quem é novo marca pelo link.</p>
               </div>
 
               <div>
@@ -726,7 +723,17 @@ export default function AgendaClient({
                 />
               </div>
 
-              {novoErro && <p className="font-body text-sm text-saida">{novoErro}</p>}
+              {novoErro && <p className="font-body text-sm text-saida" role="alert">{novoErro}</p>}
+              {convidar && (
+                <a
+                  href={`https://wa.me/55${convidar.whatsapp}?text=${encodeURIComponent(`Oi! Pra marcar seu horário é só tocar aqui: ${typeof window !== 'undefined' ? window.location.origin : ''}/${convidar.slug}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold w-full flex items-center justify-center gap-2 border border-line text-fg hover:border-amber/50 font-ui text-sm py-2.5 rounded-button transition-colors"
+                >
+                  Mandar o link pelo WhatsApp
+                </a>
+              )}
 
               <button
                 type="submit"
