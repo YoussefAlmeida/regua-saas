@@ -75,6 +75,11 @@ const config: Config = {
           fg: "rgb(var(--accent-fg-rgb) / <alpha-value>)",
         },
         // Semântica financeira — NUNCA usar pra success/error
+        // Verde oficial da marca: preenchimentos (botão confirmar, barras)
+        verde: {
+          DEFAULT: "rgb(var(--verde-rgb) / <alpha-value>)",
+          fg: "rgb(var(--verde-fg-rgb) / <alpha-value>)",
+        },
         entrada: "rgb(var(--entrada-rgb) / <alpha-value>)",
         saida: "rgb(var(--saida-rgb) / <alpha-value>)",
         info: "rgb(var(--info-rgb) / <alpha-value>)",

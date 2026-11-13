@@ -15,8 +15,8 @@ interface Servico {
 
 interface FormData { nome: string; preco: string; duracao_min: string; cor: string }
 
-const CORES = ['#9A4A1A', '#2E7A4E', '#8E2C3A', '#2F5F8A', '#6B6A2E', '#6A635B']
-const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#9A4A1A' }
+const CORES = ['#C5A46D', '#6FB08E', '#C97B84', '#8AB4DC', '#B5B26A', '#A9A59D']
+const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#C5A46D' }
 
 export default function ServicosClient({
   servicosIniciais,
@@ -104,6 +104,12 @@ export default function ServicosClient({
     const res = await fetch(`/api/painel/servicos/${s.id}`, { method: 'DELETE' })
     const json = await res.json()
     if (!res.ok) { alert(json.erro); return }
+    if (json.arquivado) {
+      // Tem atendimento no histórico: foi desativado, não apagado
+      setServicos(prev => prev.map(x => x.id === s.id ? json.servico : x))
+      alert(`"${s.nome}" já foi usado em atendimentos, então foi desativado em vez de apagado. O histórico continua certo.`)
+      return
+    }
     setServicos(prev => prev.filter(x => x.id !== s.id))
   }
 

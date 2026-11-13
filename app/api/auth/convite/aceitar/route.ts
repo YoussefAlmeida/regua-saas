@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { jwtVerify } from 'jose'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha, COOKIE_SESSION } from '@/lib/auth'
 import { problemaNaSenha } from '@/lib/senha'
 import { normalizarWhatsapp } from '@/lib/utils'
 import { falhaInterna } from '@/lib/erros'
-import { segredoBase } from '@/lib/sessao-chave'
-
-const getSecret = () => new TextEncoder().encode(segredoBase())
+import { lerTokenConvite } from '@/lib/convite'
+import { ipDa, permitirUso } from '@/lib/limite-login'
 
 const Schema = z.object({
   token: z.string(),
@@ -30,13 +28,12 @@ export async function POST(req: NextRequest) {
   if (problema) return NextResponse.json({ erro: problema }, { status: 400 })
 
   // Valida token de convite
-  let barbearia_id: string
-  try {
-    const { payload } = await jwtVerify(token, getSecret())
-    if (payload.tipo !== 'convite') throw new Error()
-    barbearia_id = payload.barbearia_id as string
-  } catch {
-    return NextResponse.json({ erro: 'Link inválido ou expirado' }, { status: 400 })
+  const barbearia_id = await lerTokenConvite(token)
+  if (!barbearia_id) return NextResponse.json({ erro: 'Link inválido ou expirado' }, { status: 400 })
+
+  // O link é reutilizável: limita quantos cadastros saem da mesma conexão
+  if (!(await permitirUso(`uso:convite:${ipDa(req)}`, 10, 60 * 60 * 1000))) {
+    return NextResponse.json({ erro: 'Muitos cadastros a partir desta conexão. Tenta de novo daqui a pouco.' }, { status: 429 })
   }
 
   const waNorm = normalizarWhatsapp(whatsapp)

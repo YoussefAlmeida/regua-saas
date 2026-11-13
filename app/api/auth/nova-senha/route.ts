@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { hashSenha, criarToken, gravarCookieSessao } from '@/lib/auth'
+import { hashSenha, criarToken, gravarCookieSessao, novaVersaoDaSessao } from '@/lib/auth'
 import { problemaNaSenha, SENHA_MIN, SENHA_MIN_CLIENTE } from '@/lib/senha'
 import { validarTokenNovaSenha } from '@/lib/recuperacao'
 import { registrarAuditoria } from '@/lib/auditoria'
@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
     return falhaInterna('nova-senha', error, 'Não deu pra salvar a senha. Tenta de novo.', { barbearia_id: u.barbearia_id, usuario_id: u.id })
   }
 
+  // Senha nova derruba as sessões abertas em outros aparelhos
+  const sv = await novaVersaoDaSessao(u.id)
+
   // Libera quem estava travado por errar a senha
   const chave = contato?.email ?? contato?.whatsapp
   if (chave) await db.from('tentativas_login').delete().eq('chave', `id:${chave}`)
@@ -49,11 +52,11 @@ export async function POST(req: NextRequest) {
   }
 
   let profissional_id: string | undefined
-  if (u.papel === 'barbeiro') {
+  if (u.papel === 'barbeiro' || u.papel === 'dono') {
     const { data: p } = await db.from('profissionais').select('id').eq('usuario_id', u.id).eq('ativo', true).maybeSingle()
     profissional_id = p?.id
   }
-  const token = await criarToken({ usuario_id: u.id, papel: u.papel, barbearia_id: u.barbearia_id, profissional_id })
+  const token = await criarToken({ usuario_id: u.id, papel: u.papel, barbearia_id: u.barbearia_id, profissional_id, sv })
   const destino = u.papel === 'cliente' ? (u.slug ? `/${u.slug}/meus-agendamentos` : '/') : '/painel/hoje'
 
   const res = NextResponse.json({ ok: true, destino })

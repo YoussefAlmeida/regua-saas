@@ -6,6 +6,7 @@ import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
 import { situacaoPlano } from '@/lib/planos'
 import AgendamentoPublico from './agendamento-publico'
 import { urlDoSiteFixa } from '@/lib/site-url'
+import { temaDaBarbearia } from '@/lib/tema'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -55,6 +56,8 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
   return (
     <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
+    {/* Cores da barbearia (já ajustadas pra continuar legíveis): valem só dentro desta página */}
+    <div style={temaDaBarbearia(dados.barbearia).vars as React.CSSProperties}>
     <AgendamentoPublico
       barbearia={dados.barbearia}
       profissionais={dados.profissionais}
@@ -62,6 +65,7 @@ export default async function AgendamentoPublicoPage({ params }: Props) {
       clienteLogado={clienteLogado}
       aceitando={aceitando}
     />
+    </div>
     </>
   )
 }

@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { SignJWT } from 'jose'
 import { getSessao } from '@/lib/auth'
-import { segredoBase } from '@/lib/sessao-chave'
-
-const getSecret = () => new TextEncoder().encode(segredoBase())
+import { criarTokenConvite } from '@/lib/convite'
 
 export async function POST(req: NextRequest) {
   const sessao = await getSessao()
@@ -11,11 +8,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
 
-  const token = await new SignJWT({ barbearia_id: sessao.barbearia_id, tipo: 'convite' })
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(getSecret())
+  const token = await criarTokenConvite(sessao.barbearia_id)
 
   const base = req.nextUrl.origin
   return NextResponse.json({ link: `${base}/convite/${token}` })

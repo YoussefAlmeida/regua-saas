@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { normalizarWhatsapp } from '@/lib/utils'
-import { verificarSenha, criarToken, gravarCookieSessao } from '@/lib/auth'
+import { verificarSenha, criarToken, gravarCookieSessao, versaoDaSessao } from '@/lib/auth'
 import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
 
 // Hash de referência pra conta inexistente gastar o mesmo tempo que uma real
@@ -124,6 +124,7 @@ export async function POST(req: NextRequest) {
     papel: usuario.papel as 'dono' | 'barbeiro' | 'cliente',
     barbearia_id: usuario.barbearia_id,
     profissional_id,
+    sv: await versaoDaSessao(usuario.id),
   })
 
   // Cliente não tem painel: vai pra "Meus agendamentos" da barbearia dele

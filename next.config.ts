@@ -1,12 +1,24 @@
 import type { NextConfig } from "next"
 
+// Host exato do projeto Supabase (antes: qualquer *.supabase.co podia ser
+// buscado pelo otimizador de imagens e carregado na página)
+const supabaseHost = (() => {
+  try { return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").hostname } catch { return "" }
+})()
+const supabaseOrigem = supabaseHost ? `https://${supabaseHost}` : ""
+const dev = process.env.NODE_ENV !== "production"
+
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+  // 'unsafe-eval' só em desenvolvimento (recarga automática do Next)
+  `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com",
-  "img-src 'self' blob: data: https:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  `img-src 'self' blob: data: ${supabaseOrigem}`.trim(),
+  `connect-src 'self' ${supabaseOrigem} ${supabaseHost ? `wss://${supabaseHost}` : ""}`.trim(),
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
   "frame-ancestors 'none'",
 ].join("; ")
 
@@ -28,9 +40,9 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "**.supabase.co" },
-    ],
+    remotePatterns: supabaseHost
+      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/**" }]
+      : [],
   },
 }
 

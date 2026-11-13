@@ -5,6 +5,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { getSessao } from '@/lib/auth'
 import NavInferior from '@/components/nav-inferior'
+import NavLateral from '@/components/nav-lateral'
 import Avisos from '@/components/aviso'
 import ConfirmarSenha from '@/components/confirmar-senha'
 import AvisoPlano from '@/components/aviso-plano'
@@ -51,11 +52,16 @@ export default async function PainelLayout({ children }: { children: React.React
     : null
 
   return (
-    <div className="min-h-screen bg-bg flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col md:pl-60">
+      <NavLateral
+        papel={papel}
+        barbearia={barbearia?.nome ?? 'RÉGUA'}
+        plano={plano.emTeste ? `Teste grátis · ${plano.diasTeste} dia${plano.diasTeste === 1 ? '' : 's'}` : plano.somenteLeitura ? plano.nome : `Plano ${plano.nome}`}
+      />
       {/* Topo */}
       <header className="bg-surface/95 backdrop-blur border-b border-line sticky top-0 z-10">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <span className="font-display text-[19px] font-semibold text-fg truncate">{barbearia?.nome ?? 'RÉGUA'}</span>
+        <div className="max-w-lg md:max-w-none mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-3">
+          <span className="font-display text-[19px] font-semibold text-fg truncate md:invisible">{barbearia?.nome ?? 'RÉGUA'}</span>
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="text-right leading-tight">
               <span className="font-body text-[13px] font-semibold text-fg block">{usuario?.nome?.split(' ')[0]}</span>
@@ -71,7 +77,7 @@ export default async function PainelLayout({ children }: { children: React.React
       <AvisoPlano plano={plano} souDono={souDono} excedente={agenda.excedente} agendado={agendado} />
 
       {/* Conteúdo */}
-      <main className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] overflow-y-auto">{children}</main>
+      <main className="flex-1 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-10 overflow-y-auto">{children}</main>
 
       {/* Nav inferior */}
       <NavInferior papel={papel} />

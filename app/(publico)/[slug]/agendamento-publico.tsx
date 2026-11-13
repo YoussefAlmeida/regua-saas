@@ -13,6 +13,7 @@ interface Profissional { id: string; nome: string; foto_url: string | null; espe
 interface Servico { id: string; nome: string; preco: number; duracao_min: number; cor: string }
 interface Barbearia {
   nome: string; slug: string; endereco: string | null; instagram: string | null; telefone: string | null
+  logo_url?: string | null; capa_url?: string | null; sobre?: string | null
 }
 
 interface Props {
@@ -63,6 +64,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState('')
+  // Horário marcado num cadastro que a barbearia fez: sem acesso à conta por aqui
+  const [semAcesso, setSemAcesso] = useState(false)
 
   const dias = useMemo(proximosDias, [])
   const ordem: Etapa[] = soUmBarbeiro ? ['servico', 'horario', 'dados'] : ['servico', 'barbeiro', 'horario', 'dados']
@@ -158,6 +161,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
       if (json.horarioOcupado) { setEtapa('horario'); carregarAgenda(profissional, servico, data) }
       return
     }
+    setSemAcesso(!!json.semAcesso)
     if (json.cliente?.nome) setLogado({ nome: json.cliente.nome })
     setSenha('')
     setEtapa('sucesso')
@@ -188,8 +192,22 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
 
   return (
     <div className="min-h-screen bg-bg">
+      {/* Capa e logo da barbearia (só na primeira tela, pra não empurrar os horários pra baixo) */}
+      {etapa === 'servico' && (barbearia.capa_url || barbearia.logo_url) && (
+        <div className="relative max-w-lg mx-auto">
+          <div className={`relative ${barbearia.capa_url ? 'h-40' : 'h-12'} bg-surface-alt overflow-hidden`}>
+            {barbearia.capa_url && <Image src={barbearia.capa_url} alt="" fill priority sizes="(max-width: 512px) 100vw, 512px" className="object-cover" />}
+            <div className="absolute inset-0 bg-gradient-to-t from-bg via-bg/30 to-transparent" aria-hidden />
+          </div>
+          {barbearia.logo_url && (
+            <div className="absolute left-4 -bottom-7 w-[72px] h-[72px] rounded-full border-2 border-bg bg-surface overflow-hidden z-20">
+              <Image src={barbearia.logo_url} alt={`Logo da ${barbearia.nome}`} width={72} height={72} className="w-full h-full object-cover" />
+            </div>
+          )}
+        </div>
+      )}
       {/* Cabeçalho da barbearia */}
-      <header className="bg-surface border-b border-line px-4 pt-4 pb-3 sticky top-0 z-10">
+      <header className={`bg-surface border-b border-line px-4 pb-3 sticky top-0 z-10 ${etapa === 'servico' && barbearia.logo_url ? 'pt-10' : 'pt-4'}`}>
         <div className="max-w-lg mx-auto">
           <div className="flex items-start gap-3">
             {etapa !== 'servico' && etapa !== 'sucesso' && (
@@ -261,6 +279,12 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <h2 className="font-semibold font-ui text-lg text-fg mb-1">O que vai fazer?</h2>
                 {logado && <p className="font-body text-sm text-fg-muted mb-4">Olá, {logado.nome.split(' ')[0]}.</p>}
                 {!logado && <p className="font-body text-sm text-fg-muted mb-4">Marca em menos de 1 minuto. Sem baixar app.</p>}
+                {barbearia.sobre && (
+                  <div className="bg-surface border border-line rounded-card px-4 py-3 mb-4">
+                    <p className="font-ui text-xs uppercase tracking-wider text-fg-muted mb-1">Sobre a barbearia</p>
+                    <p className="font-body text-sm text-fg whitespace-pre-line break-words">{barbearia.sobre}</p>
+                  </div>
+                )}
                 {servicos.length === 0 ? (
                   <p className="font-body text-sm text-fg-muted text-center py-8">A barbearia ainda não cadastrou os serviços.</p>
                 ) : (
@@ -410,7 +434,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                     <button
                       onClick={() => confirmar()}
                       disabled={enviando}
-                      className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
+                      className="font-semibold w-full bg-verde hover:brightness-110 text-verde-fg font-ui text-sm py-3.5 rounded-button transition disabled:opacity-50"
                     >
                       {enviando ? 'Confirmando…' : 'Confirmar horário'}
                     </button>
@@ -465,7 +489,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                       <button
                         type="submit"
                         disabled={enviando}
-                        className="font-semibold w-full bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3.5 rounded-button transition-colors disabled:opacity-50"
+                        className="font-semibold w-full bg-verde hover:brightness-110 text-verde-fg font-ui text-sm py-3.5 rounded-button transition disabled:opacity-50"
                       >
                         {enviando ? 'Confirmando…' : 'Confirmar horário'}
                       </button>
@@ -483,8 +507,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
             {/* ── Pronto ─────────────────────────────── */}
             {etapa === 'sucesso' && (
               <section className="text-center py-8 space-y-5">
-                <div className="w-16 h-16 rounded-full bg-entrada/10 border border-entrada/30 flex items-center justify-center mx-auto">
-                  <Check size={32} className="text-entrada" />
+                <div className="w-16 h-16 rounded-full bg-verde flex items-center justify-center mx-auto">
+                  <Check size={32} className="text-verde-fg" />
                 </div>
                 <h2 className="font-display text-4xl text-fg">Tá marcado!</h2>
                 <div className="bg-surface border border-line rounded-card p-4 text-left space-y-1 max-w-xs mx-auto">
@@ -495,13 +519,20 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
                 <p className="font-body text-sm text-fg-muted max-w-xs mx-auto">
                   A gente te lembra pelo WhatsApp 2 horas antes. Se precisar cancelar, dá pra fazer até 1 hora antes.
                 </p>
+                {semAcesso && (
+                  <p className="font-body text-sm text-fg bg-surface border border-line rounded-card p-4 max-w-xs mx-auto text-left">
+                    A barbearia já tinha seu cadastro. Pra ver e cancelar seus horários por aqui, pede pra ela te mandar o link de acesso no WhatsApp.
+                  </p>
+                )}
                 <div className="flex flex-col gap-2 max-w-xs mx-auto">
-                  <Link
-                    href={`/${barbearia.slug}/meus-agendamentos`}
-                    className="font-semibold bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
-                  >
-                    Ver meus horários
-                  </Link>
+                  {!semAcesso && (
+                    <Link
+                      href={`/${barbearia.slug}/meus-agendamentos`}
+                      className="font-semibold bg-amber hover:bg-accent-press text-accent-fg font-ui text-sm py-3 rounded-button transition-colors"
+                    >
+                      Ver meus horários
+                    </Link>
+                  )}
                   <button onClick={novoAgendamento} className="text-amber font-ui text-xs uppercase tracking-wider py-2 hover:underline">
                     Marcar outro
                   </button>

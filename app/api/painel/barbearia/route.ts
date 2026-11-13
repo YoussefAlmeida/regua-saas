@@ -3,13 +3,20 @@ import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { falhaInterna } from '@/lib/erros'
+import { registrarAuditoria } from '@/lib/auditoria'
 
 const SchemaPatch = z.object({
   nome: z.string().min(1).max(100).optional(),
   telefone: z.string().max(20).nullable().optional(),
   endereco: z.string().max(200).nullable().optional(),
   instagram: z.string().max(50).nullable().optional(),
-  logo_url: z.string().nullable().optional(),
+  // Só imagem do nosso Storage (antes aceitava qualquer endereço)
+  logo_url: z.string().max(500).nullable().optional()
+    .refine(u => !u || (!!process.env.NEXT_PUBLIC_SUPABASE_URL && u.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/fotos/`)), 'logo inválido'),
+  // Identidade visual da página pública (as imagens sobem por /api/painel/barbearia/imagem)
+  cor_primaria: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+  cor_secundaria: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().optional(),
+  sobre: z.string().trim().max(300).nullable().optional(),
   horario_funcionamento: z.record(
     z.object({
       ativo: z.boolean(),
@@ -59,6 +66,18 @@ export async function PATCH(req: NextRequest) {
     .select('id, nome, slug, telefone, endereco, instagram, logo_url, horario_funcionamento, dias_fechados')
     .single()
 
+  if (error?.code === '42703') {
+    return NextResponse.json({ erro: 'A aparência ainda não foi liberada nesta conta. Fala com o suporte do RÉGUA.' }, { status: 409 })
+  }
   if (error) return falhaInterna('painel/barbearia', error, 'Erro ao salvar')
+
+  const visual = (['cor_primaria', 'cor_secundaria', 'sobre'] as const).filter(k => k in parse.data)
+  if (visual.length) {
+    await registrarAuditoria({
+      barbearia_id: sessao.barbearia_id, usuario_id: sessao.usuario_id,
+      acao: 'aparencia', tabela: 'barbearias', registro_id: sessao.barbearia_id,
+      depois: Object.fromEntries(visual.map(k => [k, parse.data[k] ?? null])), req,
+    })
+  }
   return NextResponse.json(data)
 }

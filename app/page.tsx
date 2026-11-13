@@ -51,7 +51,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/entrar" className="px-3 py-2 text-sm font-semibold text-fg hover:text-amber">Entrar</Link>
-            <Link href={cadastro} className="px-4 py-2.5 rounded-button bg-fg text-bg text-sm font-semibold hover:bg-fg/85 transition-colors">
+            <Link href={cadastro} className="px-4 py-2.5 rounded-button bg-amber text-accent-fg text-sm font-semibold hover:bg-amber-press transition-colors">
               Testar grátis
             </Link>
           </div>
@@ -122,10 +122,10 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       </section>
 
       {/* ── Para o dono ─────────────────────────────────────── */}
-      <section id="dono" className="bg-fg text-bg scroll-mt-16">
+      <section id="dono" className="bg-surface text-fg border-y border-line scroll-mt-16">
         <div className="max-w-6xl mx-auto px-5 py-24 grid md:grid-cols-2 gap-14 items-center">
           <div>
-            <p className="text-sm font-semibold text-[#E2A27A]">Para o dono</p>
+            <p className="text-sm font-semibold text-amber">Para o dono</p>
             <h2 className="font-display text-[32px] sm:text-[44px] leading-tight font-medium mt-3">
               Você sabe quanto entrou hoje. E quanto cada barbeiro fez no mês.
             </h2>
@@ -137,8 +137,8 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
                 'Histórico de quem lançou, apagou ou mudou valor',
                 'Equipe com acesso próprio: cada barbeiro vê a agenda dele',
               ].map(t => (
-                <li key={t} className="flex gap-3 text-bg/85">
-                  <Check size={18} className="text-[#E2A27A] shrink-0 mt-0.5" /> {t}
+                <li key={t} className="flex gap-3 text-fg/85">
+                  <Check size={18} className="text-amber shrink-0 mt-0.5" /> {t}
                 </li>
               ))}
             </ul>
@@ -211,14 +211,14 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* ── Fechamento ──────────────────────────────────────── */}
       <section className="px-5 pb-24">
-        <div className="max-w-6xl mx-auto rounded-3xl bg-fg text-bg px-6 py-16 sm:px-14 sm:py-20 text-center">
-          <Regua marcas={31} className="text-[#E2A27A] justify-center mx-auto" />
+        <div className="max-w-6xl mx-auto rounded-3xl bg-surface text-fg border border-line px-6 py-16 sm:px-14 sm:py-20 text-center">
+          <Regua marcas={31} className="text-amber justify-center mx-auto" />
           <h2 className="font-display text-[32px] sm:text-[48px] leading-tight font-medium mt-8 max-w-2xl mx-auto">
             Abra a agenda de amanhã já organizada.
           </h2>
-          <p className="mt-5 text-bg/70 text-lg">Cadastre a barbearia hoje e mande o link pros clientes ainda nesta semana.</p>
+          <p className="mt-5 text-fg-muted text-lg">Cadastre a barbearia hoje e mande o link pros clientes ainda nesta semana.</p>
           <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
-            <Link href={cadastro} className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-button bg-bg text-fg font-semibold hover:bg-bg/90">
+            <Link href={cadastro} className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-button bg-amber text-accent-fg font-semibold hover:bg-amber-press">
               Testar 14 dias grátis <ArrowRight size={18} />
             </Link>
             <a href={linkSuporte('Oi! Quero saber mais sobre o RÉGUA.')} target="_blank" rel="noreferrer"

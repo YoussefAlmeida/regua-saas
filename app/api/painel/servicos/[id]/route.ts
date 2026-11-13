@@ -70,6 +70,14 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     .eq('id', id)
     .eq('barbearia_id', sessao.barbearia_id)
 
+  // 23503 = já foi usado em atendimento: o histórico precisa dele. Sai da lista
+  // de agendamento (desativado) em vez de dar erro.
+  if (error?.code === '23503') {
+    const { data: arquivado, error: errArq } = await db.from('servicos')
+      .update({ ativo: false }).eq('id', id).eq('barbearia_id', sessao.barbearia_id).select().single()
+    if (errArq) return falhaInterna('painel/servicos/id', errArq, 'Erro ao desativar')
+    return NextResponse.json({ ok: true, arquivado: true, servico: arquivado })
+  }
   if (error) return falhaInterna('painel/servicos/id', error, 'Erro ao deletar')
   return NextResponse.json({ ok: true })
 }

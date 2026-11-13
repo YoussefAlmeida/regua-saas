@@ -37,6 +37,10 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
       const extra = d.entrada === 'removida' ? ' (entrada saiu do caixa)' : d.entrada === 'lancada' ? ' (entrada lançada)' : ''
       return { texto: `${STATUS[novo] ?? 'mudou'} um atendimento${a.status === 'concluido' ? ' que estava concluído' : ''}${extra}`, alerta: a.status === 'concluido' }
     }
+    case 'agendamentos:remarcar': {
+      const quando = (v: unknown) => new Date(String(v)).toLocaleString('pt-BR', { timeZone: 'America/Bahia', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+      return { texto: `remarcou um horário de ${quando(a.inicio)} para ${quando(d.inicio)}${a.profissional_id !== d.profissional_id ? ' (trocou o barbeiro)' : ''}`, alerta: false }
+    }
     case 'agendamentos:criar':
       return { texto: `marcou um horário${d.origem === 'link' ? ' pelo link' : ''}`, alerta: false }
     case 'bloqueios_agenda:criar': return { texto: 'bloqueou um horário na agenda', alerta: false }
@@ -45,6 +49,7 @@ export function descreverAuditoria(l: LinhaAuditoria): { texto: string; alerta: 
     case 'despesas_fixas:apagar': return { texto: `apagou a despesa fixa "${a.descricao}"`, alerta: true }
     case 'profissionais:ativar_agenda': return { texto: `colocou ${d.quem ?? 'alguém'} na agenda`, alerta: false }
     case 'profissionais:desativar_agenda': return { texto: `tirou ${d.quem ?? 'alguém'} da agenda${d.agendamentos_cancelados ? ` (${d.agendamentos_cancelados} horários cancelados)` : d.horarios_mantidos ? ` (${d.horarios_mantidos} horários marcados continuam)` : ''}`, alerta: !!d.agendamentos_cancelados }
+    case 'barbearias:aparencia': return { texto: 'mudou a aparência da página de agendamento', alerta: false }
     case 'barbearias:agendar_plano': return { texto: `pediu mudança pro plano ${d.para ?? ''}${d.em ? ` a partir de ${new Date(String(d.em)).toLocaleDateString('pt-BR')}` : ' (vale quando pagar)'}`, alerta: false }
     case 'barbearias:cancelar_mudanca_plano': return { texto: 'cancelou o pedido de mudança de plano', alerta: false }
     case 'barbearias:aplicar_mudanca_plano': return { texto: `plano mudou pra ${d.para ?? ''}${Array.isArray(d.saiu) && d.saiu.length ? ` (${d.saiu.join(', ')} saiu da agenda)` : ''}`, alerta: false }

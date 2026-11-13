@@ -16,7 +16,7 @@ const HORAS: [string, 'livre' | 'ocupado' | 'escolhido'][] = [
 export function CelularAgendamento() {
   return (
     <div className="relative mx-auto w-[280px] sm:w-[300px]">
-      <div className="rounded-[2.6rem] bg-fg p-2.5 shadow-[0_30px_60px_-20px_rgb(27_25_22/0.45)]">
+      <div className="rounded-[2.6rem] bg-surface-alt border border-line p-2.5 shadow-[0_30px_60px_-20px_rgb(0_0_0/0.7)]">
         <div className="rounded-[2.1rem] bg-bg overflow-hidden">
           <div className="h-7 flex items-center justify-center">
             <span className="w-20 h-1.5 rounded-full bg-fg/15" />
@@ -128,7 +128,7 @@ export function PassosCliente() {
       {passos.map(([t, d], i) => (
         <li key={t} className="bg-surface p-6">
           <div className="flex items-center gap-2">
-            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold ${i === 3 ? 'bg-entrada text-white' : 'bg-fg text-bg'}`}>
+            <span className={`w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold ${i === 3 ? 'bg-verde text-fg' : 'bg-fg text-bg'}`}>
               {i === 3 ? <Check size={14} /> : i + 1}
             </span>
             <p className="font-semibold text-fg">{t}</p>

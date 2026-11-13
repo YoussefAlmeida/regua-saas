@@ -4,6 +4,7 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
 import MeusAgendamentos, { type MeuAgendamento } from './meus-agendamentos'
+import { temaDaBarbearia } from '@/lib/tema'
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -39,10 +40,12 @@ export default async function MeusAgendamentosPage({ params }: Props) {
   }
 
   return (
+    <div style={temaDaBarbearia(dados.barbearia).vars as React.CSSProperties}>
     <MeusAgendamentos
       barbearia={{ nome: dados.barbearia.nome, slug: dados.barbearia.slug, telefone: dados.barbearia.telefone }}
       nome={logado ? nome : null}
       agendamentosIniciais={agendamentos}
     />
+    </div>
   )
 }

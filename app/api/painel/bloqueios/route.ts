@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
     if (sessao.papel === 'cliente' || !/^\d{4}-\d{2}-\d{2}$/.test(dia)) {
       return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
     }
-    const { gte, lt } = limitesDoDia(dia)
+    const dias = Math.min(7, Math.max(1, Number(req.nextUrl.searchParams.get('dias') ?? 1) || 1))
+    const { gte } = limitesDoDia(dia)
+    const lt = new Date(new Date(gte).getTime() + dias * 86_400_000).toISOString()
     const { data, error } = await criarClienteServico()
       .from('bloqueios_agenda')
       .select('id, profissional_id, inicio, fim, motivo')

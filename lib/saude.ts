@@ -77,9 +77,22 @@ export async function verificarSaude(): Promise<{ itens: ItemSaude[]; semFuncao:
     oQueFazer: migration('20261014020000_plano_ciclo.sql'),
   })
   itens.push({
+    nome: 'Trocar a senha derruba as outras sessões (segurança)',
+    ok: await existeColuna('sessao_versao'), grave: false,
+    oQueFazer: migration('20261112000000_sessao_versao.sql'),
+  })
+  itens.push({
     nome: 'LGPD: aceite dos termos e indicação',
     ok: await existeColuna('termos_aceitos_em'), grave: false,
     oQueFazer: migration('20261015010000_lgpd_indicacao.sql'),
+  })
+  itens.push({
+    nome: 'Aparência por barbearia (logo, capa e cores)',
+    ok: info.colunas_barbearias
+      ? info.colunas_barbearias.includes('cor_primaria')
+      : !(await db.from('barbearias').select('cor_primaria').limit(1)).error,
+    grave: false,
+    oQueFazer: migration('20261113000000_marca_barbearia.sql'),
   })
   if (!semFuncao) {
     itens.push({
