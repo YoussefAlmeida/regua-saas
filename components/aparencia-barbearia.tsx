@@ -1,5 +1,6 @@
 'use client'
 
+import { reduzirImagem, ERRO_IMAGEM } from '@/lib/reduzir-imagem'
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { Check, ImagePlus, Trash2, AlertTriangle, ExternalLink } from 'lucide-react'
@@ -31,7 +32,9 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
   const inputGaleria = useRef<HTMLInputElement>(null)
   async function fotoGaleria(arquivo?: File, remover?: string) {
     setEnviandoGaleria(true)
-    const fd = new FormData(); if (arquivo) fd.append('arquivo', arquivo)
+    const foto = arquivo ? await reduzirImagem(arquivo, { lado: 1600 }).catch(() => null) : null
+    if (arquivo && !foto) { setEnviandoGaleria(false); avisar(ERRO_IMAGEM, 'erro'); return }
+    const fd = new FormData(); if (foto) fd.append('arquivo', foto)
     const res = await (remover
       ? fetch(`/api/painel/barbearia/galeria?url=${encodeURIComponent(remover)}`, { method: 'DELETE' })
       : fetch('/api/painel/barbearia/galeria', { method: 'POST', body: fd })).catch(() => null)
@@ -51,8 +54,11 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
   async function enviar(tipo: 'logo' | 'capa', arquivo: File | undefined) {
     if (!arquivo) return
     setEnviando(tipo)
+    // Capa: foto larga. Logo: menor e mantendo o fundo vazado, se tiver
+    const foto = await reduzirImagem(arquivo, tipo === 'logo' ? { lado: 600, transparente: true } : { lado: 1920 }).catch(() => null)
+    if (!foto) { setEnviando(null); avisar(ERRO_IMAGEM, 'erro'); return }
     const fd = new FormData()
-    fd.append('tipo', tipo); fd.append('arquivo', arquivo)
+    fd.append('tipo', tipo); fd.append('arquivo', foto)
     const res = await fetch('/api/painel/barbearia/imagem', { method: 'POST', body: fd }).catch(() => null)
     setEnviando(null)
     if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
@@ -123,8 +129,8 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
               </div>
             </div>
             <div className="flex flex-wrap gap-2 mt-3">
-              <input ref={inputCapa} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { enviar('capa', e.target.files?.[0]); e.target.value = '' }} />
-              <input ref={inputLogo} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { enviar('logo', e.target.files?.[0]); e.target.value = '' }} />
+              <input ref={inputCapa} type="file" accept="image/*" className="sr-only" onChange={e => { enviar('capa', e.target.files?.[0]); e.target.value = '' }} />
+              <input ref={inputLogo} type="file" accept="image/*" className="sr-only" onChange={e => { enviar('logo', e.target.files?.[0]); e.target.value = '' }} />
               <button type="button" className={btnSec} disabled={!!enviando} onClick={() => inputCapa.current?.click()}>
                 <ImagePlus size={13} aria-hidden /> {enviando === 'capa' ? 'Enviando…' : capa ? 'Trocar capa' : 'Enviar capa'}
               </button>
@@ -134,7 +140,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
               </button>
               {logo && <button type="button" className={btnSec} disabled={!!enviando} onClick={() => remover('logo')}><Trash2 size={13} aria-hidden /> Tirar logo</button>}
             </div>
-            <p className="font-body text-xs text-fg-muted mt-2">JPG, PNG ou WEBP, até 2 MB. A capa fica melhor deitada; o logo, quadrado.</p>
+            <p className="font-body text-xs text-fg-muted mt-2">Pode enviar a foto original: ela é reduzida sozinha. A capa fica melhor deitada; o logo, quadrado.</p>
           </div>
 
           {/* Galeria */}
@@ -155,7 +161,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
                 </button>
               )}
             </div>
-            <input ref={inputGaleria} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { fotoGaleria(e.target.files?.[0]); e.target.value = '' }} />
+            <input ref={inputGaleria} type="file" accept="image/*" className="sr-only" onChange={e => { fotoGaleria(e.target.files?.[0]); e.target.value = '' }} />
             <p className="font-body text-xs text-fg-muted mt-2">Cortes, o ambiente, a equipe. Aparecem na aba Sobre da sua página.</p>
           </div>
 

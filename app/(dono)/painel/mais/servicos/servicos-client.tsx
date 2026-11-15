@@ -1,5 +1,6 @@
 'use client'
 
+import { reduzirImagem, ERRO_IMAGEM } from '@/lib/reduzir-imagem'
 import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Image from 'next/image'
@@ -46,7 +47,10 @@ export default function ServicosClient({
   async function enviarFoto(s: Servico, arquivo: File | undefined) {
     if (!arquivo) return
     setEnviandoFoto(s.id)
-    const fd = new FormData(); fd.append('arquivo', arquivo)
+    // A foto original (da câmera) é reduzida aqui antes de subir
+    const foto = await reduzirImagem(arquivo, { lado: 1400 }).catch(() => null)
+    if (!foto) { setEnviandoFoto(null); avisar(ERRO_IMAGEM, 'erro'); return }
+    const fd = new FormData(); fd.append('arquivo', foto)
     const res = await fetch(`/api/painel/servicos/${s.id}/foto`, { method: 'POST', body: fd }).catch(() => null)
     setEnviandoFoto(null)
     if (!res) { avisar('Sem conexão. Confere a internet e tenta de novo.', 'erro'); return }
@@ -217,9 +221,9 @@ export default function ServicosClient({
                 </span>
                 <span>
                   <span className="block font-ui text-sm font-semibold text-amber">{enviandoFoto ? 'Enviando…' : (editando?.foto_url || fotoNova) ? 'Trocar a foto' : 'Colocar uma foto'}</span>
-                  <span className="block font-body text-xs text-fg-muted">Aparece na página de agendamento</span>
+                  <span className="block font-body text-xs text-fg-muted">Pode ser a foto original: ela é reduzida sozinha</span>
                 </span>
-                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { escolherFoto(e.target.files?.[0]); e.target.value = '' }} />
+                <input type="file" accept="image/*" className="sr-only" onChange={e => { escolherFoto(e.target.files?.[0]); e.target.value = '' }} />
               </label>
 
               <div>

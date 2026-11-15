@@ -1,5 +1,6 @@
 'use client'
 
+import { reduzirImagem, ERRO_IMAGEM } from '@/lib/reduzir-imagem'
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { Camera, Check } from 'lucide-react'
@@ -14,10 +15,11 @@ export default function PerfilClient({ inicial }: { inicial: { nome: string; esp
   const input = useRef<HTMLInputElement>(null)
 
   async function enviarFoto(arquivo: File) {
-    if (arquivo.size > 2 * 1024 * 1024) { avisar('Foto grande demais (máximo 2 MB).', 'erro'); return }
     setEnviandoFoto(true)
+    const foto = await reduzirImagem(arquivo, { lado: 800 }).catch(() => null)
+    if (!foto) { setEnviandoFoto(false); avisar(ERRO_IMAGEM, 'erro'); return }
     const fd = new FormData()
-    fd.append('foto', arquivo)
+    fd.append('foto', foto)
     const res = await fetch('/api/painel/perfil/foto', { method: 'POST', body: fd }).catch(() => null)
     setEnviandoFoto(false)
     if (!res?.ok) { avisar(res ? await erroDaResposta(res) : 'Sem conexão.', 'erro'); return }
@@ -66,7 +68,7 @@ export default function PerfilClient({ inicial }: { inicial: { nome: string; esp
         <input
           ref={input}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/*"
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) enviarFoto(f); e.target.value = '' }}
         />
