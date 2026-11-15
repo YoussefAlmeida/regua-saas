@@ -33,7 +33,7 @@ const DORES = [
   [MessageCircle, '“Tem horário hoje?” o dia inteiro', 'Você para o corte pra responder mensagem, e quem não foi respondido marca em outro lugar.'],
   [CalendarX2, 'Dois clientes no mesmo horário', 'Agenda no caderno ou de cabeça uma hora falha, e alguém fica esperando irritado.'],
   [CircleHelp, 'Fim do mês sem saber o lucro', 'Entrou dinheiro, saiu dinheiro, e você não sabe dizer quanto sobrou de verdade.'],
-  [Users, 'Acerto com a equipe no achismo', 'Sem saber quanto cada barbeiro fez, a conversa sobre comissão vira discussão.'],
+  [Users, 'Acerto com a equipe no achismo', 'Sem saber quanto cada barbeiro fez, a conversa sobre o acerto vira discussão.'],
 ] as const
 
 const SOLUCOES = [

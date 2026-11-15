@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { ChevronLeft, Lock, Trash2, Plus, Check, AlertTriangle } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { HORARIO_PADRAO } from '@/lib/horario-padrao'
+import FuncionamentoBarbearia, { type Horarios } from '@/components/funcionamento-barbearia'
 
 const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
@@ -53,7 +54,7 @@ export default function HorariosClient({
   souDono: boolean
 }) {
   // O que o dono definiu (sem nada salvo, o padrão que a barbearia já usa)
-  const loja: HorarioLoja = Object.keys(horarioBarbearia).length ? horarioBarbearia : HORARIO_PADRAO
+  const [loja, setLoja] = useState<HorarioLoja>(() => Object.keys(horarioBarbearia).length ? horarioBarbearia : HORARIO_PADRAO)
   const abre = (i: number) => {
     const h = loja[String(i)]
     return h && h.ativo !== false && h.inicio && h.fim ? h : null
@@ -198,7 +199,7 @@ export default function HorariosClient({
               <div className="flex items-center justify-between gap-2">
                 <p className="font-ui text-sm font-semibold text-fg">Funcionamento da barbearia</p>
                 {souDono
-                  ? <Link href="/painel/mais/configuracoes" className="font-body text-xs font-semibold text-amber hover:underline">Alterar</Link>
+                  ? <button type="button" onClick={() => setAba('barbearia')} className="font-body text-xs font-semibold text-amber hover:underline">Alterar</button>
                   : <span className="flex items-center gap-1 font-body text-xs text-fg-muted"><Lock size={11} /> Definido pelo dono</span>}
               </div>
               <ul className="mt-2 divide-y divide-line/60">
@@ -258,7 +259,7 @@ export default function HorariosClient({
         <p className="font-semibold font-ui text-sm text-fg-muted animate-pulse text-center py-12">Carregando…</p>
       ) : (
         <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:gap-8 md:items-start">
-          {naBarbearia && <section>{cardFuncionamento}</section>}
+          {naBarbearia && <section><FuncionamentoBarbearia inicial={loja as Horarios} onSalvo={h => setLoja(h)} /></section>}
 
           {/* ── Semana de trabalho ───────────────────────── */}
           {!naBarbearia && (

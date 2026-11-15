@@ -20,7 +20,7 @@ export default function PermissoesClient({ iniciais }: { iniciais: PermissoesEqu
   }
 
   return (
-    <>
+    <div className="space-y-3">
       <ul className="ds-card divide-y divide-line">
         {CHAVES.map(k => (
           <li key={k} className="flex items-center gap-4 px-4 py-3.5">
@@ -36,6 +36,6 @@ export default function PermissoesClient({ iniciais }: { iniciais: PermissoesEqu
         ))}
       </ul>
       <button onClick={salvar} disabled={salvando || !mudou} className="ds-btn-primary w-full"><Check size={15} aria-hidden /> {salvando ? 'Salvando…' : 'Salvar permissões'}</button>
-    </>
+    </div>
   )
 }

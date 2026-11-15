@@ -6,18 +6,18 @@ import { criarClienteServico } from '@/lib/supabase/server'
 /* ================================================================
    Permissões da equipe — o que o BARBEIRO pode fazer, definido pelo dono.
    Valem pra barbearia toda. O dono sempre pode tudo. Marcar e remarcar
-   nunca são do barbeiro. Do resto, sem nada gravado (ou sem a coluna no
+   nunca são do barbeiro; cancelar sempre é. Do resto, sem nada gravado (ou sem a coluna no
    banco), fica liberado.
    A checagem é no servidor; a tela só acompanha.
    ================================================================ */
 
-import { PERMISSOES, CHAVES, SO_DONO, type Permissao, type PermissoesEquipe } from '@/lib/permissoes-equipe-def'
+import { PERMISSOES, CHAVES, SO_DONO, SEMPRE, type Permissao, type PermissoesEquipe } from '@/lib/permissoes-equipe-def'
 export { PERMISSOES, CHAVES, type Permissao, type PermissoesEquipe }
 
 export const permissoesDaEquipe = cache(async (barbearia_id: string): Promise<PermissoesEquipe> => {
   const { data } = await criarClienteServico().from('barbearias').select('permissoes').eq('id', barbearia_id).maybeSingle<{ permissoes: Record<string, unknown> | null }>()
   const gravadas = data?.permissoes ?? {}
-  return { ...Object.fromEntries(SO_DONO.map(k => [k, false])), ...Object.fromEntries(CHAVES.map(k => [k, gravadas[k] !== false])) } as PermissoesEquipe
+  return { ...Object.fromEntries(SO_DONO.map(k => [k, false])), ...Object.fromEntries(SEMPRE.map(k => [k, true])), ...Object.fromEntries(CHAVES.map(k => [k, gravadas[k] !== false])) } as PermissoesEquipe
 })
 
 export async function pode(sessao: SessaoUsuario, permissao: Permissao): Promise<boolean> {

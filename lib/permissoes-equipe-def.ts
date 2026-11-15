@@ -5,13 +5,15 @@ export const PERMISSOES = {
   remarcar:    { rotulo: 'Remarcar horário', descricao: 'Mudar o dia ou a hora de um horário da própria agenda' },
   cancelar:    { rotulo: 'Cancelar horário', descricao: 'Cancelar um horário da própria agenda' },
   bloquear:    { rotulo: 'Bloquear horários', descricao: 'Fechar pedaços da própria agenda (folga, compromisso)' },
-  ver_valores: { rotulo: 'Ver os próprios valores', descricao: 'Quanto gerou, comissão e desempenho' },
+  ver_valores: { rotulo: 'Ver os próprios valores', descricao: 'Quanto gerou e o próprio desempenho' },
 } as const
 
 export type Permissao = keyof typeof PERMISSOES
 export type PermissoesEquipe = Record<Permissao, boolean>
 /** Nunca liberadas pro barbeiro: quem marca é o cliente (pelo link) ou o dono */
 export const SO_DONO: Permissao[] = ['marcar', 'remarcar']
-/** As que o dono liga e desliga em Permissões */
-export const CHAVES = (Object.keys(PERMISSOES) as Permissao[]).filter(k => !SO_DONO.includes(k))
+/** Sempre do barbeiro: cancelar um horário da própria agenda */
+export const SEMPRE: Permissao[] = ['cancelar']
+/** As que o dono liga e desliga em Equipe */
+export const CHAVES = (Object.keys(PERMISSOES) as Permissao[]).filter(k => !SO_DONO.includes(k) && !SEMPRE.includes(k))
 

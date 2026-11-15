@@ -1,5 +1,5 @@
 /* Horário de funcionamento que toda barbearia nova já ganha
-   (o dono ajusta em Mais → Configurações). Chaves: 0 = domingo … 6 = sábado. */
+   (o dono ajusta em Mais → Horários). Chaves: 0 = domingo … 6 = sábado. */
 export interface HorarioPadraoDia { ativo: boolean; inicio?: string; fim?: string; intervalo_inicio?: string; intervalo_fim?: string }
 
 export const HORARIO_PADRAO: Record<string, HorarioPadraoDia> = {

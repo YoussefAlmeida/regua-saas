@@ -1,5 +1,7 @@
 'use client'
 
+import PermissoesClient from '@/app/(painel)/painel/mais/permissoes/permissoes-client'
+import type { PermissoesEquipe } from '@/lib/permissoes-equipe-def'
 import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Link from 'next/link'
@@ -21,7 +23,8 @@ interface Barbeiro {
   profissionais?: { id: string; ativo: boolean }[] | null
 }
 
-export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
+export default function BarbeirosClient({ barbeirosIniciais, dono, max, permissoes }: {
+  permissoes: PermissoesEquipe
   barbeirosIniciais: Barbeiro[]
   dono: { nome: string; naAgenda: boolean }
   max: number | null
@@ -288,6 +291,14 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max }: {
           </button>
         </div>
       )}
+
+      <section className="space-y-3">
+        <div>
+          <h2 className="font-semibold font-ui text-sm text-fg-muted">O que a equipe pode fazer</h2>
+          <p className="font-body text-xs text-fg-muted mt-1">O barbeiro conclui, marca falta e cancela os horários dele. Marcar e remarcar é com você e com o cliente, pelo link.</p>
+        </div>
+        <PermissoesClient iniciais={permissoes} />
+      </section>
     </div>
   )
 }
