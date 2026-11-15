@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
         if (await verificarSenha(d.senha, c.senha_hash).catch(() => false)) {
           const b = Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia
           return NextResponse.json({
-            erro: 'Essa é uma conta de cliente. Cliente entra pelo link da barbearia, em "Meus horários".',
+            erro: 'Essa é uma conta de cliente. Cliente entra pelo link da barbearia, em "Perfil".',
             linkCliente: b ? `/${b.slug}/perfil` : null,
           }, { status: 403 })
         }
@@ -127,8 +127,8 @@ export async function POST(req: NextRequest) {
     sv: await versaoDaSessao(usuario.id),
   })
 
-  // Cliente não tem painel: vai pra "Meus agendamentos" da barbearia dele
-  let destino = '/painel/hoje'
+  // Cada público cai na própria área: dono no painel, barbeiro em /barbeiro, cliente na barbearia dele
+  let destino = usuario.papel === 'barbeiro' ? '/barbeiro/hoje' : '/painel/inicio'
   if (usuario.papel === 'cliente') {
     const b = Array.isArray(usuario.barbearia) ? usuario.barbearia[0] : usuario.barbearia
     destino = b ? `/${b.slug}/perfil/agendamentos` : '/'

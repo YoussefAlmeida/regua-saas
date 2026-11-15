@@ -2,40 +2,17 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import {
-  LayoutDashboard, Home, CalendarDays, Wallet, Users2, Users, Scissors, Clock,
-  BarChart3, Settings, CreditCard, LogOut, UserRound,
-} from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { Marca } from '@/components/marca'
+import { MENU_DONO, MENU_BARBEIRO } from '@/components/menu'
 
-/* Menu lateral do painel no computador (no celular fica o menu inferior).
-   Os itens seguem o papel: o barbeiro não vê nada de gestão. */
-
-const DONO = [
-  { href: '/painel/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/painel/hoje', label: 'Hoje', icon: Home },
-  { href: '/painel/agenda', label: 'Agenda', icon: CalendarDays },
-  { href: '/painel/mais/clientes', label: 'Clientes', icon: Users2 },
-  { href: '/painel/mais/barbeiros', label: 'Equipe', icon: Users },
-  { href: '/painel/mais/servicos', label: 'Serviços', icon: Scissors },
-  { href: '/painel/mais/horarios', label: 'Horários', icon: Clock },
-  { href: '/painel/financeiro', label: 'Financeiro', icon: Wallet },
-  { href: '/painel/mais/configuracoes', label: 'Configurações', icon: Settings },
-  { href: '/painel/mais/plano', label: 'Plano', icon: CreditCard },
-]
-
-const BARBEIRO = [
-  { href: '/painel/hoje', label: 'Hoje', icon: Home },
-  { href: '/painel/agenda', label: 'Agenda', icon: CalendarDays },
-  { href: '/painel/mais/horarios', label: 'Meu horário', icon: Clock },
-  { href: '/painel/mais/desempenho', label: 'Meu desempenho', icon: BarChart3 },
-  { href: '/painel/mais/perfil', label: 'Meu perfil', icon: UserRound },
-]
+/* Menu lateral no computador (no celular fica a barra de baixo).
+   Dono: três blocos. Barbeiro: Hoje, Agenda e Perfil. */
 
 export default function NavLateral({ papel, barbearia, plano }: { papel: string; barbearia: string; plano: string }) {
   const pathname = usePathname()
   const router = useRouter()
-  const itens = papel === 'dono' ? DONO : BARBEIRO
+  const grupos = papel === 'dono' ? MENU_DONO : [{ grupo: '', itens: MENU_BARBEIRO }]
 
   async function sair() {
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null)
@@ -54,7 +31,10 @@ export default function NavLateral({ papel, barbearia, plano }: { papel: string;
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5" aria-label="Painel">
-        {itens.map(({ href, label, icon: Icon }) => {
+        {grupos.map(({ grupo, itens }) => (
+          <div key={grupo} className="space-y-0.5">
+            {grupo && <p className="ds-eyebrow px-3 pt-3 pb-1">{grupo}</p>}
+            {itens.map(({ href, label, icon: Icon }) => {
           const ativo = pathname === href || pathname.startsWith(`${href}/`)
           return (
             <Link
@@ -71,6 +51,8 @@ export default function NavLateral({ papel, barbearia, plano }: { papel: string;
             </Link>
           )
         })}
+          </div>
+        ))}
       </nav>
 
       <div className="border-t border-line p-3">

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
     profissional_id = p?.id
   }
   const token = await criarToken({ usuario_id: u.id, papel: u.papel, barbearia_id: u.barbearia_id, profissional_id, sv })
-  const destino = u.papel === 'cliente' ? (u.slug ? `/${u.slug}/perfil/agendamentos` : '/') : '/painel/hoje'
+  const destino = u.papel === 'cliente' ? (u.slug ? `/${u.slug}/perfil/agendamentos` : '/') : u.papel === 'barbeiro' ? '/barbeiro/hoje' : '/painel/inicio'
 
   const res = NextResponse.json({ ok: true, destino })
   gravarCookieSessao(res, token)

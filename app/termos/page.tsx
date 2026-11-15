@@ -63,7 +63,7 @@ export default function TermosPage() {
         <h2>Clientes que marcam pelo link</h2>
         <ul>
           <li>O horário é combinado com a barbearia; dúvidas sobre preço, atraso ou falta são com ela.</li>
-          <li>Dá pra desmarcar em &ldquo;Meus horários&rdquo; até 1 hora antes.</li>
+          <li>Dá pra desmarcar em Perfil → &ldquo;Meus Agendamentos&rdquo; até 1 hora antes.</li>
           <li>Use seu próprio WhatsApp: marcar em nome de outra pessoa sem autorização não é permitido.</li>
         </ul>
       </section>
