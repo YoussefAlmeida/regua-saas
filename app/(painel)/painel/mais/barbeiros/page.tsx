@@ -1,3 +1,4 @@
+import { permissoesDaEquipe } from '@/lib/permissoes-equipe'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { criarClienteServico } from '@/lib/supabase/server'
@@ -30,6 +31,7 @@ export default async function BarbeirosPage() {
       barbeirosIniciais={barbeiros ?? []}
       dono={{ nome: dono?.nome ?? 'Você', naAgenda: !!eu?.ativo }}
       max={plano.maxProfissionais}
+      permissoes={await permissoesDaEquipe(sessao.barbearia_id)}
     />
   )
 }

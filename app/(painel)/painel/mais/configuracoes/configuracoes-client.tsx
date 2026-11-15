@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Check, X, CalendarOff } from 'lucide-react'
-import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 
-const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 type HorarioDia = { ativo: boolean; inicio?: string; fim?: string; intervalo_inicio?: string; intervalo_fim?: string }
-type Horarios = Record<string, HorarioDia>
 
 interface Barbearia {
   id: string
@@ -21,27 +19,18 @@ interface Barbearia {
 }
 
 export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia: Barbearia | null; siteUrl: string }) {
-  const horarioInicial = (barbearia?.horario_funcionamento && Object.keys(barbearia.horario_funcionamento).length > 0)
-    ? barbearia.horario_funcionamento
-    : HORARIO_PADRAO
-
   const [form, setForm] = useState({
     nome: barbearia?.nome ?? '',
     telefone: barbearia?.telefone ?? '',
     endereco: barbearia?.endereco ?? '',
     instagram: barbearia?.instagram ?? '',
   })
-  const [horarios, setHorarios] = useState<Horarios>(horarioInicial)
   const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
   const [fechados, setFechados] = useState<string[]>((barbearia?.dias_fechados ?? []).filter(d => d >= hoje))
   const [novoFechado, setNovoFechado] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
   const [erro, setErro] = useState('')
-
-  function updateHorario(dia: string, campo: keyof HorarioDia, valor: boolean | string) {
-    setHorarios(h => ({ ...h, [dia]: { ...h[dia], [campo]: valor } }))
-  }
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault()
@@ -57,7 +46,6 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
         telefone: form.telefone.trim() || null,
         endereco: form.endereco.trim() || null,
         instagram: form.instagram.trim() || null,
-        horario_funcionamento: horarios,
         dias_fechados: fechados,
       }),
     })
@@ -147,83 +135,9 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
         </div>
       </section>
 
-      {/* Horários de funcionamento */}
-      <section className="space-y-3">
-        <h2 className="font-semibold font-ui text-sm text-fg-muted">Horários de funcionamento</h2>
-        <p className="font-body text-xs text-fg-muted">
-          Vale pra toda a barbearia. Cada barbeiro monta o horário dele dentro deste, em Mais → Horários.
-        </p>
-
-        <div className="bg-surface rounded-card border border-line overflow-hidden">
-          {DIAS.map((dia, idx) => {
-            const key = String(idx)
-            const h = horarios[key] ?? { ativo: false }
-            return (
-              <div
-                key={key}
-                className={`flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 ${idx < 6 ? 'border-b border-line' : ''}`}
-              >
-                <button
-                  type="button"
-                  onClick={() => updateHorario(key, 'ativo', !h.ativo)}
-                  className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${h.ativo ? 'bg-amber' : 'bg-line'}`}
-                >
-                  <span
-                    className={`absolute left-0 top-0.5 w-4 h-4 rounded-full bg-fg transition-transform ${h.ativo ? 'translate-x-[18px]' : 'translate-x-0.5'}`}
-                  />
-                </button>
-                <span className={`font-ui text-xs uppercase tracking-wider w-8 shrink-0 ${h.ativo ? 'text-fg' : 'text-fg-muted'}`}>
-                  {dia}
-                </span>
-
-                {h.ativo ? (
-                  <div className="flex items-center gap-1.5 min-[400px]:gap-2 flex-1 min-w-0">
-                    <input
-                      type="time"
-                      value={h.inicio ?? '08:00'}
-                      onChange={e => updateHorario(key, 'inicio', e.target.value)}
-                      className="flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
-                    />
-                    <span className="text-fg-muted text-xs">–</span>
-                    <input
-                      type="time"
-                      value={h.fim ?? '19:00'}
-                      onChange={e => updateHorario(key, 'fim', e.target.value)}
-                      className="flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber"
-                    />
-                  </div>
-                ) : (
-                  <span className="font-body text-xs text-fg-muted">Fechado</span>
-                )}
-                {h.ativo && (() => {
-                  const temAlmoco = !!(h.intervalo_inicio && h.intervalo_fim)
-                  const campo = 'flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber'
-                  return (
-                    <div className="basis-full flex items-center gap-3 pl-12">
-                      <label className="flex items-center gap-1.5 font-body text-xs text-fg-muted cursor-pointer shrink-0">
-                        <input type="checkbox" checked={temAlmoco} className="accent-[rgb(var(--accent-rgb))]"
-                          onChange={e => setHorarios(hs => {
-                            const { intervalo_inicio: _i, intervalo_fim: _f, ...resto } = hs[key] ?? { ativo: true }
-                            void _i; void _f
-                            return { ...hs, [key]: e.target.checked ? { ...resto, intervalo_inicio: '12:00', intervalo_fim: '13:00' } : resto }
-                          })} />
-                        Almoço
-                      </label>
-                      {temAlmoco && (
-                        <div className="flex items-center gap-1.5 min-[400px]:gap-2 flex-1 min-w-0">
-                          <input type="time" aria-label={`Início do almoço, ${dia}`} value={h.intervalo_inicio} onChange={e => updateHorario(key, 'intervalo_inicio', e.target.value)} className={campo} />
-                          <span className="text-fg-muted text-xs">–</span>
-                          <input type="time" aria-label={`Fim do almoço, ${dia}`} value={h.intervalo_fim} onChange={e => updateHorario(key, 'intervalo_fim', e.target.value)} className={campo} />
-                        </div>
-                      )}
-                    </div>
-                  )
-                })()}
-              </div>
-            )
-          })}
-        </div>
-      </section>
+      <p className="font-body text-xs text-fg-muted">
+        O horário de funcionamento e o almoço agora ficam em <Link href="/painel/mais/horarios" className="text-amber font-semibold hover:underline">Horários</Link>.
+      </p>
 
       {/* Dias fechados (feriados) — vencem o horário de qualquer barbeiro */}
       <section className="space-y-3">

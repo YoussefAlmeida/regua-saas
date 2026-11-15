@@ -82,7 +82,6 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   // Com meta definida pelo dono, o anel mostra a meta; sem ela, compara com o mês passado
   const meu = (await extrasDosProfissionais(db, sessao.barbearia_id)).mapa.get(profissional_id)
   const meta = meu?.meta_mensal && meu.meta_mensal > 0 ? meu.meta_mensal : null
-  const comissao = meu?.comissao_pct != null ? { pct: meu.comissao_pct, valor: periodos[2].valor * meu.comissao_pct / 100 } : null
   const progresso = meta ? Math.round((periodos[2].valor / meta) * 100)
     : totalMesPassado > 0 ? Math.round((periodos[2].valor / totalMesPassado) * 100) : null
   const nomeMesPassado = new Date(Date.UTC(y, m - 2, 1)).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
@@ -148,9 +147,6 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
           <p className="ds-eyebrow">Em {nomeMes}</p>
           <p className="font-mono text-xl font-semibold text-fg whitespace-nowrap mt-1">{brl(periodos[2].valor)}</p>
           <p className="font-body text-xs text-fg-muted mt-0.5">{periodos[2].qtd} atendimento{periodos[2].qtd !== 1 ? 's' : ''}</p>
-          {comissao && (
-            <p className="font-body text-sm text-fg mt-2">Comissão: <strong className="font-display font-semibold text-amber tabular-nums">{brl(comissao.valor)}</strong> <span className="text-fg-muted">({String(comissao.pct).replace('.', ',')}%)</span></p>
-          )}
           <p className="font-body text-xs text-fg-muted mt-2">
             {meta
               ? `Meta do mês: ${brl(meta)}.`
