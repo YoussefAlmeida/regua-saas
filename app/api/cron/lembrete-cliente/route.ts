@@ -3,7 +3,6 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { enviarTexto, textoLembreteCliente, urlDoSite } from '@/lib/whatsapp'
 import { falhaInterna } from '@/lib/erros'
 import { cronAutorizado } from '@/lib/segredo'
-import { clienteQuer } from '@/lib/cliente-extras'
 
 /* Roda a cada 15 minutos. O plano Hobby da Vercel só permite cron diário,
    então quem chama esta rota é um agendador externo (ex.: cron-job.org)
@@ -26,7 +25,7 @@ export async function GET(req: NextRequest) {
     .select(`
       id, inicio, valor_servico,
       barbearia:barbearias!barbearia_id(nome, slug),
-      cliente:usuarios!cliente_id(id, nome, whatsapp),
+      cliente:usuarios!cliente_id(nome, whatsapp),
       profissional:profissionais!profissional_id(nome),
       servico:servicos!servico_id(nome)
     `)
@@ -49,8 +48,6 @@ export async function GET(req: NextRequest) {
     const servico   = Array.isArray(ag.servico)   ? ag.servico[0]   : ag.servico
 
     if (!cliente?.whatsapp) continue
-    // O cliente desligou os lembretes no perfil dele
-    if (!(await clienteQuer(cliente.id, 'lembretes'))) continue
 
     const hora = new Date(ag.inicio).toLocaleTimeString('pt-BR', {
       hour: '2-digit', minute: '2-digit', timeZone: 'America/Bahia',

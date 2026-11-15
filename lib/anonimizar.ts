@@ -1,4 +1,3 @@
-import { extrasDoCliente } from '@/lib/cliente-extras'
 import { randomBytes } from 'node:crypto'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { hashSenha } from '@/lib/auth'
@@ -32,9 +31,6 @@ export async function anonimizarCliente(usuario_id: string, barbearia_id: string
     atualizado_em: agora,
   }).eq('id', u.id)
 
-  // Foto, e-mail e preferências (colunas novas: sem elas no banco, o erro é ignorado)
-  await db.from('usuarios').update({ foto_url: null, email_contato: null, notificacoes: {} }).eq('id', u.id)
-
   if (u.whatsapp) {
     await db.from('tentativas_login').delete().in('chave', [`id:${u.whatsapp}`, `id:rec:${u.whatsapp}`, `id:reauth:${u.id}`])
   }
@@ -54,12 +50,11 @@ export async function dadosDoCliente(usuario_id: string, barbearia_id: string) {
       .select('inicio, fim, status, valor_servico, cancelado_por, criado_em, servico:servicos!servico_id(nome), profissional:profissionais!profissional_id(nome)')
       .eq('cliente_id', usuario_id).order('inicio', { ascending: false }),
   ])
-  const extras = await extrasDoCliente(db, usuario_id)
   return {
     gerado_em: new Date().toISOString(),
     controladora: b ? { barbearia: b.nome, telefone: b.telefone, endereco: b.endereco } : null,
     operador: 'RÉGUA (sistema de agendamento usado pela barbearia)',
-    voce: u ? { ...u, email: extras.email, foto: extras.foto_url, avisos: extras.avisos } : u,
+    voce: u,
     agendamentos: ags ?? [],
     politica: '/privacidade',
   }

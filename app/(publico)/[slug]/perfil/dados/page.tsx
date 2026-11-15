@@ -9,7 +9,7 @@ export default async function DadosPage({ params }: { params: Promise<{ slug: st
   const { barbearia, tema, cliente } = await carregarPerfilLogado(slug)
   return (
     <div style={tema}>
-      <DadosCliente slug={barbearia.slug} inicial={{ nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email ?? '', foto: cliente.foto_url }} liberado={cliente.liberado} />
+      <DadosCliente slug={barbearia.slug} inicial={{ nome: cliente.nome, whatsapp: cliente.whatsapp }} />
     </div>
   )
 }

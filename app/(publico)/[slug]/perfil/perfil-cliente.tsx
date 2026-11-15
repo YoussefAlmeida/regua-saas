@@ -3,15 +3,15 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { CircleUserRound, CalendarCheck, Bell, LogOut, ChevronRight, Phone, Mail } from 'lucide-react'
+import { CircleUserRound, CalendarCheck, LogOut, ChevronRight, Phone } from 'lucide-react'
 import NavCliente from '@/components/cliente/nav-cliente'
 import Avatar from '@/components/cliente/avatar'
 import { formatarTelefone } from '@/lib/telefone'
 
-/* Meu Perfil: quem é o cliente e as quatro portas — Meus Dados,
-   Meus Agendamentos, Notificações e Sair. Sem login, mostra a entrada. */
+/* Meu Perfil: quem é o cliente e as três portas — Meus Dados,
+   Meus Agendamentos e Sair. Sem login, mostra a entrada. */
 
-interface Cliente { nome: string; whatsapp: string; email: string | null; foto: string | null; avisosLigados: boolean }
+interface Cliente { nome: string; whatsapp: string }
 
 export default function PerfilCliente({ barbearia, cliente }: { barbearia: { nome: string; slug: string }; cliente: Cliente | null }) {
   const router = useRouter()
@@ -74,11 +74,10 @@ export default function PerfilCliente({ barbearia, cliente }: { barbearia: { nom
         ) : (
           <>
             <section className="ds-card p-4 flex items-center gap-4" aria-label="Seus dados">
-              <Avatar foto={cliente.foto} nome={cliente.nome} className="w-[72px] h-[72px] min-[380px]:w-[88px] min-[380px]:h-[88px] text-[26px]" />
+              <Avatar nome={cliente.nome} className="w-[72px] h-[72px] min-[380px]:w-[88px] min-[380px]:h-[88px] text-[26px]" />
               <div className="min-w-0 space-y-1.5">
                 <p className="font-display text-[19px] leading-snug font-semibold text-fg truncate">{cliente.nome}</p>
                 <p className="flex items-center gap-2 font-body text-sm text-fg"><Phone size={15} className="text-fg-muted shrink-0" aria-hidden /> <span className="truncate tabular-nums">{formatarTelefone(cliente.whatsapp)}</span></p>
-                <p className="flex items-center gap-2 font-body text-sm text-fg"><Mail size={15} className="text-fg-muted shrink-0" aria-hidden /> <span className={`truncate ${cliente.email ? '' : 'text-fg-muted'}`}>{cliente.email ?? 'Sem e-mail cadastrado'}</span></p>
               </div>
             </section>
 
@@ -91,12 +90,6 @@ export default function PerfilCliente({ barbearia, cliente }: { barbearia: { nom
               <Link href={`${base}/agendamentos`} className={linha}>
                 <CalendarCheck size={24} className="text-amber shrink-0" strokeWidth={1.7} aria-hidden />
                 <span className="flex-1 min-w-0"><span className="block font-display text-base font-semibold text-fg">Meus Agendamentos</span><span className="block font-body text-sm text-fg-muted">Acompanhe ou cancele seus horários</span></span>
-                <ChevronRight size={18} className="text-fg-muted shrink-0" aria-hidden />
-              </Link>
-              <Link href={`${base}/notificacoes`} className={linha}>
-                <Bell size={24} className="text-amber shrink-0" strokeWidth={1.7} aria-hidden />
-                <span className="flex-1 min-w-0"><span className="block font-display text-base font-semibold text-fg truncate">Notificações</span><span className="block font-body text-sm text-fg-muted">Receba lembretes e atualizações</span></span>
-                <span className={`ds-tag shrink-0 ${cliente.avisosLigados ? 'bg-amber/15 text-amber' : 'bg-surface-alt text-fg-muted'}`}>{cliente.avisosLigados ? 'Ligadas' : 'Desligadas'}</span>
                 <ChevronRight size={18} className="text-fg-muted shrink-0" aria-hidden />
               </Link>
               <button type="button" onClick={() => setConfirmarSaida(true)} className={linha}>
