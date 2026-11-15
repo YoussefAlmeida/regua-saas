@@ -85,7 +85,7 @@ export default function PrivacidadePage() {
           <li>saber com quem compartilhamos.</li>
         </ul>
         <p className="mt-2">
-          <strong>Cliente:</strong> em &ldquo;Meus horários&rdquo;, no link da barbearia, tem os botões &ldquo;Baixar meus dados&rdquo; e
+          <strong>Cliente:</strong> em Perfil → &ldquo;Meus Dados&rdquo;, no link da barbearia, tem os botões &ldquo;Baixar meus dados&rdquo; e
           &ldquo;Apagar minha conta&rdquo;. Para qualquer outro pedido, fale com a gente {contato}. Respondemos em até 15 dias.
         </p>
       </section>

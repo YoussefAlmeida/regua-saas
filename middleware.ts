@@ -26,9 +26,12 @@ export async function middleware(req: NextRequest) {
   // Landing page de venda
   if (pathname === '/') return seguir()
 
+  // /barbeiro sozinho não é barbearia: é a área do barbeiro
+  if (pathname === '/barbeiro') return NextResponse.redirect(new URL('/barbeiro/hoje', req.url))
+
   // Rotas públicas por slug da barbearia
   // e o Perfil do cliente com as telas internas (cada página checa a sessão sozinha)
-  if (/^\/[a-z0-9-]+(\/meus-agendamentos|\/perfil(\/(dados|agendamentos))?|\/opengraph-image[\w-]*)?$/.test(pathname)) return seguir()
+  if (!pathname.startsWith('/barbeiro/') && /^\/[a-z0-9-]+(\/meus-agendamentos|\/perfil(\/(dados|agendamentos))?|\/opengraph-image[\w-]*)?$/.test(pathname)) return seguir()
 
   const token = req.cookies.get(COOKIE_SESSION)?.value
   if (!token) return NextResponse.redirect(new URL('/entrar', req.url))
@@ -37,9 +40,21 @@ export async function middleware(req: NextRequest) {
     const { payload } = await jwtVerify(token, chaveSessao(), OPCOES_SESSAO)
     // Painel é só da equipe: cliente não lê nem mexe em nada daqui
     // (antes um cliente logado pelo link conseguia listar e alterar agendamentos)
-    if (payload.papel === 'cliente' && (pathname.startsWith('/painel') || pathname.startsWith('/api/painel'))) {
+    if (payload.papel === 'cliente' && (pathname.startsWith('/painel') || pathname.startsWith('/barbeiro/') || pathname.startsWith('/api/painel'))) {
       if (pathname.startsWith('/api/')) return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
       return NextResponse.redirect(new URL('/', req.url))
+    }
+    // Cada um na própria área: /painel é do dono, /barbeiro é do barbeiro
+    if (payload.papel === 'barbeiro' && pathname.startsWith('/painel')) {
+      const destino = pathname.startsWith('/painel/agenda') ? '/barbeiro/agenda'
+        : pathname.startsWith('/painel/mais/horarios') ? '/barbeiro/perfil/horario'
+        : pathname.startsWith('/painel/mais/desempenho') ? '/barbeiro/perfil/desempenho'
+        : pathname.startsWith('/painel/mais') ? '/barbeiro/perfil'
+        : '/barbeiro/hoje'
+      return NextResponse.redirect(new URL(destino, req.url))
+    }
+    if (payload.papel === 'dono' && pathname.startsWith('/barbeiro/')) {
+      return NextResponse.redirect(new URL('/painel/inicio', req.url))
     }
     const headers = limpos
     headers.set('x-usuario-id', payload.sub!)

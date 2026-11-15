@@ -4,7 +4,7 @@ import { CalendarCheck, CircleDollarSign, Users2, Scissors, ArrowUpRight, ArrowD
 import GraficoFaturamento, { type PontoDia } from './grafico-faturamento'
 
 /* Dashboard do proprietário — só apresentação: recebe os números prontos
-   (app/(painel)/painel/dashboard/page.tsx calcula). */
+   (app/(dono)/painel/dashboard/page.tsx calcula). */
 
 export interface DadosDashboard {
   periodo: string
@@ -46,14 +46,8 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
   const semMovimento = d.porDia.every(p => p.valor === 0)
 
   return (
-    <div className="px-4 md:px-8 py-6 max-w-6xl mx-auto space-y-4">
-      <div className="flex items-end justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="ds-titulo">Dashboard</h1>
-          <p className="font-body text-sm text-fg-muted">Visão geral da sua barbearia</p>
-        </div>
-        <span className="font-body text-xs text-fg-muted border border-line rounded-button px-3 py-1.5">{d.periodo}</span>
-      </div>
+    <div className="space-y-4">
+      <h2 className="ds-eyebrow pt-2">{d.periodo}</h2>
 
       {/* Indicadores */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-3" aria-label="Indicadores dos últimos 30 dias">

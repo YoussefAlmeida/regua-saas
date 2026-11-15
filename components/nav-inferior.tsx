@@ -2,29 +2,22 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Home, Wallet, MoreHorizontal, BarChart3 } from 'lucide-react'
+import { MoreHorizontal } from 'lucide-react'
+import { MENU_DONO, ATALHOS_DONO, MENU_BARBEIRO } from '@/components/menu'
 
-const ITENS = [
-  { href: '/painel/hoje', label: 'Hoje', icon: Home },
-  { href: '/painel/agenda', label: 'Agenda', icon: CalendarDays },
-  { href: '/painel/financeiro', label: 'Financeiro', icon: Wallet },
-  { href: '/painel/mais', label: 'Mais', icon: MoreHorizontal },
-]
-
+/* Barra de baixo no celular. Dono: Início, Agenda, Financeiro e Mais
+   (o resto do menu). Barbeiro: Hoje, Agenda e Perfil. */
 export default function NavInferior({ papel }: { papel: string }) {
   const pathname = usePathname()
-
-  // Esconde financeiro p/ não-donos
-  // Barbeiro: no lugar do caixa (que é do dono), o próprio desempenho
-  const itens = papel === 'dono' ? ITENS : ITENS.map(i => i.href === '/painel/financeiro'
-    ? { href: '/painel/mais/desempenho', label: 'Desempenho', icon: BarChart3 } : i)
+  const itens = papel === 'dono'
+    ? [...MENU_DONO.flatMap(g => g.itens).filter(i => ATALHOS_DONO.includes(i.href)), { href: '/painel/mais', label: 'Mais', icon: MoreHorizontal }]
+    : MENU_BARBEIRO
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur border-t border-line z-20 pb-[env(safe-area-inset-bottom)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-surface/95 backdrop-blur border-t border-line z-20 pb-[env(safe-area-inset-bottom)]" aria-label="Navegação">
       <div className="max-w-lg mx-auto flex">
         {itens.map(({ href, label, icon: Icon }) => {
-          // "Mais" não acende quando a tela aberta tem aba própria (ex.: Desempenho do barbeiro)
-          const ativo = pathname.startsWith(href) && !itens.some(o => o.href !== href && o.href.startsWith(href) && pathname.startsWith(o.href))
+          const ativo = pathname === href || pathname.startsWith(`${href}/`)
           return (
             <Link
               key={href}

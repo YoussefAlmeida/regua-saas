@@ -1,0 +1,94 @@
+import { criarClienteAutenticado } from '@/lib/supabase/usuario'
+import { permissoesDaEquipe } from '@/lib/permissoes-equipe'
+
+/* O dia de hoje: agendamentos, atendimentos que ficaram sem status, caixa do
+   dia e pendências de configuração. O barbeiro recebe só a própria agenda.
+   Alimenta o Início do dono e o Hoje do barbeiro. */
+export async function carregarHoje({ barbearia_id, usuario_id, souBarbeiro, meuProfissionalId }: {
+  barbearia_id: string; usuario_id: string; souBarbeiro: boolean; meuProfissionalId: string
+}) {
+  const db = await criarClienteAutenticado()
+  const { data: eu } = souBarbeiro
+    ? await db.from('usuarios').select('nome').eq('id', usuario_id).maybeSingle()
+    : { data: null }
+
+  const hoje = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Bahia' })
+  const [y, m, d] = hoje.split('-').map(Number)
+  const inicio_gte = new Date(Date.UTC(y, m - 1, d, 3, 0, 0)).toISOString()
+  const inicio_lt  = new Date(Date.UTC(y, m - 1, d + 1, 3, 0, 0)).toISOString()
+
+  let qHoje = db
+    .from('agendamentos')
+    .select(`
+      id, inicio, fim, status, valor_servico, observacao,
+      profissional:profissionais!profissional_id(id, nome),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
+      servico:servicos!servico_id(nome, duracao_min, cor)
+    `)
+    .eq('barbearia_id', barbearia_id)
+    .neq('status', 'cancelado')
+    .gte('inicio', inicio_gte)
+    .lt('inicio', inicio_lt)
+    .order('inicio')
+  // Barbeiro vê só a própria agenda e o próprio número (seção 6.1.1)
+  if (souBarbeiro) qHoje = qHoje.eq('profissional_id', meuProfissionalId)
+  const { data: agendamentos } = await qHoje
+
+  // Atendimentos que já passaram e ninguém marcou (últimos 7 dias, antes de hoje)
+  const seteDiasAtras = new Date(Date.UTC(y, m - 1, d - 7, 3, 0, 0)).toISOString()
+  let qEsq = db
+    .from('agendamentos')
+    .select(`
+      id, inicio, fim, status, valor_servico, observacao,
+      profissional:profissionais!profissional_id(id, nome),
+      cliente:usuarios!cliente_id(id, nome, whatsapp),
+      servico:servicos!servico_id(nome, duracao_min, cor)
+    `)
+    .eq('barbearia_id', barbearia_id)
+    .in('status', ['agendado', 'confirmado'])
+    .gte('inicio', seteDiasAtras)
+    .lt('inicio', inicio_gte)
+    .order('inicio')
+  if (souBarbeiro) qEsq = qEsq.eq('profissional_id', meuProfissionalId)
+  const { data: esquecidos } = await qEsq
+
+  const { data: movHoje } = souBarbeiro
+    ? { data: [] }
+    : await db
+        .from('movimentacoes')
+        .select('id, tipo, descricao, valor, origem')
+        .eq('barbearia_id', barbearia_id)
+        .eq('data', hoje)
+
+  // Primeiro acesso do barbeiro: lembra de completar perfil e horário
+  const pendencias: { href: string; texto: string }[] = []
+  if (souBarbeiro && meuProfissionalId) {
+    const [{ data: prof }, { count: nHorarios }] = await Promise.all([
+      db.from('profissionais').select('foto_url, especialidade, ativo').eq('id', meuProfissionalId).maybeSingle(),
+      db.from('horarios_trabalho').select('id', { count: 'exact', head: true }).eq('profissional_id', meuProfissionalId),
+    ])
+    if (prof && !prof.ativo) pendencias.push({ href: '/barbeiro/hoje', texto: 'Você está fora da agenda: os horários já marcados continuam, mas não entra horário novo. Fala com o dono da barbearia.' })
+    else if (!prof?.foto_url || !prof?.especialidade) pendencias.push({ href: '/barbeiro/perfil', texto: 'Coloca sua foto e especialidade — o cliente escolhe por elas' })
+    if (!nHorarios) pendencias.push({ href: '/barbeiro/perfil/horario', texto: 'Confere seus dias e horário de almoço' })
+  }
+  if (!souBarbeiro) {
+    const [{ count: nServicos }, { count: nProfs }] = await Promise.all([
+      db.from('servicos').select('id', { count: 'exact', head: true }).eq('barbearia_id', barbearia_id).eq('ativo', true),
+      db.from('profissionais').select('id', { count: 'exact', head: true }).eq('barbearia_id', barbearia_id).eq('ativo', true),
+    ])
+    if (!nServicos || !nProfs) {
+      pendencias.push({ href: '/painel/comecar', texto: 'Termina de configurar: falta ' + (!nProfs ? 'quem corta' : 'cadastrar os serviços') + ' pra liberar o link de agendamento' })
+    }
+  }
+
+  return {
+    pendencias,
+    agendamentosIniciais: (agendamentos ?? []) as never[],
+    esquecidosIniciais: (esquecidos ?? []) as never[],
+    movimentacoesHoje: movHoje ?? [],
+    data: hoje,
+    souBarbeiro,
+    verValores: !souBarbeiro || (await permissoesDaEquipe(barbearia_id)).ver_valores,
+    nome: eu?.nome?.split(' ')[0] ?? '',
+  }
+}

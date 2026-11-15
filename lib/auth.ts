@@ -123,7 +123,7 @@ export async function novaVersaoDaSessao(usuario_id: string): Promise<number> {
 
 /** Endereços do próprio sistema — nenhuma barbearia pode usar como link */
 export const SLUGS_RESERVADOS = new Set([
-  'admin', 'api', 'painel', 'entrar', 'sair', 'cadastro', 'cadastro-barbearia', 'convite',
+  'admin', 'api', 'painel', 'barbeiro', 'entrar', 'sair', 'cadastro', 'cadastro-barbearia', 'convite',
   'recuperar-senha', 'nova-senha', 'planos', 'precos', 'termos', 'privacidade', 'ajuda', 'suporte', 'blog',
   'regua', 'app', 'www', 'login', 'conta', 'minha-conta', '_next', 'favicon', 'static',
 ])

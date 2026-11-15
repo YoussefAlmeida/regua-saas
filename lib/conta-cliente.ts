@@ -109,7 +109,7 @@ export async function resolverCliente(acesso: Acesso, barbearia_id: string, req:
       // Cliente que a barbearia cadastrou e ainda não tem senha. Antes, quem digitasse
       // esse WhatsApp escolhia a senha e entrava na conta (via o histórico da pessoa).
       // Agora o horário é marcado no cadastro dela, sem abrir a conta: o acesso a
-      // "Meus horários" vem pelo link de senha que a barbearia manda no WhatsApp dela.
+      // O acesso ao Perfil vem pelo link de senha que a barbearia manda no WhatsApp dela.
       if (!existente.ativo) return falha('Essa conta está desativada. Fala com a barbearia.', 403)
       if (!(await permitirUso(`uso:conta-nova:${ip}`, 5, 60 * 60 * 1000))) {
         return falha('Muitas tentativas a partir desta conexão. Tenta de novo daqui a pouco.', 429)
