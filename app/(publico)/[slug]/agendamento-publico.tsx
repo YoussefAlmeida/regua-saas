@@ -550,8 +550,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
               {semAcesso
                 ? 'A barbearia já tinha seu cadastro. Pra ver e cancelar seus horários por aqui, pede pra ela te mandar o link de acesso.'
                 : lembreteAtivo
-                  ? 'A gente te lembra pelo WhatsApp 2 horas antes. Cancelamento até 1 hora antes, em Meus horários.'
-                  : 'Anota o dia e o horário. Cancelamento até 1 hora antes, em Meus horários.'}
+                  ? 'A gente te lembra pelo WhatsApp 2 horas antes. Cancelamento até 1 hora antes, em Perfil → Meus agendamentos.'
+                  : 'Anota o dia e o horário. Cancelamento até 1 hora antes, em Perfil → Meus agendamentos.'}
             </p>
             <button onClick={novoAgendamento} className="font-body text-sm text-amber underline underline-offset-4 mt-5">Marcar outro horário</button>
           </div>

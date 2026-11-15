@@ -35,7 +35,7 @@ export default async function PainelLayout({ children }: { children: React.React
     .single()
 
   // Cliente não tem painel — vai pros agendamentos dele
-  if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/meus-agendamentos` : '/entrar')
+  if (papel === 'cliente') redirect(barbearia?.slug ? `/${barbearia.slug}/perfil/agendamentos` : '/entrar')
 
   const souDono = papel === 'dono'
   const [{ data: usuario }, plano, agenda, { data: mudanca }] = await Promise.all([

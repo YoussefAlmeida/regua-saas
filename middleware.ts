@@ -27,8 +27,8 @@ export async function middleware(req: NextRequest) {
   if (pathname === '/') return seguir()
 
   // Rotas públicas por slug da barbearia
-  // e "Meus agendamentos" do cliente (a página checa a sessão sozinha)
-  if (/^\/[a-z0-9-]+(\/meus-agendamentos|\/perfil|\/opengraph-image[\w-]*)?$/.test(pathname)) return seguir()
+  // e o Perfil do cliente com as telas internas (cada página checa a sessão sozinha)
+  if (/^\/[a-z0-9-]+(\/meus-agendamentos|\/perfil(\/(dados|agendamentos|notificacoes))?|\/opengraph-image[\w-]*)?$/.test(pathname)) return seguir()
 
   const token = req.cookies.get(COOKIE_SESSION)?.value
   if (!token) return NextResponse.redirect(new URL('/entrar', req.url))
