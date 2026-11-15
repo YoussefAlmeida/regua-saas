@@ -14,8 +14,6 @@ export type PlanoPagoId = 'cadeira' | 'barbearia' | 'rede'
 export type PlanoId = 'trial' | PlanoPagoId
 
 export interface Recursos {
-  /** Mais → Histórico (quem lançou, apagou, mudou valor) */
-  historico: boolean
   /** Ranking por barbeiro, clientes novos x retorno */
   relatoriosAvancados: boolean
   /** Despesas fixas lançadas sozinhas todo mês */
@@ -43,7 +41,7 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
     preco: 39.99,
     resumo: 'Pra quem trabalha sozinho',
     maxProfissionais: 1,
-    recursos: { historico: false, relatoriosAvancados: false, despesasFixas: false },
+    recursos: { relatoriosAvancados: false, despesasFixas: false },
     suporte: 'Suporte 2 vezes por mês',
     itens: [
       '1 profissional na agenda',
@@ -60,7 +58,7 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
     preco: 79.99,
     resumo: 'Pra equipe de até 3',
     maxProfissionais: 3,
-    recursos: { historico: true, relatoriosAvancados: true, despesasFixas: true },
+    recursos: { relatoriosAvancados: true, despesasFixas: true },
     suporte: 'Suporte pelo WhatsApp',
     destaque: true,
     itens: [
@@ -77,7 +75,7 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
     preco: 129.99,
     resumo: 'Pra mais de 3 profissionais',
     maxProfissionais: null,
-    recursos: { historico: true, relatoriosAvancados: true, despesasFixas: true },
+    recursos: { relatoriosAvancados: true, despesasFixas: true },
     suporte: 'Suporte prioritário',
     itens: [
       'Profissionais sem limite',
@@ -91,7 +89,7 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
 
 export const LISTA_PLANOS: Plano[] = [PLANOS.cadeira, PLANOS.barbearia, PLANOS.rede]
 
-const TUDO: Recursos = { historico: true, relatoriosAvancados: true, despesasFixas: true }
+const TUDO: Recursos = { relatoriosAvancados: true, despesasFixas: true }
 
 export interface SituacaoPlano {
   plano: PlanoId
