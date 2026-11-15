@@ -4,14 +4,12 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { exigirSenha } from '@/lib/reautenticar'
 import { normalizarWhatsapp } from '@/lib/utils'
-import { semColuna, AVISO_ATUALIZACAO } from '@/lib/extras'
 
-/* O cliente atualiza os próprios dados: nome, e-mail de contato e telefone.
+/* O cliente atualiza os próprios dados: nome e telefone.
    O telefone é o login, então trocar pede a senha e o número não pode
    estar em uso. Só muda o que veio diferente. */
 const Schema = z.object({
   nome: z.string().trim().min(2).max(100).optional(),
-  email: z.union([z.string().trim().toLowerCase().email().max(120), z.literal(''), z.null()]).optional(),
   whatsapp: z.string().trim().max(30).optional(),
   senha: z.string().max(200).optional(),
 })
@@ -20,10 +18,7 @@ export async function PATCH(req: NextRequest) {
   const s = await getSessao()
   if (!s || s.papel !== 'cliente') return NextResponse.json({ erro: 'Entre na sua conta' }, { status: 401 })
   const parse = Schema.safeParse(await req.json().catch(() => null))
-  if (!parse.success) {
-    const campo = parse.error.issues[0]?.path[0]
-    return NextResponse.json({ erro: campo === 'email' ? 'Confere o e-mail: parece incompleto' : 'Confere o nome (mínimo 2 letras)' }, { status: 400 })
-  }
+  if (!parse.success) return NextResponse.json({ erro: 'Confere o nome (mínimo 2 letras)' }, { status: 400 })
   const d = parse.data
   const db = criarClienteServico()
   const { data: atual } = await db.from('usuarios').select('nome, whatsapp').eq('id', s.usuario_id).eq('barbearia_id', s.barbearia_id).maybeSingle()
@@ -51,12 +46,5 @@ export async function PATCH(req: NextRequest) {
     if (error) return NextResponse.json({ erro: 'Não deu pra salvar' }, { status: 500 })
   }
 
-  // E-mail fica em coluna nova: se o banco ainda não tem, o resto já foi salvo
-  if (d.email !== undefined) {
-    const { error } = await db.from('usuarios').update({ email_contato: d.email || null }).eq('id', s.usuario_id).eq('barbearia_id', s.barbearia_id)
-    if (semColuna(error)) return NextResponse.json({ erro: `Nome e telefone salvos. O e-mail ainda não: ${AVISO_ATUALIZACAO}` }, { status: 409 })
-    if (error) return NextResponse.json({ erro: 'Não deu pra salvar o e-mail' }, { status: 500 })
-  }
-
-  return NextResponse.json({ ok: true, nome: (base.nome as string) ?? atual.nome, whatsapp: (base.whatsapp as string) ?? atual.whatsapp, email: d.email === undefined ? undefined : d.email || null })
+  return NextResponse.json({ ok: true, nome: (base.nome as string) ?? atual.nome, whatsapp: (base.whatsapp as string) ?? atual.whatsapp })
 }

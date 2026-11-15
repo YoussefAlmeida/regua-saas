@@ -2,38 +2,33 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, Check, Download, Trash2 } from 'lucide-react'
+import { Check, Download, Trash2 } from 'lucide-react'
 import NavCliente from '@/components/cliente/nav-cliente'
 import TopoInterno from '@/components/cliente/topo-interno'
 import Avatar from '@/components/cliente/avatar'
-import RecorteFoto from '@/components/cliente/recorte-foto'
 import { formatarTelefone } from '@/lib/telefone'
 
-/* Meus Dados: foto (com recorte), nome, telefone e e-mail. No fim,
+/* Meus Dados: nome e telefone. No fim,
    os direitos da LGPD: baixar os próprios dados e apagar a conta. */
 
-interface Dados { nome: string; whatsapp: string; email: string; foto: string | null }
+interface Dados { nome: string; whatsapp: string }
 const soDigitos = (v: string) => v.replace(/\D/g, '')
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 
-export default function DadosCliente({ slug, inicial, liberado }: { slug: string; inicial: Dados; liberado: boolean }) {
+export default function DadosCliente({ slug, inicial }: { slug: string; inicial: Dados }) {
   const router = useRouter()
   const [salvos, setSalvos] = useState(inicial)
   const [nome, setNome] = useState(inicial.nome)
   const [fone, setFone] = useState(formatarTelefone(inicial.whatsapp))
-  const [email, setEmail] = useState(inicial.email)
   const [senha, setSenha] = useState('')
-  const [erros, setErros] = useState<Partial<Record<'nome' | 'fone' | 'email' | 'senha', string>>>({})
+  const [erros, setErros] = useState<Partial<Record<'nome' | 'fone' | 'senha', string>>>({})
   const [msg, setMsg] = useState<{ t: string; erro?: boolean } | null>(null)
   const [salvando, setSalvando] = useState(false)
-  const [escolhida, setEscolhida] = useState<File | null>(null)
-  const [enviandoFoto, setEnviandoFoto] = useState(false)
   const [apagar, setApagar] = useState(false)
   const [senhaApagar, setSenhaApagar] = useState('')
   const [apagando, setApagando] = useState(false)
 
   const mudouFone = soDigitos(fone) !== salvos.whatsapp
-  const mudou = nome.trim() !== salvos.nome || mudouFone || email.trim().toLowerCase() !== salvos.email
+  const mudou = nome.trim() !== salvos.nome || mudouFone
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault()
@@ -41,7 +36,6 @@ export default function DadosCliente({ slug, inicial, liberado }: { slug: string
     const er: typeof erros = {}
     if (nome.trim().length < 2) er.nome = 'Escreva seu nome completo.'
     if (!/^\d{10,11}$/.test(soDigitos(fone))) er.fone = 'Telefone com DDD: 10 ou 11 números.'
-    if (email.trim() && !EMAIL.test(email.trim())) er.email = 'Esse e-mail parece incompleto.'
     if (mudouFone && !senha) er.senha = 'O telefone é o seu login: confirme com a senha pra trocar.'
     setErros(er)
     if (Object.keys(er).length) return
@@ -51,37 +45,14 @@ export default function DadosCliente({ slug, inicial, liberado }: { slug: string
     const corpo: Record<string, string> = {}
     if (nome.trim() !== salvos.nome) corpo.nome = nome.trim()
     if (mudouFone) { corpo.whatsapp = soDigitos(fone); corpo.senha = senha }
-    if (email.trim().toLowerCase() !== salvos.email) corpo.email = email.trim().toLowerCase()
     const res = await fetch('/api/cliente/perfil', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) }).catch(() => null)
     setSalvando(false)
     if (!res) { setMsg({ t: 'Sem conexão. Confere a internet e tenta de novo.', erro: true }); return }
     const j = await res.json().catch(() => ({}))
     if (!res.ok) { setMsg({ t: j.erro ?? 'Não deu pra salvar', erro: true }); return }
-    setSalvos(s => ({ ...s, nome: j.nome ?? s.nome, whatsapp: j.whatsapp ?? s.whatsapp, email: j.email === undefined ? s.email : j.email ?? '' }))
+    setSalvos(s => ({ nome: j.nome ?? s.nome, whatsapp: j.whatsapp ?? s.whatsapp }))
     setSenha('')
     setMsg({ t: 'Dados salvos.' })
-    router.refresh()
-  }
-
-  async function enviarFoto(foto: File) {
-    setEscolhida(null); setEnviandoFoto(true); setMsg(null)
-    const fd = new FormData(); fd.append('arquivo', foto)
-    const res = await fetch('/api/cliente/perfil/foto', { method: 'POST', body: fd }).catch(() => null)
-    setEnviandoFoto(false)
-    if (!res) { setMsg({ t: 'Sem conexão. A foto não foi enviada.', erro: true }); return }
-    const j = await res.json().catch(() => ({}))
-    if (!res.ok) { setMsg({ t: j.erro ?? 'Não deu pra enviar a foto', erro: true }); return }
-    setSalvos(s => ({ ...s, foto: j.url }))
-    setMsg({ t: 'Foto atualizada.' })
-    router.refresh()
-  }
-
-  async function removerFoto() {
-    setEnviandoFoto(true); setMsg(null)
-    const res = await fetch('/api/cliente/perfil/foto', { method: 'DELETE' }).catch(() => null)
-    setEnviandoFoto(false)
-    if (!res?.ok) { setMsg({ t: 'Não deu pra remover a foto', erro: true }); return }
-    setSalvos(s => ({ ...s, foto: null }))
     router.refresh()
   }
 
@@ -102,16 +73,7 @@ export default function DadosCliente({ slug, inicial, liberado }: { slug: string
       <div className="max-w-lg mx-auto px-4 pt-6 pb-28 space-y-6">
         <TopoInterno voltar={`/${slug}/perfil`} titulo="Meus Dados" subtitulo="Atualize suas informações pessoais" />
 
-        <div className="flex flex-col items-center gap-2">
-          <label className={`relative cursor-pointer ${enviandoFoto || !liberado ? 'pointer-events-none opacity-60' : ''}`}>
-            <Avatar foto={salvos.foto} nome={salvos.nome} className="w-28 h-28 text-[34px]" />
-            <span className="absolute -right-1 -bottom-1 w-9 h-9 rounded-full bg-amber text-accent-fg border-2 border-bg flex items-center justify-center"><Camera size={16} aria-hidden /></span>
-            <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label="Trocar a foto de perfil"
-              onChange={e => { setEscolhida(e.target.files?.[0] ?? null); e.target.value = '' }} />
-          </label>
-          <p className="font-body text-xs text-fg-muted">{enviandoFoto ? 'Enviando a foto…' : !liberado ? 'Foto de perfil ainda não liberada nesta conta.' : 'Toque na foto pra trocar'}</p>
-          {salvos.foto && !enviandoFoto && <button type="button" onClick={removerFoto} className="font-body text-xs text-fg-muted underline underline-offset-2 hover:text-fg">Remover foto</button>}
-        </div>
+        <div className="flex justify-center"><Avatar nome={salvos.nome} className="w-24 h-24 text-[30px]" /></div>
 
         <form onSubmit={salvar} noValidate className="ds-card p-5 space-y-4">
           <div>
@@ -131,11 +93,6 @@ export default function DadosCliente({ slug, inicial, liberado }: { slug: string
               {erroDe('senha')}
             </div>
           )}
-          <div>
-            <label className="ds-label" htmlFor="email">E-mail <span className="text-fg-muted font-normal">(opcional)</span></label>
-            <input id="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} maxLength={120} placeholder="voce@email.com" aria-invalid={!!erros.email} className="ds-input !text-base" />
-            {erroDe('email')}
-          </div>
           {msg && <p className={`font-body text-sm flex items-center gap-1.5 ${msg.erro ? 'text-saida' : 'text-entrada'}`} role="status">{!msg.erro && <Check size={15} aria-hidden />}{msg.t}</p>}
           <button type="submit" disabled={salvando || !mudou} className="ds-btn-primary w-full">{salvando ? 'Salvando…' : 'Salvar alterações'}</button>
         </form>
@@ -161,7 +118,6 @@ export default function DadosCliente({ slug, inicial, liberado }: { slug: string
         </section>
       </div>
 
-      {escolhida && <RecorteFoto arquivo={escolhida} onCancelar={() => setEscolhida(null)} onPronto={enviarFoto} />}
       <NavCliente slug={slug} ativo="perfil" />
     </div>
   )

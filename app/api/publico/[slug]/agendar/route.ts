@@ -1,4 +1,3 @@
-import { clienteQuer } from '@/lib/cliente-extras'
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { criarClienteServico } from '@/lib/supabase/server'
@@ -137,10 +136,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   const usuarioProf = Array.isArray(profissional.usuario) ? profissional.usuario[0] : profissional.usuario
   const profWhatsapp = (usuarioProf as { whatsapp?: string } | null)?.whatsapp
 
-  // A confirmação respeita o que o cliente escolheu em Perfil → Notificações
-  const querConfirmacao = await clienteQuer(cliente.id, 'atualizacoes')
   const [, avisoBarbeiro] = await Promise.allSettled([
-    !querConfirmacao ? Promise.resolve(false) : enviarTexto(cliente.whatsapp, textoConfirmacaoCliente({
+    enviarTexto(cliente.whatsapp, textoConfirmacaoCliente({
       clienteNome: cliente.nome.split(' ')[0],
       barbeariaNome: barbearia.nome,
       servicoNome: servico.nome,

@@ -11,7 +11,7 @@ export default async function PerfilPage({ params }: { params: Promise<{ slug: s
     <div style={tema}>
       <PerfilCliente
         barbearia={{ nome: barbearia.nome, slug: barbearia.slug }}
-        cliente={cliente && { nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email, foto: cliente.foto_url, avisosLigados: Object.values(cliente.avisos).some(Boolean) }}
+        cliente={cliente && { nome: cliente.nome, whatsapp: cliente.whatsapp }}
       />
     </div>
   )

@@ -3,7 +3,6 @@ import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
 import { temaDaBarbearia } from '@/lib/tema'
-import { extrasDoCliente } from '@/lib/cliente-extras'
 
 /* O que toda tela do Perfil do cliente precisa: a barbearia do link e a
    conta de quem está logado nela. Sem login, `cliente` vem null. */
@@ -21,7 +20,7 @@ export async function carregarPerfil(slug: string) {
   const db = criarClienteServico()
   const { data: u } = await db.from('usuarios').select('nome, whatsapp').eq('id', sessao.usuario_id).eq('barbearia_id', b.id).maybeSingle()
   if (!u) return { ...base, cliente: null }
-  return { ...base, cliente: { id: sessao.usuario_id, nome: u.nome as string, whatsapp: (u.whatsapp ?? '') as string, ...(await extrasDoCliente(db, sessao.usuario_id)) } }
+  return { ...base, cliente: { id: sessao.usuario_id, nome: u.nome as string, whatsapp: (u.whatsapp ?? '') as string } }
 }
 
 /** Telas internas: sem login, volta pro Perfil (que mostra a entrada) */
