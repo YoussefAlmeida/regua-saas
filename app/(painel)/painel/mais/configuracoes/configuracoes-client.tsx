@@ -161,7 +161,7 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
             return (
               <div
                 key={key}
-                className={`flex items-center gap-3 px-4 py-3 ${idx < 6 ? 'border-b border-line' : ''}`}
+                className={`flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 ${idx < 6 ? 'border-b border-line' : ''}`}
               >
                 <button
                   type="button"
@@ -195,6 +195,30 @@ export default function ConfiguracoesClient({ barbearia, siteUrl }: { barbearia:
                 ) : (
                   <span className="font-body text-xs text-fg-muted">Fechado</span>
                 )}
+                {h.ativo && (() => {
+                  const temAlmoco = !!(h.intervalo_inicio && h.intervalo_fim)
+                  const campo = 'flex-1 min-w-0 max-w-[7.5rem] [&::-webkit-calendar-picker-indicator]:hidden min-[400px]:[&::-webkit-calendar-picker-indicator]:block bg-surface border border-line rounded-button px-1.5 min-[400px]:px-2 py-1 font-body text-xs text-fg focus:outline-none focus:ring-1 focus:ring-amber'
+                  return (
+                    <div className="basis-full flex items-center gap-3 pl-12">
+                      <label className="flex items-center gap-1.5 font-body text-xs text-fg-muted cursor-pointer shrink-0">
+                        <input type="checkbox" checked={temAlmoco} className="accent-[rgb(var(--accent-rgb))]"
+                          onChange={e => setHorarios(hs => {
+                            const { intervalo_inicio: _i, intervalo_fim: _f, ...resto } = hs[key] ?? { ativo: true }
+                            void _i; void _f
+                            return { ...hs, [key]: e.target.checked ? { ...resto, intervalo_inicio: '12:00', intervalo_fim: '13:00' } : resto }
+                          })} />
+                        Almoço
+                      </label>
+                      {temAlmoco && (
+                        <div className="flex items-center gap-1.5 min-[400px]:gap-2 flex-1 min-w-0">
+                          <input type="time" aria-label={`Início do almoço, ${dia}`} value={h.intervalo_inicio} onChange={e => updateHorario(key, 'intervalo_inicio', e.target.value)} className={campo} />
+                          <span className="text-fg-muted text-xs">–</span>
+                          <input type="time" aria-label={`Fim do almoço, ${dia}`} value={h.intervalo_fim} onChange={e => updateHorario(key, 'intervalo_fim', e.target.value)} className={campo} />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
               </div>
             )
           })}

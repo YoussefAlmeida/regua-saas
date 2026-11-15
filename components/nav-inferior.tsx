@@ -7,7 +7,7 @@ import { CalendarDays, Home, Wallet, MoreHorizontal, BarChart3 } from 'lucide-re
 const ITENS = [
   { href: '/painel/hoje', label: 'Hoje', icon: Home },
   { href: '/painel/agenda', label: 'Agenda', icon: CalendarDays },
-  { href: '/painel/financeiro', label: 'Caixa', icon: Wallet },
+  { href: '/painel/financeiro', label: 'Financeiro', icon: Wallet },
   { href: '/painel/mais', label: 'Mais', icon: MoreHorizontal },
 ]
 

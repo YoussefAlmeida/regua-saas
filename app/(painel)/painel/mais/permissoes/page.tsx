@@ -23,7 +23,7 @@ export default async function PermissoesPage() {
       </div>
       <PermissoesClient iniciais={await permissoesDaEquipe(sessao.barbearia_id)} />
       <p className="font-body text-xs text-fg-muted">
-        Você, como dono, sempre pode tudo. O barbeiro nunca vê o financeiro da barbearia, a equipe, os relatórios nem as configurações, e só mexe na agenda dele: isso não muda por aqui.
+        Marcar e remarcar horário não é do barbeiro: o cliente marca pelo link e você marca pelo painel. Você, como dono, sempre pode tudo. O barbeiro nunca vê o financeiro da barbearia, a equipe, os relatórios nem as configurações, e só mexe na agenda dele: isso não muda por aqui.
       </p>
     </div>
   )

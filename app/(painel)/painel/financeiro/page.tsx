@@ -6,9 +6,10 @@ import { CAMPOS_MOV } from '@/lib/financeiro'
 import { planoDaBarbearia } from '@/lib/plano-servidor'
 import FinanceiroClient, { type Movimentacao } from './financeiro-client'
 import { todasAsLinhas } from '@/lib/paginar'
+import RelatorioMes from '@/components/relatorio-mes'
 
 
-export default async function FinanceiroPage() {
+export default async function FinanceiroPage({ searchParams }: { searchParams: Promise<{ aba?: string }> }) {
   const sessao = await getSessao()
   if (!sessao) redirect('/entrar')
   if (sessao.papel !== 'dono') redirect('/painel/hoje')
@@ -43,6 +44,8 @@ export default async function FinanceiroPage() {
       profissionais={profissionais ?? []}
       mesInicial={mesAtual}
       podeDespesasFixas={plano.recursos.despesasFixas}
+      abaInicial={(await searchParams).aba === 'relatorio' ? 'relatorio' : 'resumo'}
+      relatorio={<RelatorioMes barbearia_id={sessao.barbearia_id} avancado={plano.recursos.relatoriosAvancados} />}
     />
   )
 }

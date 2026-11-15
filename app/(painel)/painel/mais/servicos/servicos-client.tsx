@@ -3,7 +3,7 @@
 import { confirmar } from '@/components/confirmar'
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Pencil, Trash2, Clock, Check, X, ImagePlus } from 'lucide-react'
+import { Plus, Trash2, Clock, Check, X, ImagePlus, ChevronRight } from 'lucide-react'
 import { avisar, erroDaResposta } from '@/components/aviso'
 import { formatBRL } from '@/lib/utils'
 
@@ -20,7 +20,6 @@ interface Servico {
 
 interface FormData { nome: string; preco: string; duracao_min: string; cor: string; descricao: string }
 
-const CORES = ['#F5D900', '#3DDC84', '#C97B84', '#4DA3FF', '#B5B26A', '#9B9B9B']
 const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#F5D900', descricao: '' }
 
 export default function ServicosClient({
@@ -37,6 +36,13 @@ export default function ServicosClient({
   const [salvando, setSalvando] = useState(false)
 
   const [enviandoFoto, setEnviandoFoto] = useState<string | null>(null)
+  // Foto escolhida no formulário de um serviço novo: sobe depois de criar
+  const [fotoNova, setFotoNova] = useState<{ arquivo: File; previa: string } | null>(null)
+  function escolherFoto(arquivo: File | undefined) {
+    if (!arquivo) return
+    if (editando) { enviarFoto(editando, arquivo); return }
+    setFotoNova(f => { if (f) URL.revokeObjectURL(f.previa); return { arquivo, previa: URL.createObjectURL(arquivo) } })
+  }
   async function enviarFoto(s: Servico, arquivo: File | undefined) {
     if (!arquivo) return
     setEnviandoFoto(s.id)
@@ -47,6 +53,7 @@ export default function ServicosClient({
     if (!res.ok) { avisar(await erroDaResposta(res), 'erro'); return }
     const { url } = await res.json()
     setServicos(prev => prev.map(x => x.id === s.id ? { ...x, foto_url: url } : x))
+    setEditando(e => e && e.id === s.id ? { ...e, foto_url: url } : e)
     avisar('Foto do serviço atualizada.', 'sucesso')
   }
 
@@ -64,7 +71,7 @@ export default function ServicosClient({
     setModal('editar')
   }
 
-  function fechar() { setModal(null); setErro('') }
+  function fechar() { setModal(null); setErro(''); setFotoNova(f => { if (f) URL.revokeObjectURL(f.previa); return null }) }
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault()
@@ -104,6 +111,7 @@ export default function ServicosClient({
       setServicos(s => s.map(x => x.id === editando.id ? json : x))
     } else {
       setServicos(s => [...s, json].sort((a, b) => a.nome.localeCompare(b.nome)))
+      if (fotoNova) await enviarFoto(json, fotoNova.arquivo)
     }
     fechar()
   }
@@ -117,7 +125,8 @@ export default function ServicosClient({
     if (res.ok) {
       const json = await res.json()
       setServicos(prev => prev.map(x => x.id === s.id ? json : x))
-    }
+      setEditando(e => e && e.id === s.id ? json : e)
+    } else avisar(await erroDaResposta(res), 'erro')
   }
 
   async function deletar(s: Servico) {
@@ -129,9 +138,11 @@ export default function ServicosClient({
       // Tem atendimento no histórico: foi desativado, não apagado
       setServicos(prev => prev.map(x => x.id === s.id ? json.servico : x))
       avisar(`"${s.nome}" já foi usado em atendimentos, então foi desativado em vez de apagado.`, 'info')
+      fechar()
       return
     }
     setServicos(prev => prev.filter(x => x.id !== s.id))
+    fechar()
   }
 
   const inputCls = 'ds-input'
@@ -161,55 +172,28 @@ export default function ServicosClient({
       ) : (
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-2 md:gap-3">
           {servicos.map(s => (
-            <div
+            <button
               key={s.id}
-              className={`bg-surface rounded-card border px-4 py-4 flex flex-wrap min-[400px]:flex-nowrap items-center gap-x-3 gap-y-1 transition-opacity ${
-                s.ativo ? 'border-line' : 'border-line opacity-50'
-              }`}
+              type="button"
+              onClick={() => abrirEditar(s)}
+              className={`ds-card w-full text-left px-4 py-3.5 flex items-center gap-3 hover:border-amber/40 transition-colors ${s.ativo ? '' : 'opacity-50'}`}
             >
-              <label className="relative w-14 h-14 rounded-button overflow-hidden bg-surface-alt border border-line flex items-center justify-center cursor-pointer shrink-0 hover:border-amber/60 transition-colors" title={s.foto_url ? 'Trocar a foto' : 'Colocar uma foto'}>
+              <span className="relative w-14 h-14 rounded-button overflow-hidden bg-surface-alt border border-line flex items-center justify-center shrink-0">
                 {s.foto_url
-                  ? <Image src={s.foto_url} alt="" fill sizes="56px" className={`object-cover ${enviandoFoto === s.id ? 'opacity-40' : ''}`} />
-                  : <ImagePlus size={17} className={`text-fg-muted ${enviandoFoto === s.id ? 'animate-pulse' : ''}`} aria-hidden />}
-                <span className="absolute left-1 top-1 w-2.5 h-2.5 rounded-full border border-bg" style={{ backgroundColor: s.cor }} aria-hidden />
-                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" aria-label={`Foto de ${s.nome}`}
-                  onChange={e => { enviarFoto(s, e.target.files?.[0]); e.target.value = '' }} />
-              </label>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold font-ui text-sm text-fg truncate">{s.nome}</p>
-                {s.descricao && <p className="font-body text-xs text-fg-muted truncate">{s.descricao}</p>}
-                <div className="flex items-center gap-3 mt-0.5">
+                  ? <Image src={s.foto_url} alt="" fill sizes="56px" className="object-cover" />
+                  : <Scissors size={17} className="text-fg-muted" aria-hidden />}
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block font-semibold font-ui text-sm text-fg truncate">{s.nome}</span>
+                {s.descricao && <span className="block font-body text-xs text-fg-muted truncate">{s.descricao}</span>}
+                <span className="flex items-center gap-3 mt-0.5">
                   <span className="font-mono text-sm text-amber">{formatBRL(s.preco)}</span>
-                  <span className="flex items-center gap-1 font-body text-xs text-fg-muted whitespace-nowrap">
-                    <Clock size={11} />
-                    {s.duracao_min} min
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center justify-end gap-2 shrink-0 basis-full min-[400px]:basis-auto">
-                <button
-                  onClick={() => toggleAtivo(s)}
-                  title={s.ativo ? 'Desativar' : 'Ativar'}
-                  className={`w-8 h-8 rounded-button flex items-center justify-center transition-colors ${
-                    s.ativo ? 'text-entrada hover:bg-entrada/10' : 'text-fg-muted hover:bg-surface-alt'
-                  }`}
-                >
-                  {s.ativo ? <Check size={14} /> : <X size={14} />}
-                </button>
-                <button
-                  onClick={() => abrirEditar(s)}
-                  className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-fg hover:bg-surface-alt transition-colors"
-                >
-                  <Pencil size={14} />
-                </button>
-                <button
-                  onClick={() => deletar(s)}
-                  className="w-8 h-8 rounded-button flex items-center justify-center text-fg-muted hover:text-saida hover:bg-saida/10 transition-colors"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
+                  <span className="flex items-center gap-1 font-body text-xs text-fg-muted whitespace-nowrap"><Clock size={11} aria-hidden /> {s.duracao_min} min</span>
+                  {!s.ativo && <span className="ds-tag bg-surface-alt text-fg-muted">Desativado</span>}
+                </span>
+              </span>
+              <ChevronRight size={16} className="text-fg-muted shrink-0" aria-hidden />
+            </button>
           ))}
         </div>
       )}
@@ -218,12 +202,26 @@ export default function ServicosClient({
       {modal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div className="absolute inset-0 bg-black/60" onClick={fechar} />
-          <div className="relative w-full sm:max-w-md bg-surface rounded-t-card sm:rounded-card border border-line p-6 z-10">
+          <div className="relative w-full sm:max-w-md max-h-[92dvh] overflow-y-auto bg-surface rounded-t-card sm:rounded-card border border-line p-6 z-10">
             <h2 className="font-semibold font-ui text-lg text-fg mb-5">
               {modal === 'novo' ? 'Novo serviço' : 'Editar serviço'}
             </h2>
 
             <form onSubmit={salvar} className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <span className="relative w-20 h-20 rounded-button overflow-hidden bg-surface-alt border border-line flex items-center justify-center shrink-0">
+                  {(editando?.foto_url || fotoNova)
+                    // eslint-disable-next-line @next/next/no-img-element
+                    ? <img src={fotoNova?.previa ?? editando!.foto_url!} alt="" className={`w-full h-full object-cover ${enviandoFoto ? 'opacity-40' : ''}`} />
+                    : <ImagePlus size={20} className="text-fg-muted" aria-hidden />}
+                </span>
+                <span>
+                  <span className="block font-ui text-sm font-semibold text-amber">{enviandoFoto ? 'Enviando…' : (editando?.foto_url || fotoNova) ? 'Trocar a foto' : 'Colocar uma foto'}</span>
+                  <span className="block font-body text-xs text-fg-muted">Aparece na página de agendamento</span>
+                </span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={e => { escolherFoto(e.target.files?.[0]); e.target.value = '' }} />
+              </label>
+
               <div>
                 <label className={labelCls}>Nome</label>
                 <input
@@ -246,7 +244,6 @@ export default function ServicosClient({
                   maxLength={140}
                   className={inputCls}
                 />
-                <p className="font-body text-xs text-fg-muted mt-1">Aparece na página de agendamento, ao lado da foto. A foto você coloca tocando no quadrado do serviço, na lista.</p>
               </div>
 
               <div className="flex gap-3">
@@ -278,23 +275,6 @@ export default function ServicosClient({
                 </div>
               </div>
 
-              <div>
-                <label className={labelCls}>Cor na agenda</label>
-                <div className="flex gap-2 flex-wrap mt-1">
-                  {CORES.map(c => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, cor: c }))}
-                      className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                        form.cor === c ? 'border-fg scale-110' : 'border-transparent'
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
-              </div>
-
               {erro && <p className="font-body text-sm text-saida">{erro}</p>}
 
               <div className="flex gap-3 pt-2">
@@ -313,6 +293,17 @@ export default function ServicosClient({
                   {salvando ? 'Salvando…' : 'Salvar'}
                 </button>
               </div>
+
+              {editando && (
+                <div className="flex gap-3 pt-3 border-t border-line">
+                  <button type="button" onClick={() => toggleAtivo(editando)} className="ds-btn-ghost flex-1 !min-h-[40px] text-xs">
+                    {editando.ativo ? <><X size={14} aria-hidden /> Desativar</> : <><Check size={14} aria-hidden /> Reativar</>}
+                  </button>
+                  <button type="button" onClick={() => deletar(editando)} className="ds-btn-ghost flex-1 !min-h-[40px] text-xs !text-saida">
+                    <Trash2 size={14} aria-hidden /> Excluir serviço
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>

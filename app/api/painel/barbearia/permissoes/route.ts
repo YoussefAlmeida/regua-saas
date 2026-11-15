@@ -7,7 +7,7 @@ import { CHAVES, type Permissao } from '@/lib/permissoes-equipe'
 import { semColuna, AVISO_ATUALIZACAO } from '@/lib/extras'
 
 /* O dono define o que a equipe pode fazer */
-const Schema = z.object(Object.fromEntries(CHAVES.map(k => [k, z.boolean()])) as Record<Permissao, z.ZodBoolean>)
+const Schema = z.object(Object.fromEntries(CHAVES.map(k => [k, z.boolean()])) as Record<Permissao, z.ZodBoolean>).partial()
 
 export async function PUT(req: NextRequest) {
   const sessao = await getSessao()

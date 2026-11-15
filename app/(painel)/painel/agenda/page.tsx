@@ -55,11 +55,12 @@ export default async function AgendaPage() {
 
   return (
     <AgendaClient
-      // Barbeiro vê e marca só na própria agenda (seção 6.1.1)
+      // Barbeiro vê só a própria agenda; marcar e remarcar é do dono e do cliente
       profissionaisIniciais={visiveis.filter(p => papel !== 'barbeiro' || p.id === meuProfissionalId)}
       servicosIniciais={servicos ?? []}
       agendamentosIniciais={(agendamentosHoje as unknown) as Agendamento[] ?? []}
       dataInicial={hoje}
+      podeMarcar={papel === 'dono'}
     />
   )
 }

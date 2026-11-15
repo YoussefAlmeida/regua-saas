@@ -201,13 +201,16 @@ export default function HorariosClient({
                   ? <Link href="/painel/mais/configuracoes" className="font-body text-xs font-semibold text-amber hover:underline">Alterar</Link>
                   : <span className="flex items-center gap-1 font-body text-xs text-fg-muted"><Lock size={11} /> Definido pelo dono</span>}
               </div>
-              <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-0.5">
+              <ul className="mt-2 divide-y divide-line/60">
                 {DIAS.map((nome, i) => {
                   const h = abre(i)
                   return (
-                    <li key={nome} className="flex justify-between font-body text-xs">
-                      <span className="text-fg-muted">{nome.slice(0, 3)}</span>
-                      <span className={`font-mono ${h ? 'text-fg' : 'text-fg-muted'}`}>{h ? `${h.inicio}–${h.fim}` : 'Fechada'}</span>
+                    <li key={nome} className="flex items-baseline justify-between gap-3 py-1.5 font-body text-sm">
+                      <span className="text-fg-muted">{nome}</span>
+                      <span className="text-right">
+                        <span className={`font-mono ${h ? 'text-fg' : 'text-fg-muted'}`}>{h ? `${h.inicio}–${h.fim}` : 'Fechada'}</span>
+                        {h?.intervalo_inicio && h.intervalo_fim && <span className="block font-body text-xs text-fg-muted">almoço {h.intervalo_inicio}–{h.intervalo_fim}</span>}
+                      </span>
                     </li>
                   )
                 })}
