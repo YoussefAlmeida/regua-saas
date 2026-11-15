@@ -11,7 +11,6 @@ export const planoDaBarbearia = cache(async (barbearia_id: string): Promise<Situ
 })
 
 const NOME_RECURSO: Record<keyof Recursos, string> = {
-  historico: 'O Histórico',
   relatoriosAvancados: 'Os relatórios avançados',
   despesasFixas: 'As despesas fixas automáticas',
 }

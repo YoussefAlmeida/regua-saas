@@ -12,19 +12,6 @@ export async function extrasDosServicos(db: SupabaseClient, barbearia_id: string
   return new Map(((data ?? []) as unknown as ({ id: string } & ExtraServico)[]).map(s => [s.id, { foto_url: s.foto_url, descricao: s.descricao }]))
 }
 
-export interface ExtraProfissional { comissao_pct: number | null; meta_mensal: number | null }
-export async function extrasDosProfissionais(db: SupabaseClient, barbearia_id: string): Promise<{ mapa: Map<string, ExtraProfissional>; liberado: boolean }> {
-  const { data, error } = await db.from('profissionais').select('id, comissao_pct, meta_mensal').eq('barbearia_id', barbearia_id)
-  const linhas = (data ?? []) as unknown as { id: string; comissao_pct: number | string | null; meta_mensal: number | string | null }[]
-  return {
-    liberado: !error,
-    mapa: new Map(linhas.map(p => [p.id, {
-      comissao_pct: p.comissao_pct === null ? null : Number(p.comissao_pct),
-      meta_mensal: p.meta_mensal === null ? null : Number(p.meta_mensal),
-    }])),
-  }
-}
-
 /** 42703 = a coluna ainda não existe no banco */
 export const semColuna = (e: { code?: string } | null | undefined) => e?.code === '42703'
 export const AVISO_ATUALIZACAO = 'Esse recurso ainda não foi liberado nesta conta. Fala com o suporte do RÉGUA.'

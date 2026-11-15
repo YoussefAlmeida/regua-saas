@@ -8,7 +8,6 @@ import { pessoasDaEquipe } from '@/lib/plano-servidor'
 import MudarPlano from './mudar-plano'
 
 const NOMES: Record<keyof Recursos, string> = {
-  historico: 'Histórico (quem lançou, apagou ou mudou valor)',
   relatoriosAvancados: 'Relatórios por barbeiro e de clientes',
   despesasFixas: 'Despesas fixas lançadas sozinhas todo mês',
 }
