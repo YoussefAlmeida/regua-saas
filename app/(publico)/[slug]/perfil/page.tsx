@@ -1,29 +1,18 @@
 import type { Metadata } from 'next'
-import { notFound, redirect } from 'next/navigation'
-import { getSessao } from '@/lib/auth'
-import { criarClienteServico } from '@/lib/supabase/server'
-import { carregarBarbeariaPublica } from '@/lib/barbearia-publica'
-import { temaDaBarbearia } from '@/lib/tema'
+import { carregarPerfil } from '@/lib/perfil-cliente'
 import PerfilCliente from './perfil-cliente'
 
-export const metadata: Metadata = { title: 'Perfil', robots: { index: false } }
+export const metadata: Metadata = { title: 'Meu perfil', robots: { index: false } }
 
 export default async function PerfilPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const dados = await carregarBarbeariaPublica(slug)
-  if (!dados) notFound()
-
-  // Sem conta nesta barbearia: entra por "Meus horários"
-  const sessao = await getSessao()
-  if (sessao?.papel !== 'cliente' || sessao.barbearia_id !== dados.barbearia.id) redirect(`/${slug}/meus-agendamentos`)
-
-  const { data: u } = await criarClienteServico().from('usuarios')
-    .select('nome, whatsapp').eq('id', sessao.usuario_id).eq('barbearia_id', dados.barbearia.id).maybeSingle()
-  if (!u) redirect(`/${slug}/meus-agendamentos`)
-
+  const { barbearia, tema, cliente } = await carregarPerfil(slug)
   return (
-    <div style={temaDaBarbearia(dados.barbearia).vars as React.CSSProperties}>
-      <PerfilCliente barbearia={{ nome: dados.barbearia.nome, slug: dados.barbearia.slug }} nomeInicial={u.nome} whatsapp={u.whatsapp ?? ''} />
+    <div style={tema}>
+      <PerfilCliente
+        barbearia={{ nome: barbearia.nome, slug: barbearia.slug }}
+        cliente={cliente && { nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email, foto: cliente.foto_url, avisosLigados: Object.values(cliente.avisos).some(Boolean) }}
+      />
     </div>
   )
 }

@@ -39,7 +39,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
     setResposta(json)
   }
 
-  const voltar = slug ? `/${slug}/meus-agendamentos` : '/entrar'
+  const voltar = slug ? `/${slug}/perfil` : '/entrar'
   const inputCls = 'ds-input'
 
   return (

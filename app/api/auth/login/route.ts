@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
           const b = Array.isArray(c.barbearia) ? c.barbearia[0] : c.barbearia
           return NextResponse.json({
             erro: 'Essa é uma conta de cliente. Cliente entra pelo link da barbearia, em "Meus horários".',
-            linkCliente: b ? `/${b.slug}/meus-agendamentos` : null,
+            linkCliente: b ? `/${b.slug}/perfil` : null,
           }, { status: 403 })
         }
       }
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
   let destino = '/painel/hoje'
   if (usuario.papel === 'cliente') {
     const b = Array.isArray(usuario.barbearia) ? usuario.barbearia[0] : usuario.barbearia
-    destino = b ? `/${b.slug}/meus-agendamentos` : '/'
+    destino = b ? `/${b.slug}/perfil/agendamentos` : '/'
   }
 
   const res = NextResponse.json({ ok: true, papel: usuario.papel, destino }, { status: 200 })
