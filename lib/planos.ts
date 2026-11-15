@@ -67,7 +67,6 @@ export const PLANOS: Record<PlanoPagoId, Plano> = {
       'Até 3 profissionais na agenda',
       'Tudo do Cadeira',
       'Despesas fixas automáticas',
-      'Histórico: quem lançou, apagou ou mudou valor',
       'Relatórios por barbeiro e de clientes',
       'Suporte pelo WhatsApp',
     ],

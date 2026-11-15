@@ -70,12 +70,9 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
       <div className="grid lg:grid-cols-3 gap-3">
         {/* Faturamento */}
         <section className={`${card} p-4 lg:col-span-2`}>
-          <div className="flex items-start justify-between gap-3 mb-3">
-            <div>
-              <h2 className="font-ui text-sm font-semibold text-fg">Faturamento</h2>
-              <p className={rotulo}>Entradas no caixa por dia</p>
-            </div>
-            <p className="font-mono text-lg md:text-xl font-semibold text-fg whitespace-nowrap">{brl(d.faturamento.total)}</p>
+          <div className="mb-3">
+            <h2 className="font-ui text-sm font-semibold text-fg">Entradas por dia</h2>
+            <p className={rotulo}>Como o faturamento se distribuiu no período</p>
           </div>
           {semMovimento ? (
             <div className="empty-state h-[200px] !py-0">

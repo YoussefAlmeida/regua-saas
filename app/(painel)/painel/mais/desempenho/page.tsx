@@ -35,7 +35,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   const db = criarClienteServico()
   const pedido = (await searchParams).p
   const profissional_id = sessao.papel === 'barbeiro' ? sessao.profissional_id : pedido
-  if (!profissional_id) redirect('/painel/mais/relatorios')
+  if (!profissional_id) redirect('/painel/financeiro?aba=relatorio')
 
   const { data: prof } = await db
     .from('profissionais')
@@ -119,7 +119,7 @@ export default async function DesempenhoPage({ searchParams }: { searchParams: P
   return (
     <div className="px-4 md:px-8 py-6 max-w-lg md:max-w-4xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link href={sessao.papel === 'dono' ? '/painel/mais/relatorios' : '/painel/mais'} className="text-fg-muted hover:text-fg" aria-label="Voltar">
+        <Link href={sessao.papel === 'dono' ? '/painel/financeiro?aba=relatorio' : '/painel/mais'} className="text-fg-muted hover:text-fg" aria-label="Voltar">
           <ChevronLeft size={20} />
         </Link>
         <div>

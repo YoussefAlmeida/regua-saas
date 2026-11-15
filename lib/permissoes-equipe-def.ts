@@ -10,5 +10,8 @@ export const PERMISSOES = {
 
 export type Permissao = keyof typeof PERMISSOES
 export type PermissoesEquipe = Record<Permissao, boolean>
-export const CHAVES = Object.keys(PERMISSOES) as Permissao[]
+/** Nunca liberadas pro barbeiro: quem marca é o cliente (pelo link) ou o dono */
+export const SO_DONO: Permissao[] = ['marcar', 'remarcar']
+/** As que o dono liga e desliga em Permissões */
+export const CHAVES = (Object.keys(PERMISSOES) as Permissao[]).filter(k => !SO_DONO.includes(k))
 

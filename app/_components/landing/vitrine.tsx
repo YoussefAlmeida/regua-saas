@@ -1,4 +1,4 @@
-import { CalendarCheck, CircleDollarSign, Users2, Check, Clock, LayoutDashboard, CalendarDays, Wallet, BarChart3 } from 'lucide-react'
+import { CalendarCheck, CircleDollarSign, Users2, Check, Clock, LayoutDashboard, CalendarDays, Wallet, Scissors } from 'lucide-react'
 
 /* Vitrine da página de vendas: o painel e o link de agendamento como eles são,
    desenhados em HTML (sem imagem pra carregar). Dados de exemplo. */
@@ -26,7 +26,7 @@ function Grafico() {
 
 /** Painel do dono, numa moldura de navegador */
 export function PainelVitrine() {
-  const menu = [[LayoutDashboard, 'Dashboard', true], [CalendarDays, 'Agenda', false], [Users2, 'Clientes', false], [Wallet, 'Financeiro', false], [BarChart3, 'Relatórios', false]] as const
+  const menu = [[LayoutDashboard, 'Dashboard', true], [CalendarDays, 'Agenda', false], [Users2, 'Clientes', false], [Wallet, 'Financeiro', false], [Scissors, 'Serviços', false]] as const
   return (
     <div className="rounded-2xl border border-line bg-surface shadow-[0_40px_120px_-30px_rgb(0_0_0/0.9)] overflow-hidden" aria-hidden>
       <div className="flex items-center gap-1.5 px-4 h-9 border-b border-line bg-surface-alt/60">

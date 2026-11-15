@@ -30,7 +30,7 @@ interface DespesaFixa { id: string; descricao: string; valor: number; dia_vencim
 interface Categoria { id: string; nome: string; tipo: 'entrada' | 'saida'; cor: string; padrao: boolean }
 interface Profissional { id: string; nome: string }
 
-type Tab = 'resumo' | 'extrato' | 'fixas'
+type Tab = 'resumo' | 'extrato' | 'fixas' | 'relatorio'
 type FiltroTipo = 'tudo' | 'entrada' | 'saida'
 
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -62,7 +62,12 @@ export default function FinanceiroClient({
   profissionais,
   mesInicial,
   podeDespesasFixas = true,
+  abaInicial = 'resumo',
+  relatorio = null,
 }: {
+  abaInicial?: 'resumo' | 'relatorio'
+  /** Relatório do mês, já pronto do servidor */
+  relatorio?: React.ReactNode
   podeDespesasFixas?: boolean
   movimentacoesIniciais: Movimentacao[]
   anteriorInicial: { tipo: string; valor: number }[]
@@ -71,7 +76,7 @@ export default function FinanceiroClient({
   profissionais: Profissional[]
   mesInicial: string
 }) {
-  const [tab, setTab] = useState<Tab>('resumo')
+  const [tab, setTab] = useState<Tab>(abaInicial)
   const [mes, setMes] = useState(mesInicial)
   const [movs, setMovs] = useState<Movimentacao[]>(movimentacoesIniciais)
   const [anterior, setAnterior] = useState(anteriorInicial)
@@ -319,21 +324,21 @@ export default function FinanceiroClient({
     <div className="flex flex-col max-w-lg md:max-w-5xl mx-auto pb-24">
       {/* Abas */}
       <div className="flex border-b border-line bg-surface sticky top-[57px] z-10 md:rounded-b-card md:border-x" role="tablist">
-        {(['resumo', 'extrato', 'fixas'] as Tab[]).map(t => (
+        {(['resumo', 'extrato', 'fixas', 'relatorio'] as Tab[]).map(t => (
           <button
             key={t}
             role="tab"
             aria-selected={tab === t}
             onClick={() => setTab(t)}
-            className={`flex-1 py-3 font-ui text-xs uppercase tracking-wider border-b-2 transition-colors ${tab === t ? 'border-amber text-fg' : 'border-transparent text-fg-muted hover:text-fg'}`}
+            className={`flex-1 py-3 font-ui text-[11px] min-[400px]:text-xs uppercase tracking-wide min-[400px]:tracking-wider border-b-2 transition-colors ${tab === t ? 'border-amber text-fg' : 'border-transparent text-fg-muted hover:text-fg'}`}
           >
-            {t === 'resumo' ? 'Resumo' : t === 'extrato' ? 'Extrato' : 'Fixas'}
+            {t === 'resumo' ? 'Resumo' : t === 'extrato' ? 'Extrato' : t === 'fixas' ? 'Fixas' : 'Relatório'}
           </button>
         ))}
       </div>
 
       <div className="px-4 md:px-0 py-4">
-        {tab !== 'fixas' && (
+        {tab !== 'fixas' && tab !== 'relatorio' && (
           <div className="flex items-center justify-between md:justify-start md:gap-2 mb-4">
             <button onClick={() => mudarMes(mesVizinho(mes, -1))} className="p-2 text-fg-muted hover:text-fg" aria-label="Mês anterior"><ChevronLeft size={18} /></button>
             <p className="font-semibold font-ui text-sm text-fg">{mesLabel(mes)}</p>
@@ -341,7 +346,7 @@ export default function FinanceiroClient({
           </div>
         )}
 
-        {carregando && tab !== 'fixas' ? (
+        {tab === 'relatorio' ? relatorio : carregando && tab !== 'fixas' ? (
           <div className="space-y-3" aria-busy>
             {[0, 1, 2].map(i => <div key={i} className="h-20 rounded-card bg-surface border border-line animate-pulse" />)}
           </div>
@@ -548,7 +553,7 @@ export default function FinanceiroClient({
       </div>
 
       {/* Botões de lançar — sempre à mão */}
-      {tab !== 'fixas' && (
+      {tab !== 'fixas' && tab !== 'relatorio' && (
         <div className="fixed bottom-20 md:bottom-6 inset-x-0 md:left-60 z-20 pointer-events-none">
           <div className="max-w-lg md:max-w-5xl mx-auto px-4 md:px-0 flex gap-2 justify-end">
             <button onClick={() => abrirNovo('entrada')} className="font-semibold pointer-events-auto flex items-center gap-1.5 bg-surface-alt border border-entrada/40 text-entrada font-ui text-sm px-4 py-3 rounded-full shadow-lg shadow-black/40">

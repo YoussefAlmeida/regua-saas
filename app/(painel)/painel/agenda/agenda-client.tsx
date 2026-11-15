@@ -73,7 +73,10 @@ export default function AgendaClient({
   servicosIniciais,
   agendamentosIniciais,
   dataInicial,
+  podeMarcar = true,
 }: {
+  /** Só o dono marca e remarca; o barbeiro acompanha, conclui e cancela */
+  podeMarcar?: boolean
   profissionaisIniciais: Profissional[]
   servicosIniciais: Servico[]
   agendamentosIniciais: Agendamento[]
@@ -367,13 +370,13 @@ export default function AgendaClient({
               </button>
             ))}
           </div>
-          <button
+          {podeMarcar && <button
             onClick={() => abrirNovo()}
             className="font-semibold flex items-center gap-1.5 bg-amber hover:bg-accent-press text-accent-fg font-ui text-xs px-3 py-2 rounded-button transition-colors"
           >
             <Plus size={13} />
             Novo
-          </button>
+          </button>}
         </div>
       </div>
 
@@ -417,7 +420,7 @@ export default function AgendaClient({
               ? (data === hoje ? { coluna: '*', min: agoraMin } : null)
               : semana.includes(hoje) ? { coluna: hoje, min: agoraMin } : null}
             onEvento={id => { const a = agendamentos.find(x => x.id === id); if (a) setSelecionado(a) }}
-            onVazio={(coluna, min) => visao === 'dia'
+            onVazio={(coluna, min) => !podeMarcar ? undefined : visao === 'dia'
               ? (profissionais.find(p => p.id === coluna)?.ativo ? abrirNovo(coluna, data, min) : avisar('Esse barbeiro está fora da agenda e não recebe horário novo.', 'info'))
               : (profAtual?.ativo ? abrirNovo(profAtual.id, coluna, min) : avisar('Esse barbeiro está fora da agenda e não recebe horário novo.', 'info'))}
           />
@@ -465,13 +468,15 @@ export default function AgendaClient({
             <p className="font-semibold font-ui text-sm text-fg-muted mb-2">Dia livre</p>
             {profAtual?.ativo === false ? (
               <p className="font-body text-sm text-fg-muted">Fora da agenda: só os horários que já estavam marcados.</p>
-            ) : (
+            ) : podeMarcar ? (
               <button
                 onClick={() => abrirNovo(profAtual?.id)}
                 className="text-amber font-body text-sm hover:underline"
               >
                 Adicionar agendamento
               </button>
+            ) : (
+              <p className="font-body text-sm text-fg-muted">Os clientes marcam pelo link da barbearia.</p>
             )}
           </div>
         ) : (
@@ -625,7 +630,7 @@ export default function AgendaClient({
                     Faltou
                   </button>
                 </div>
-                <button
+                {podeMarcar && <button
                   onClick={() => setRemarcar({
                     dia: dataLocal(selecionado.inicio),
                     hora: hhmm(minutosLocais(selecionado.inicio)),
@@ -635,7 +640,7 @@ export default function AgendaClient({
                   className="font-semibold w-full flex items-center justify-center gap-2 border border-line text-fg hover:border-amber/50 font-ui text-sm py-2.5 rounded-button transition-colors"
                 >
                   <CalendarClock size={15} /> Remarcar
-                </button>
+                </button>}
                 <button
                   onClick={() => atualizarStatus(selecionado.id, 'cancelado')}
                   disabled={salvandoStatus}
