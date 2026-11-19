@@ -101,6 +101,7 @@ export default async function InicioPage() {
     faturamento: { total: fatAtual, variacao: variacao(fatAtual, fatAntes) },
     clientesAtivos: { total: clientes(noAtual), variacao: variacao(clientes(noAtual), clientes(noAntes)) },
     barbeiros: (profs ?? []).length,
+    concluidos: noAtual.filter(a => a.status === 'concluido').length,
     cancelados: noAtual.filter(a => a.status === 'cancelado').length,
     faltas: noAtual.filter(a => a.status === 'faltou').length,
     porDia,

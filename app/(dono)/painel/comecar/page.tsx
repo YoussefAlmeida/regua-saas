@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessao } from '@/lib/auth'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { urlDoSiteAtual } from '@/lib/site-url'
+import { modoSolo, garantirDonoNaAgenda } from '@/lib/plano-servidor'
 import ComecarClient from './comecar-client'
 
 export const metadata = { title: 'Primeiros passos' }
@@ -12,6 +13,12 @@ export default async function ComecarPage() {
   if (sessao.papel !== 'dono') redirect('/barbeiro/hoje')
 
   const db = criarClienteServico()
+  // Modo solo: o dono é quem corta. Conta antiga que pulou esse passo entra na agenda aqui.
+  const solo = await modoSolo(sessao.barbearia_id)
+  if (solo) {
+    const { data: eu } = await db.from('usuarios').select('nome').eq('id', sessao.usuario_id).single()
+    await garantirDonoNaAgenda(sessao.barbearia_id, sessao.usuario_id, eu?.nome ?? 'Dono').catch(() => null)
+  }
   const [{ data: barbearia }, { data: servicos }, { data: profissionais }, { data: dono }] = await Promise.all([
     db.from('barbearias').select('nome, slug').eq('id', sessao.barbearia_id).single(),
     db.from('servicos').select('id, nome, preco, duracao_min').eq('barbearia_id', sessao.barbearia_id).eq('ativo', true).order('preco'),
@@ -27,6 +34,7 @@ export default async function ComecarPage() {
       temEquipe={(profissionais ?? []).length > 0}
       donoCorta={(profissionais ?? []).some(p => p.usuario_id === sessao.usuario_id)}
       siteUrl={await urlDoSiteAtual()}
+      solo={solo}
     />
   )
 }

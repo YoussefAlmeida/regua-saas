@@ -1,12 +1,13 @@
 import { headers } from 'next/headers'
 import Link from 'next/link'
 import { LogOut } from 'lucide-react'
-import { MENU_DONO } from '@/components/menu'
-import { planoDaBarbearia } from '@/lib/plano-servidor'
+import { menuDono } from '@/components/menu'
+import { planoDaBarbearia, modoSolo } from '@/lib/plano-servidor'
 
 export default async function MaisPage() {
   const h = await headers()
-  const plano = await planoDaBarbearia(h.get('x-barbearia-id')!)
+  const barbearia_id = h.get('x-barbearia-id')!
+  const [plano, solo] = await Promise.all([planoDaBarbearia(barbearia_id), modoSolo(barbearia_id)])
 
   const textoPlano = plano.emTeste ? `Teste grátis · ${plano.diasTeste} dia${plano.diasTeste === 1 ? '' : 's'}` : `Plano ${plano.nome}`
 
@@ -15,7 +16,7 @@ export default async function MaisPage() {
       <h1 className="ds-titulo mb-6">Mais</h1>
 
       <div className="space-y-6">
-        {MENU_DONO.map(({ grupo, itens }) => (
+        {menuDono(solo).map(({ grupo, itens }) => (
           <section key={grupo} className="space-y-2">
             <h2 className="ds-eyebrow">{grupo}</h2>
             {itens.map(({ href, label, desc, icon: Icon }) => (

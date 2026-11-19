@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Marca } from '@/components/marca'
 import Link from 'next/link'
+import { FOCO_SOLO } from '@/lib/planos'
 
 type Tipo = 'dono' | 'barbeiro'
 
@@ -15,6 +16,10 @@ export default function EntrarPage() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
   const [linkCliente, setLinkCliente] = useState<string | null>(null)
+  // Modo solo: uma entrada só (o profissional, por e-mail). A de barbeiro fica num link discreto.
+  const [mostrarTipos, setMostrarTipos] = useState(!FOCO_SOLO)
+
+  function trocar(t: Tipo) { setTipo(t); setCredencial(''); setErro(''); setLinkCliente(null) }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -59,7 +64,7 @@ export default function EntrarPage() {
 
       <div className="w-full max-w-sm">
         {/* Toggle dono / barbeiro */}
-        <div className="flex rounded-button border border-line overflow-hidden mb-6">
+        {mostrarTipos && <div className="flex rounded-button border border-line overflow-hidden mb-6">
           <button
             type="button"
             onClick={() => { setTipo('dono'); setCredencial(''); setErro(''); setLinkCliente(null) }}
@@ -78,7 +83,7 @@ export default function EntrarPage() {
           >
             Sou barbeiro
           </button>
-        </div>
+        </div>}
 
         <form onSubmit={handleSubmit} className="bg-surface rounded-card border border-line p-6 space-y-4">
           <div className="space-y-1">
@@ -129,11 +134,20 @@ export default function EntrarPage() {
           </Link>
         </p>
 
-        <p className="text-center font-body text-xs text-fg-muted mt-5 leading-relaxed">
-          {tipo === 'dono'
-            ? 'Dono que também corta entra aqui, com o e-mail. Você vê a barbearia toda e a sua agenda.'
-            : 'Dono entra na aba "Sou dono", mesmo que também corte. Cliente entra pelo link da barbearia.'}
-        </p>
+        {mostrarTipos ? (
+          <p className="text-center font-body text-xs text-fg-muted mt-5 leading-relaxed">
+            {tipo === 'dono'
+              ? 'Dono que também corta entra aqui, com o e-mail. Você vê a barbearia toda e a sua agenda.'
+              : 'Dono entra na aba "Sou dono", mesmo que também corte. Cliente entra pelo link da barbearia.'}
+          </p>
+        ) : (
+          <p className="text-center font-body text-xs text-fg-muted mt-5 leading-relaxed">
+            Entra com o e-mail do cadastro. Cliente marca pelo link da barbearia.{' '}
+            <button type="button" onClick={() => { setMostrarTipos(true); trocar('barbeiro') }} className="underline hover:text-fg">
+              Trabalha numa equipe? Entrar como barbeiro
+            </button>
+          </p>
+        )}
 
         {tipo === 'dono' && (
           <p className="text-center font-body text-sm text-fg-muted mt-6">

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { NextRequest } from 'next/server'
 import { getSessao } from '@/lib/auth'
+import { bloquearNoSolo } from '@/lib/plano-servidor'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { falhaInterna } from '@/lib/erros'
 import { criarTokenConvite } from '@/lib/convite'
@@ -28,6 +29,8 @@ export async function POST(req: NextRequest) {
   if (!sessao || sessao.papel !== 'dono') {
     return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
   }
+  const solo = await bloquearNoSolo(sessao.barbearia_id)
+  if (solo) return solo
 
   const token = await criarTokenConvite(sessao.barbearia_id)
 

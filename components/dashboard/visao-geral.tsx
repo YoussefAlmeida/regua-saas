@@ -1,6 +1,6 @@
 import Cabe from '@/components/cabe'
 import Link from 'next/link'
-import { CalendarCheck, CircleDollarSign, Users2, Scissors, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react'
+import { CalendarCheck, CircleDollarSign, Users2, Scissors, CircleCheck, ArrowUpRight, ArrowDownRight, ChevronRight } from 'lucide-react'
 import GraficoFaturamento, { type PontoDia } from './grafico-faturamento'
 
 /* Dashboard do proprietário — só apresentação: recebe os números prontos
@@ -12,6 +12,8 @@ export interface DadosDashboard {
   faturamento: { total: number; variacao: number | null }
   clientesAtivos: { total: number; variacao: number | null }
   barbeiros: number
+  /** Atendimentos concluídos nos 30 dias */
+  concluidos: number
   cancelados: number
   faltas: number
   porDia: PontoDia[]
@@ -41,7 +43,10 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
     { icone: CalendarCheck, rotulo: 'Agendamentos', valor: String(d.agendamentos.total), variacao: d.agendamentos.variacao as number | null | undefined },
     { icone: CircleDollarSign, rotulo: 'Faturamento', valor: brl(d.faturamento.total), variacao: d.faturamento.variacao },
     { icone: Users2, rotulo: 'Clientes ativos', valor: String(d.clientesAtivos.total), variacao: d.clientesAtivos.variacao },
-    { icone: Scissors, rotulo: 'Barbeiros na agenda', valor: String(d.barbeiros), variacao: undefined },
+    // Um barbeiro só: contar barbeiros não diz nada; mostra quantos ele atendeu
+    d.barbeiros > 1
+      ? { icone: Scissors, rotulo: 'Barbeiros na agenda', valor: String(d.barbeiros), variacao: undefined }
+      : { icone: CircleCheck, rotulo: 'Atendimentos concluídos', valor: String(d.concluidos), variacao: undefined },
   ]
   const semMovimento = d.porDia.every(p => p.valor === 0)
 
@@ -118,7 +123,7 @@ export default function VisaoGeral({ d }: { d: DadosDashboard }) {
                   <span className="font-mono text-sm font-semibold text-amber bg-amber/10 rounded-button px-2 py-1 shrink-0">{a.hora}</span>
                   <span className="font-body text-sm text-fg truncate flex-1 min-w-0">{a.cliente}</span>
                   <span className="font-body text-xs text-fg-muted truncate hidden sm:block w-36">{a.servico}</span>
-                  <span className="font-body text-xs text-fg-muted truncate w-20 text-right">{a.barbeiro}</span>
+                  {d.barbeiros > 1 && <span className="font-body text-xs text-fg-muted truncate w-20 text-right">{a.barbeiro}</span>}
                 </li>
               ))}
             </ul>

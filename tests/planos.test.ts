@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { fimDoCicloAposPagamento, planoPeloValor } from '../lib/planos.ts'
+import { fimDoCicloAposPagamento, planoPeloValor, ehSolo, situacaoPlano, FOCO_SOLO } from '../lib/planos.ts'
 
 const DIA = 86_400_000
 const agora = new Date('2026-10-15T12:00:00Z')
@@ -38,4 +38,18 @@ test('trocar de plano começa o mês hoje', () => {
 test('primeiro pagamento depois do teste começa hoje', () => {
   const fim = fimDoCicloAposPagamento({ plano: 'trial', status: 'trial', plano_ciclo_fim: null }, 'rede', agora)
   assert.equal(fim.toISOString(), '2026-11-15T12:00:00.000Z')
+})
+
+test('modo solo: plano de 1 profissional com no máximo 1 na agenda', () => {
+  assert.equal(ehSolo(1, 0), true)  // dono ainda não entrou na agenda
+  assert.equal(ehSolo(1, 1), true)
+  assert.equal(ehSolo(1, 2), false) // passou do limite: telas de equipe ficam pra ele ajustar
+  assert.equal(ehSolo(3, 1), false) // plano de equipe
+  assert.equal(ehSolo(null, 1), false)
+})
+
+test('teste grátis segue o foco do lançamento', () => {
+  const trial = situacaoPlano({ plano: 'trial', status: 'trial', trial_fim: new Date(Date.now() + 5 * DIA).toISOString() })
+  assert.equal(trial.emTeste, true)
+  assert.equal(trial.maxProfissionais, FOCO_SOLO ? 1 : null)
 })

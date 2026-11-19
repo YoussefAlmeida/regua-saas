@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import { getSessao } from '@/lib/auth'
-import { planoDaBarbearia } from '@/lib/plano-servidor'
+import { planoDaBarbearia, modoSolo } from '@/lib/plano-servidor'
 import BarbeirosClient from './barbeiros-client'
 
 export default async function BarbeirosPage() {
@@ -13,6 +13,8 @@ export default async function BarbeirosPage() {
   if (papel !== 'dono') redirect('/painel/mais')
   const sessao = await getSessao()
   if (!sessao) redirect('/entrar')
+  // Um barbeiro só: não tem equipe pra gerenciar
+  if (await modoSolo(sessao.barbearia_id)) redirect('/painel/inicio')
 
   const db = await criarClienteAutenticado()
 

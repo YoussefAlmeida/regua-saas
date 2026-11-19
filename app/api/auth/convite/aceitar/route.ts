@@ -7,6 +7,7 @@ import { normalizarWhatsapp } from '@/lib/utils'
 import { falhaInterna } from '@/lib/erros'
 import { lerTokenConvite } from '@/lib/convite'
 import { ipDa, permitirUso } from '@/lib/limite-login'
+import { bloquearNoSolo } from '@/lib/plano-servidor'
 
 const Schema = z.object({
   token: z.string(),
@@ -30,6 +31,8 @@ export async function POST(req: NextRequest) {
   // Valida token de convite
   const barbearia_id = await lerTokenConvite(token)
   if (!barbearia_id) return NextResponse.json({ erro: 'Link inválido ou expirado' }, { status: 400 })
+  // Link antigo de convite numa barbearia de um barbeiro só não cria barbeiro
+  if (await bloquearNoSolo(barbearia_id)) return NextResponse.json({ erro: 'Esse link de convite não está mais ativo. Fala com o dono da barbearia.' }, { status: 403 })
 
   // O link é reutilizável: limita quantos cadastros saem da mesma conexão
   if (!(await permitirUso(`uso:convite:${ipDa(req)}`, 10, 60 * 60 * 1000))) {
