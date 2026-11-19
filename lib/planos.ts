@@ -1,7 +1,8 @@
 /* ================================================================
    Planos do RÉGUA — fonte única (landing, painel, admin e regras)
 
-   Teste grátis (14 dias): tudo liberado, sem limite de profissionais.
+   Teste grátis (14 dias): tudo liberado. Com o FOCO_SOLO ligado, o teste
+   vale pra 1 profissional (o próprio dono), igual ao plano Cadeira.
    Acabou o teste sem plano: só leitura NA HORA (vê os dados, não
    agenda nem lança nada) até escolher um plano.
    Plano pago vencido: 5 dias de carência, depois só leitura até pagar.
@@ -9,6 +10,23 @@
    "Profissional" = quem aparece na agenda. O dono só conta se ele
    também corta ("Sou eu que corto").
    ================================================================ */
+
+/**
+ * Foco do lançamento: barbearia de um barbeiro só (o dono que corta).
+ * Ligado: quem se cadastra já entra na agenda, o teste vale pra 1
+ * profissional e as telas de equipe ficam escondidas. A parte de equipe
+ * continua no código: pra voltar a vender equipe, troque para false.
+ */
+export const FOCO_SOLO = true
+
+/**
+ * Modo solo: o plano vai até 1 profissional e a agenda tem no máximo 1.
+ * Se passou do limite (ex.: tinha equipe e caiu pro Cadeira), NÃO é solo:
+ * as telas de equipe continuam pra ele escolher quem fica.
+ */
+export function ehSolo(maxProfissionais: number | null, naAgenda: number): boolean {
+  return maxProfissionais === 1 && naAgenda <= 1
+}
 
 export type PlanoPagoId = 'cadeira' | 'barbearia' | 'rede'
 export type PlanoId = 'trial' | PlanoPagoId
@@ -135,7 +153,7 @@ export function situacaoPlano(b: { plano: string; status: string; trial_fim: str
     return { plano: pago.id, nome: pago.nome, emTeste: false, diasTeste: 0, somenteLeitura: false, cancelada: false, maxProfissionais: pago.maxProfissionais, recursos: pago.recursos, ...ciclo, emCarencia: atraso }
   }
   if (b.status === 'trial' && fim > Date.now()) {
-    return { plano: 'trial', nome: 'Teste grátis', emTeste: true, diasTeste, somenteLeitura: false, cancelada: false, maxProfissionais: null, recursos: TUDO, ...semCiclo }
+    return { plano: 'trial', nome: 'Teste grátis', emTeste: true, diasTeste, somenteLeitura: false, cancelada: false, maxProfissionais: FOCO_SOLO ? 1 : null, recursos: TUDO, ...semCiclo }
   }
   // Teste vencido (mesmo antes do cron virar 'leitura') ou suspensa
   return { plano: 'trial', nome: 'Teste acabou', emTeste: false, diasTeste: 0, somenteLeitura: true, cancelada: false, maxProfissionais: pago?.maxProfissionais ?? null, recursos: pago?.recursos ?? TUDO, ...semCiclo }

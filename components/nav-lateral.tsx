@@ -4,15 +4,15 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { Marca } from '@/components/marca'
-import { MENU_DONO, MENU_BARBEIRO } from '@/components/menu'
+import { menuDono, MENU_BARBEIRO } from '@/components/menu'
 
 /* Menu lateral no computador (no celular fica a barra de baixo).
    Dono: três blocos. Barbeiro: Hoje, Agenda e Perfil. */
 
-export default function NavLateral({ papel, barbearia, plano }: { papel: string; barbearia: string; plano: string }) {
+export default function NavLateral({ papel, barbearia, plano, solo = false }: { papel: string; barbearia: string; plano: string; solo?: boolean }) {
   const pathname = usePathname()
   const router = useRouter()
-  const grupos = papel === 'dono' ? MENU_DONO : [{ grupo: '', itens: MENU_BARBEIRO }]
+  const grupos = papel === 'dono' ? menuDono(solo) : [{ grupo: '', itens: MENU_BARBEIRO }]
 
   async function sair() {
     await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null)

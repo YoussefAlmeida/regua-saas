@@ -167,7 +167,7 @@ export default async function RelatorioMes({ barbearia_id, avancado }: { barbear
       )}
 
       {/* Ranking barbeiros */}
-      {avancado && ranking.length > 0 && (
+      {avancado && ranking.length > 1 && (
         <div className="ds-card overflow-hidden">
           <p className="ds-eyebrow px-4 py-3 border-b border-line">
             Ranking da equipe

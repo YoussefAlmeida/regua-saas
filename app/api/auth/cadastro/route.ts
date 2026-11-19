@@ -7,6 +7,8 @@ import { HORARIO_PADRAO } from '@/lib/horario-padrao'
 import { falhaInterna } from '@/lib/erros'
 import { VERSAO_TERMOS } from '@/lib/empresa'
 import { ipDa, permitirUso } from '@/lib/limite-login'
+import { FOCO_SOLO } from '@/lib/planos'
+import { garantirDonoNaAgenda } from '@/lib/plano-servidor'
 
 const Schema = z.object({
   barbearia_nome: z.string().min(2).max(80),
@@ -100,6 +102,11 @@ export async function POST(req: NextRequest) {
 
   // Separado do cadastro: se a atualização do banco ainda não rodou, o cadastro não quebra
   await db.from('usuarios').update({ termos_aceitos_em: new Date().toISOString(), termos_versao: VERSAO_TERMOS }).eq('id', usuario.id)
+  // Modo solo: quem cadastra é quem corta, já entra na agenda.
+  // Se falhar, os primeiros passos colocam de novo; o cadastro não quebra.
+  if (FOCO_SOLO) {
+    await garantirDonoNaAgenda(barbearia.id, usuario.id, d.dono_nome).catch(() => null)
+  }
   if (d.ref && d.ref !== slug) {
     const { data: indicou } = await db.from('barbearias').select('slug').eq('slug', d.ref).maybeSingle()
     if (indicou) await db.from('barbearias').update({ indicada_por: indicou.slug }).eq('id', barbearia.id)

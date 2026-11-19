@@ -1,7 +1,7 @@
 import { cache } from 'react'
 import { NextResponse } from 'next/server'
 import { criarClienteServico } from '@/lib/supabase/server'
-import { situacaoPlano, PLANOS, planoParaProfissionais, type SituacaoPlano, type Recursos } from '@/lib/planos'
+import { situacaoPlano, PLANOS, planoParaProfissionais, ehSolo, type SituacaoPlano, type Recursos } from '@/lib/planos'
 
 /** Situação do plano da barbearia (uma consulta por requisição) */
 export const planoDaBarbearia = cache(async (barbearia_id: string): Promise<SituacaoPlano> => {
@@ -80,4 +80,33 @@ export async function pessoasDaEquipe(barbearia_id: string): Promise<PessoaDaEqu
   return (us ?? [])
     .map(u => ({ usuario_id: u.id, nome: u.nome, naAgenda: ativo.has(u.id), souDono: u.papel === 'dono' }))
     .sort((a, b) => Number(b.souDono) - Number(a.souDono))
+}
+
+/** Barbearia de um barbeiro só: as telas e rotas de equipe ficam escondidas */
+export const modoSolo = cache(async (barbearia_id: string): Promise<boolean> => {
+  const { max, profissionais } = await agendaDoPlano(barbearia_id)
+  return ehSolo(max, profissionais.length)
+})
+
+/** 403 nas rotas de equipe quando a barbearia é de um barbeiro só; null se pode */
+export async function bloquearNoSolo(barbearia_id: string): Promise<NextResponse | null> {
+  if (!(await modoSolo(barbearia_id))) return null
+  return NextResponse.json(
+    { erro: 'Equipe faz parte do plano para barbearias com mais de um barbeiro. Fala com a gente pelo WhatsApp.', upgrade: true },
+    { status: 403 },
+  )
+}
+
+/**
+ * Coloca o dono na agenda (é ele quem corta). Não faz nada se já está.
+ * Usado no cadastro e nos primeiros passos do modo solo.
+ */
+export async function garantirDonoNaAgenda(barbearia_id: string, usuario_id: string, nome: string): Promise<void> {
+  const db = criarClienteServico()
+  const { data: existente } = await db.from('profissionais')
+    .select('id, ativo').eq('usuario_id', usuario_id).maybeSingle()
+  if (existente?.ativo) return
+  if (existente) { await db.from('profissionais').update({ ativo: true }).eq('id', existente.id); return }
+  // O banco aceita um profissional por usuário: clique duplo não duplica
+  await db.from('profissionais').insert({ barbearia_id, usuario_id, nome })
 }

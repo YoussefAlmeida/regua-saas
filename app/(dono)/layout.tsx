@@ -12,6 +12,7 @@ import Confirmar from '@/components/confirmar'
 import AvisoPlano from '@/components/aviso-plano'
 import PlanoDono from '@/components/plano-dono'
 import { planoDaBarbearia, agendaDoPlano } from '@/lib/plano-servidor'
+import { ehSolo } from '@/lib/planos'
 import { PLANOS, type PlanoPagoId } from '@/lib/planos'
 
 export const metadata: Metadata = { robots: { index: false, follow: false } }
@@ -59,6 +60,7 @@ export default async function PainelLayout({ children }: { children: React.React
       <NavLateral
         papel={papel}
         barbearia={barbearia?.nome ?? 'RÉGUA'}
+        solo={ehSolo(agenda.max, agenda.profissionais.length)}
         plano={plano.emTeste ? `Teste grátis · ${plano.diasTeste} dia${plano.diasTeste === 1 ? '' : 's'}` : plano.somenteLeitura ? plano.nome : `Plano ${plano.nome}`}
       />
       {/* Topo */}

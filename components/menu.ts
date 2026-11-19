@@ -23,6 +23,12 @@ export const MENU_DONO: { grupo: string; itens: ItemMenu[] }[] = [
   ] },
 ]
 
+/** Menu do dono; no modo solo (um barbeiro só) a Equipe some */
+export function menuDono(solo: boolean): { grupo: string; itens: ItemMenu[] }[] {
+  if (!solo) return MENU_DONO
+  return MENU_DONO.map(g => ({ ...g, itens: g.itens.filter(i => i.href !== '/painel/mais/barbeiros') }))
+}
+
 /** Barra de baixo do dono no celular: o que se usa toda hora; o resto fica em "Mais" */
 export const ATALHOS_DONO = ['/painel/inicio', '/painel/agenda', '/painel/financeiro']
 

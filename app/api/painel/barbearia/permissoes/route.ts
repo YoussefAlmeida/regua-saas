@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getSessao } from '@/lib/auth'
+import { bloquearNoSolo } from '@/lib/plano-servidor'
 import { criarClienteServico } from '@/lib/supabase/server'
 import { registrarAuditoria } from '@/lib/auditoria'
 import { CHAVES, type Permissao } from '@/lib/permissoes-equipe'
@@ -12,6 +13,8 @@ const Schema = z.object(Object.fromEntries(CHAVES.map(k => [k, z.boolean()])) as
 export async function PUT(req: NextRequest) {
   const sessao = await getSessao()
   if (!sessao || sessao.papel !== 'dono') return NextResponse.json({ erro: 'Sem permissão' }, { status: 403 })
+  const solo = await bloquearNoSolo(sessao.barbearia_id)
+  if (solo) return solo
   const parse = Schema.safeParse(await req.json().catch(() => null))
   if (!parse.success) return NextResponse.json({ erro: 'Dados inválidos' }, { status: 400 })
 

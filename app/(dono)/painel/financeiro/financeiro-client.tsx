@@ -396,7 +396,7 @@ export default function FinanceiroClient({
                 )}
 
                 <div className="grid md:grid-cols-2 gap-4 items-start">
-                {porBarbeiro.length > 0 && (
+                {porBarbeiro.length > 1 && (
                   <section className="ds-card p-4">
                     <p className="ds-eyebrow mb-3">Entradas por barbeiro</p>
                     <ul className="space-y-2.5">
@@ -638,11 +638,11 @@ export default function FinanceiroClient({
                 <label className={labelCls} htmlFor="desc">Descrição (opcional)</label>
                 <input id="desc" value={novo.descricao} onChange={e => setNovo(n => ({ ...n, descricao: e.target.value }))} maxLength={200} placeholder={novo.tipo === 'entrada' ? 'Ex.: venda de pomada' : 'Ex.: conta de luz'} className={inputCls} />
               </div>
-              <div className={novo.tipo === 'entrada' && profissionais.length > 0 ? '' : 'col-span-2'}>
+              <div className={novo.tipo === 'entrada' && profissionais.length > 1 ? '' : 'col-span-2'}>
                 <label className={labelCls} htmlFor="data">Data</label>
                 <input id="data" type="date" value={novo.data} onChange={e => setNovo(n => ({ ...n, data: e.target.value }))} required className={inputCls} />
               </div>
-              {novo.tipo === 'entrada' && profissionais.length > 0 && (
+              {novo.tipo === 'entrada' && profissionais.length > 1 && (
                 <div>
                   <label className={labelCls} htmlFor="prof">Barbeiro</label>
                   <select id="prof" value={novo.profissional_id} onChange={e => setNovo(n => ({ ...n, profissional_id: e.target.value }))} className={inputCls}>

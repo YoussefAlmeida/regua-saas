@@ -8,7 +8,8 @@ import { avisar, erroDaResposta } from '@/components/aviso'
 import { lerValorBRL } from '@/lib/dinheiro'
 
 /* Primeiro uso do dono — seção 6.1.2
-   1. Quem corta  2. Serviços  3. Link pronto  4. Agendamento de teste */
+   1. Quem corta  2. Serviços  3. Link pronto  4. Agendamento de teste
+   Modo solo: o dono já está na agenda, então começa direto nos serviços. */
 
 type Passo = 'equipe' | 'servicos' | 'link' | 'teste'
 const PASSOS: { id: Passo; t: string }[] = [
@@ -32,7 +33,7 @@ const SUGESTOES = [
 const brl = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
 export default function ComecarClient({
-  barbearia, donoNome, servicosIniciais, temEquipe, donoCorta, siteUrl,
+  barbearia, donoNome, servicosIniciais, temEquipe, donoCorta, siteUrl, solo = false,
 }: {
   barbearia: { nome: string; slug: string }
   donoNome: string
@@ -40,6 +41,7 @@ export default function ComecarClient({
   temEquipe: boolean
   donoCorta: boolean
   siteUrl: string
+  solo?: boolean
 }) {
   const router = useRouter()
   const [passo, setPasso] = useState<Passo>(temEquipe ? (servicosIniciais.length ? 'link' : 'servicos') : 'equipe')
@@ -51,7 +53,8 @@ export default function ComecarClient({
   const [copiado, setCopiado] = useState(false)
 
   const linkPublico = `${siteUrl}/${barbearia.slug}`
-  const idx = PASSOS.findIndex(p => p.id === passo)
+  const passos = solo ? PASSOS.filter(p => p.id !== 'equipe') : PASSOS
+  const idx = passos.findIndex(p => p.id === passo)
 
   async function souEuQueCorto() {
     setOcupado(true)
@@ -103,7 +106,7 @@ export default function ComecarClient({
         <p className="font-ui text-xs uppercase tracking-wider text-amber">Primeiros passos</p>
         <h1 className="font-display text-3xl text-fg mt-1">
           {passo === 'equipe' && `Bem-vindo, ${donoNome.split(' ')[0]}`}
-          {passo === 'servicos' && 'O que vocês fazem?'}
+          {passo === 'servicos' && (solo ? `Bem-vindo, ${donoNome.split(' ')[0]}. O que você faz?` : 'O que vocês fazem?')}
           {passo === 'link' && 'Seu link tá pronto'}
           {passo === 'teste' && 'Agora testa'}
         </h1>
@@ -111,7 +114,7 @@ export default function ComecarClient({
 
       {/* Progresso */}
       <ol className="flex gap-2">
-        {PASSOS.map((p, i) => (
+        {passos.map((p, i) => (
           <li key={p.id} className="flex-1">
             <div className={`h-1 rounded-full ${i <= idx ? 'bg-amber' : 'bg-line'}`} />
             <p className={`font-ui text-[10px] uppercase tracking-wider mt-1.5 ${i === idx ? 'text-fg' : 'text-fg-muted'}`}>{p.t}</p>
@@ -168,7 +171,7 @@ export default function ComecarClient({
       {/* 2 — Serviços */}
       {passo === 'servicos' && (
         <section className="space-y-4">
-          <p className="font-body text-sm text-fg-muted">Toca nos que vocês fazem e ajusta o preço. Dá pra mudar depois em Mais → Serviços.</p>
+          <p className="font-body text-sm text-fg-muted">Toca nos que {solo ? 'você faz' : 'vocês fazem'} e ajusta o preço. Dá pra mudar depois em Mais → Serviços.</p>
 
           {servicos.length > 0 && (
             <ul className="ds-card divide-y divide-line">

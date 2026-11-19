@@ -380,8 +380,8 @@ export default function AgendaClient({
         </div>
       </div>
 
-      {/* Tabs de profissionais */}
-      {profissionais.length > 0 && (
+      {/* Tabs de profissionais (um barbeiro só: não precisa de aba) */}
+      {profissionais.length > 1 && (
         <div className={`${visao === 'dia' ? 'flex md:hidden' : visao === 'mes' ? 'hidden' : 'flex'} border-b border-line bg-surface shrink-0 overflow-x-auto`}>
           {profissionais.map((p, i) => {
             const total = agendamentos.filter(a => a.profissional?.id === p.id && a.status !== 'faltou').length
@@ -686,7 +686,7 @@ export default function AgendaClient({
             </div>
 
             <form onSubmit={criarAgendamento} className="space-y-4">
-              <div>
+              <div className={profissionais.filter(p => p.ativo).length > 1 ? '' : 'hidden'}>
                 <label className={labelCls}>Barbeiro</label>
                 <select
                   value={novoForm.profissional_id}
