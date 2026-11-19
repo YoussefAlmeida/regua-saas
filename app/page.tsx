@@ -8,15 +8,19 @@ import { Marca } from '@/components/marca'
 import { PainelVitrine, CelularVitrine } from './_components/landing/vitrine'
 import { linkSuporte } from '@/lib/empresa'
 import { formatBRL } from '@/lib/utils'
-import { LISTA_PLANOS } from '@/lib/planos'
+import { LISTA_PLANOS, PLANOS as TABELA, FOCO_SOLO } from '@/lib/planos'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: { absolute: 'RÉGUA — Agenda online e caixa da barbearia, sem app pra baixar' },
-  description: 'Seu cliente marca sozinho pelo link em menos de 1 minuto. Você vê a agenda da equipe e o dinheiro do dia no celular. Planos a partir de R$ 39,99. 14 dias grátis, sem cartão.',
+  description: 'Seu cliente marca sozinho pelo link em menos de 1 minuto. Você vê sua agenda e o dinheiro do dia no celular. A partir de R$ 39,99 por mês. 14 dias grátis, sem cartão.',
   alternates: { canonical: '/' },
   openGraph: { title: 'RÉGUA — Sua barbearia na régua', url: '/' },
 }
+
+// Planos vêm de lib/planos.ts (mesma tabela do painel e do admin).
+// Foco solo: a página vende só o plano de quem corta sozinho.
+const PLANOS_VISIVEIS = FOCO_SOLO ? [TABELA.cadeira] : LISTA_PLANOS
 
 // Dados estruturados: o Google entende que é um app com preço
 const JSON_LD = {
@@ -25,41 +29,40 @@ const JSON_LD = {
   name: 'RÉGUA',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
-  description: 'Agendamento online, agenda da equipe e fluxo de caixa para barbearias.',
-  offers: LISTA_PLANOS.map(p => ({ '@type': 'Offer', name: p.nome, price: p.preco.toFixed(2), priceCurrency: 'BRL' })),
+  description: 'Agendamento online e fluxo de caixa para barbeiros e barbearias.',
+  offers: PLANOS_VISIVEIS.map(p => ({ '@type': 'Offer', name: p.nome, price: p.preco.toFixed(2), priceCurrency: 'BRL' })),
 }
 
 const DORES = [
   [MessageCircle, '“Tem horário hoje?” o dia inteiro', 'Você para o corte pra responder mensagem, e quem não foi respondido marca em outro lugar.'],
   [CalendarX2, 'Dois clientes no mesmo horário', 'Agenda no caderno ou de cabeça uma hora falha, e alguém fica esperando irritado.'],
   [CircleHelp, 'Fim do mês sem saber o lucro', 'Entrou dinheiro, saiu dinheiro, e você não sabe dizer quanto sobrou de verdade.'],
-  [Users, 'Acerto com a equipe no achismo', 'Sem saber quanto cada barbeiro fez, a conversa sobre o acerto vira discussão.'],
+  [Users, 'Cliente que marca e não aparece', 'Você segura o horário, recusa outro cliente e fica olhando pra porta. No fim do mês isso vira uma diária perdida.'],
 ] as const
 
 const SOLUCOES = [
-  [CalendarCheck, 'Agenda aberta 24 horas', 'O cliente escolhe o serviço, o barbeiro e o horário e confirma sozinho, em menos de 1 minuto. Você só vê o horário entrar.'],
-  [ShieldCheck, 'Conflito de horário não existe', 'O sistema não deixa dois clientes no mesmo horário com o mesmo barbeiro. Cancelou, o horário volta a ficar livre na hora.'],
-  [Wallet, 'Caixa que se preenche sozinho', 'Concluiu o atendimento, a entrada cai no caixa com o nome do barbeiro. Você lança só as saídas.'],
-  [BarChart3, 'Números pra decidir', 'Faturamento, clientes ativos, serviços mais procurados e ocupação da equipe numa tela só.'],
-  [UserRoundCheck, 'Cada um com o seu acesso', 'O barbeiro vê a agenda e o desempenho dele. O financeiro da barbearia é só seu.'],
+  [CalendarCheck, 'Agenda aberta 24 horas', 'O cliente escolhe o serviço e o horário e confirma sozinho, em menos de 1 minuto. Você só vê o horário entrar.'],
+  [ShieldCheck, 'Conflito de horário não existe', 'O sistema não deixa dois clientes no mesmo horário. Cancelou, o horário volta a ficar livre na hora pra outro marcar.'],
+  [Wallet, 'Caixa que se preenche sozinho', 'Concluiu o atendimento, a entrada cai no caixa. Você lança só as saídas e vê quanto sobrou.'],
+  [BarChart3, 'Números pra decidir', 'Faturamento, clientes ativos, serviços mais procurados e quanto da sua agenda está ocupada, numa tela só.'],
+  [UserRoundCheck, 'Feito pra quem corta sozinho', 'Uma conta, um painel, nada de tela de equipe que você não usa. Dá pra olhar entre um cliente e outro.'],
   [Palette, 'A página é da sua barbearia', 'Sua logo, sua capa e suas cores no link de agendamento. O cliente vê a sua marca.'],
 ] as const
 
 const ANTES_DEPOIS = [
   ['Responder “tem horário?” no meio do corte', 'O cliente vê os horários livres e marca sozinho'],
-  ['Caderno, memória e horário em dobro', 'Uma agenda por barbeiro, sem conflito'],
+  ['Caderno, memória e horário em dobro', 'Uma agenda só, sem horário em dobro'],
   ['Somar o caixa no fim do dia', 'Entrada lançada na hora que você conclui o atendimento'],
   ['“Acho que esse mês foi bom”', 'Faturamento do mês comparado com o mês anterior'],
 ] as const
 
 const PASSOS = [
-  ['1', 'Cadastre a barbearia', 'Nome, serviços com preço e duração, e quem corta. Leva uns 10 minutos.'],
+  ['1', 'Cadastre a barbearia', 'Nome, serviços com preço e duração, e seus horários. Leva uns 10 minutos.'],
   ['2', 'Divulgue o seu link', 'Coloque na bio do Instagram e mande pros clientes. Ninguém precisa baixar aplicativo.'],
   ['3', 'Atenda e acompanhe', 'Os horários entram na agenda e cada atendimento concluído aparece no caixa.'],
 ] as const
 
-// Planos vêm de lib/planos.ts (mesma tabela do painel e do admin)
-const PLANOS = LISTA_PLANOS.map(p => ({
+const PLANOS = PLANOS_VISIVEIS.map(p => ({
   id: p.id, label: p.nome, desc: p.resumo, preco: p.preco, destaque: !!p.destaque, funcionalidades: p.itens,
 }))
 
@@ -102,7 +105,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             Agenda cheia e caixa organizado, <span className="block text-amber">sem viver no WhatsApp.</span>
           </h1>
           <p className="mt-6 text-lg sm:text-xl text-fg-muted max-w-2xl mx-auto leading-relaxed">
-            Seu cliente marca sozinho pelo seu link, em menos de 1 minuto. Você acompanha a agenda da equipe e o dinheiro do dia pelo celular.
+            Seu cliente marca sozinho pelo seu link, em menos de 1 minuto. Você acompanha sua agenda e o dinheiro do dia pelo celular.
           </p>
           <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
             <Link href={cadastro} className={`${btnOuro} px-7 py-4 text-base`}>Testar grátis por 14 dias <ArrowRight size={18} aria-hidden /></Link>
@@ -199,9 +202,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="text-center max-w-2xl mx-auto">
             <p className={olho}>Planos</p>
             <h2 className={`${titulo} mt-3`}>Custa menos que um corte por semana.</h2>
-            <p className="mt-4 text-lg text-fg-muted">14 dias grátis em qualquer plano, com tudo liberado. Depois, por mês, sem fidelidade.</p>
+            <p className="mt-4 text-lg text-fg-muted">{FOCO_SOLO ? '14 dias grátis, com tudo liberado.' : '14 dias grátis em qualquer plano, com tudo liberado.'} Depois, por mês, sem fidelidade.</p>
           </div>
-          <div className="mt-14 grid md:grid-cols-3 gap-5 items-stretch">
+          <div className={`mt-14 grid gap-5 items-stretch ${PLANOS.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-3'}`}>
             {PLANOS.map(p => (
               <article key={p.id} className={`relative flex flex-col rounded-2xl p-7 ${
                 p.destaque ? 'bg-bg border-2 border-amber shadow-[0_30px_80px_-30px_rgb(245_217_0/0.35)]' : 'bg-bg border border-line'}`}>
@@ -227,9 +230,16 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
               </article>
             ))}
           </div>
-          <p className="mt-8 text-center text-sm text-fg-muted">
-            Conta como profissional quem aparece na agenda. Se você é o dono e também corta, você conta.
-          </p>
+          {FOCO_SOLO ? (
+            <p className="mt-8 text-center text-sm text-fg-muted">
+              A gente instala com você, na sua barbearia, e volta em 30 dias pra ver se está tudo rodando.{' '}
+              <a href={linkSuporte('Oi! Minha barbearia tem mais de um barbeiro. Como funciona o RÉGUA pra equipe?')} target="_blank" rel="noreferrer" className="underline hover:text-fg">Tem equipe? Fala com a gente.</a>
+            </p>
+          ) : (
+            <p className="mt-8 text-center text-sm text-fg-muted">
+              Conta como profissional quem aparece na agenda. Se você é o dono e também corta, você conta.
+            </p>
+          )}
         </div>
       </section>
 

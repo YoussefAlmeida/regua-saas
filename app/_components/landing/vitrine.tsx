@@ -59,12 +59,12 @@ export function PainelVitrine() {
             <Grafico />
           </div>
           <div className="rounded-xl border border-line bg-bg/60 divide-y divide-line">
-            {[['10:00', 'João Silva', 'Corte masculino', 'Carlos'], ['10:30', 'Pedro Mendes', 'Barba', 'Rafael'], ['11:00', 'Lucas Costa', 'Corte + barba', 'Carlos']].map(([h, c, s, b]) => (
+            {[['10:00', 'João Silva', 'Corte masculino', 'R$ 35'], ['10:40', 'Pedro Mendes', 'Barba', 'R$ 20'], ['11:00', 'Lucas Costa', 'Corte + barba', 'R$ 50']].map(([h, c, s, b]) => (
               <div key={h} className="flex items-center gap-2.5 px-3 py-2 text-[11px]">
                 <span className="rounded-md bg-amber/15 text-amber font-semibold px-1.5 py-0.5 tabular-nums">{h}</span>
                 <span className="text-fg font-medium truncate flex-1">{c}</span>
                 <span className="text-fg-muted truncate hidden sm:block">{s}</span>
-                <span className="text-fg-muted">{b}</span>
+                <span className="text-fg-muted tabular-nums">{b}</span>
               </div>
             ))}
           </div>
