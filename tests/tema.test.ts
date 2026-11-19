@@ -1,13 +1,13 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { temaDaBarbearia, contraste, legivelNoFundo, textoSobre, FUNDO, PRIMARIA_PADRAO, SECUNDARIA_PADRAO } from '../lib/tema.ts'
+import { temaDaBarbearia, contraste, legivelNoFundo, textoSobre, FUNDO, CLARO, PRIMARIA_PADRAO, SECUNDARIA_PADRAO } from '../lib/tema.ts'
 
 test('sem cores escolhidas: paleta oficial, sem ajuste', () => {
   const t = temaDaBarbearia(null)
   assert.equal(t.primaria, PRIMARIA_PADRAO)
   assert.equal(t.secundaria, SECUNDARIA_PADRAO)
   assert.equal(t.ajustada, false)
-  assert.equal(t.vars['--accent-rgb'], '245 217 0')
+  assert.equal(t.vars['--accent-rgb'], '163 255 62')
 })
 
 test('cor escura demais é clareada até ficar legível no fundo', () => {
@@ -25,8 +25,8 @@ test('cor que já é legível não muda', () => {
 
 test('texto sobre a cor é sempre o de maior contraste', () => {
   assert.equal(textoSobre('#FFFFFF'), FUNDO)
-  assert.equal(textoSobre('#F5D900'), FUNDO)
-  assert.equal(textoSobre('#1A237E'), '#FFFFFF')
+  assert.equal(textoSobre('#A3FF3E'), FUNDO)
+  assert.equal(textoSobre('#1A237E'), CLARO)
   for (const cor of ['#F5D900', '#FF5722', '#2196F3', '#9C27B0', '#FFEB3B', '#3DDC84']) {
     const t = temaDaBarbearia({ cor_primaria: cor })
     assert.ok(contraste(textoSobre(t.primaria), t.primaria) >= 4.5, cor)

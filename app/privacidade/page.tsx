@@ -4,7 +4,7 @@ import { EMPRESA, linkSuporte } from '@/lib/empresa'
 
 export const metadata: Metadata = {
   title: 'Política de Privacidade',
-  description: 'Como o RÉGUA trata os dados de barbearias, barbeiros e clientes, conforme a LGPD.',
+  description: 'Como o CUBO trata os dados de barbearias, barbeiros e clientes, conforme a LGPD.',
   alternates: { canonical: '/privacidade' },
 }
 
@@ -16,17 +16,17 @@ export default function PrivacidadePage() {
   return (
     <PaginaLegal titulo="Política de Privacidade" atualizado="15/10/2026">
       <p>
-        O RÉGUA é um sistema de agenda e financeiro para barbearias. Esta política explica, de forma simples, quais dados
+        O CUBO é um sistema de agenda e financeiro para barbearias. Esta política explica, de forma simples, quais dados
         tratamos, por quê e quais são os seus direitos pela Lei Geral de Proteção de Dados (Lei 13.709/2018, LGPD).
       </p>
 
       <section>
         <h2>Quem cuida dos seus dados</h2>
         <ul>
-          <li><strong>Dono e barbeiros:</strong> o RÉGUA é o controlador dos dados da conta (nome, e-mail, WhatsApp, senha).</li>
+          <li><strong>Dono e barbeiros:</strong> o CUBO é o controlador dos dados da conta (nome, e-mail, WhatsApp, senha).</li>
           <li>
             <strong>Clientes da barbearia:</strong> a barbearia é a controladora (é com ela que você marca seu horário).
-            O RÉGUA é o operador: guarda e processa esses dados só para prestar o serviço à barbearia.
+            O CUBO é o operador: guarda e processa esses dados só para prestar o serviço à barbearia.
           </li>
         </ul>
       </section>

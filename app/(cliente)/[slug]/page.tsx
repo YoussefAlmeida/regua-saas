@@ -17,7 +17,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dados = await carregarBarbeariaPublica((await params).slug)
-  if (!dados) return { title: 'Barbearia não encontrada · RÉGUA' }
+  if (!dados) return { title: 'Barbearia não encontrada · CUBO' }
   const descricao = `Marque seu horário na ${dados.barbearia.nome}${dados.barbearia.endereco ? ` (${dados.barbearia.endereco})` : ''} em menos de 1 minuto. Sem baixar app.`
   return {
     title: `Agendar na ${dados.barbearia.nome}`,

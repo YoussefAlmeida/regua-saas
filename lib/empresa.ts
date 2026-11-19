@@ -1,7 +1,7 @@
-/* Quem é o RÉGUA (aparece nos Termos, na Privacidade e no rodapé).
+/* Quem é o CUBO (aparece nos Termos, na Privacidade e no rodapé).
    EMPRESA_RAZAO_SOCIAL / EMPRESA_DOCUMENTO (CNPJ ou CPF) vêm da Vercel. */
 export const EMPRESA = {
-  marca: 'RÉGUA',
+  marca: 'CUBO',
   razaoSocial: process.env.EMPRESA_RAZAO_SOCIAL ?? null,
   documento: process.env.EMPRESA_DOCUMENTO ?? null,
   cidade: process.env.EMPRESA_CIDADE ?? 'Feira de Santana, BA',

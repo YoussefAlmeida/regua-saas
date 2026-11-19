@@ -56,7 +56,7 @@ export default function EntrarPage() {
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4">
       <div className="mb-10 text-center">
-        <h1 aria-label="RÉGUA"><Marca className="text-fg scale-150 origin-center" /></h1>
+        <h1 aria-label="CUBO"><Marca className="text-fg scale-150 origin-center" /></h1>
         <p className="font-body text-fg-muted text-sm mt-4">
           Agenda e caixa da barbearia
         </p>

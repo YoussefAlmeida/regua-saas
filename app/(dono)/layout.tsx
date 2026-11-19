@@ -59,14 +59,14 @@ export default async function PainelLayout({ children }: { children: React.React
     <div className="min-h-screen bg-bg flex flex-col md:pl-60">
       <NavLateral
         papel={papel}
-        barbearia={barbearia?.nome ?? 'RÉGUA'}
+        barbearia={barbearia?.nome ?? 'CUBO'}
         solo={ehSolo(agenda.max, agenda.profissionais.length)}
         plano={plano.emTeste ? `Teste grátis · ${plano.diasTeste} dia${plano.diasTeste === 1 ? '' : 's'}` : plano.somenteLeitura ? plano.nome : `Plano ${plano.nome}`}
       />
       {/* Topo */}
       <header className="bg-surface/95 backdrop-blur border-b border-line sticky top-0 z-10">
         <div className="max-w-lg md:max-w-none mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-3">
-          <span className="font-display text-[19px] font-semibold text-fg truncate md:invisible">{barbearia?.nome ?? 'RÉGUA'}</span>
+          <span className="font-display text-[19px] font-semibold text-fg truncate md:invisible">{barbearia?.nome ?? 'CUBO'}</span>
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="text-right leading-tight">
               <span className="font-body text-[13px] font-semibold text-fg block">{usuario?.nome?.split(' ')[0]}</span>

@@ -31,7 +31,7 @@ export default function LoginAdmin() {
       <div className="w-full max-w-xs space-y-6">
         <div className="text-center">
           <ShieldCheck size={28} className="mx-auto text-amber mb-2" />
-          <h1 className="font-display text-4xl text-amber">Régua</h1>
+          <h1 className="font-display text-4xl text-amber">CUBO</h1>
           <p className="font-ui text-[11px] uppercase tracking-[0.2em] text-fg-muted">Painel do dono do sistema</p>
         </div>
         <form onSubmit={entrar} className="ds-card p-6 space-y-4">

@@ -21,7 +21,7 @@ interface Servico {
 
 interface FormData { nome: string; preco: string; duracao_min: string; cor: string; descricao: string }
 
-const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#F5D900', descricao: '' }
+const FORM_VAZIO: FormData = { nome: '', preco: '', duracao_min: '30', cor: '#A3FF3E', descricao: '' }
 
 export default function ServicosClient({
   servicosIniciais,

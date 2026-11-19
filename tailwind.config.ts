@@ -88,7 +88,7 @@ const config: Config = {
 
       // ── Tipografia ────────────────────────────────────────────
       fontFamily: {
-        display: ["var(--font-display)", "Georgia", "serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
         // Interface, texto e valores na mesma sans (valores com algarismos tabulares)
         ui: ["var(--font-body)", "system-ui", "sans-serif"],
         body: ["var(--font-body)", "system-ui", "sans-serif"],

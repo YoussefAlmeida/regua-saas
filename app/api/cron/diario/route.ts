@@ -119,8 +119,8 @@ async function avisarVencimento(db: ReturnType<typeof criarClienteServico>) {
   const janela = (de: number) => ({ gte: new Date(agora + de * DIA).toISOString(), lt: new Date(agora + (de + 1) * DIA).toISOString() })
   let avisos = 0
   for (const [de, texto] of [
-    [2, (n: string) => `RÉGUA: o plano da ${n} vence em 3 dias. Pra não parar a agenda, é só pagar a próxima mensalidade. Qualquer dúvida, responde aqui.`],
-    [-2, (n: string) => `RÉGUA: o pagamento do plano da ${n} venceu ontem. Você tem ${CARENCIA_DIAS - 1} dias de carência antes da agenda ficar só leitura. Fala com a gente pra pagar.`],
+    [2, (n: string) => `CUBO: o plano da ${n} vence em 3 dias. Pra não parar a agenda, é só pagar a próxima mensalidade. Qualquer dúvida, responde aqui.`],
+    [-2, (n: string) => `CUBO: o pagamento do plano da ${n} venceu ontem. Você tem ${CARENCIA_DIAS - 1} dias de carência antes da agenda ficar só leitura. Fala com a gente pra pagar.`],
   ] as const) {
     const j = janela(de)
     const { data } = await db.from('barbearias').select('nome, telefone')

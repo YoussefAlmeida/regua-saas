@@ -10,7 +10,7 @@ export const SENHA_MIN_CLIENTE = 4
 
 const OBVIAS = new Set([
   'senha', 'senha123', 'senha1234', 'password', 'password1', 'qwerty', 'qwerty123',
-  'abc123', 'abcd1234', 'mudar123', 'barbearia', 'barbeiro', 'regua', 'regua123',
+  'abc123', 'abcd1234', 'mudar123', 'barbearia', 'barbeiro', 'regua', 'regua123', 'cubo', 'cubo123', 'cubo1234',
   '123mudar', 'admin', 'admin123', 'iloveyou', 'brasil', 'bahia', 'teste123',
 ])
 

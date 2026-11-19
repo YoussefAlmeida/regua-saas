@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
   const coluna = COLUNA[tipo]
   const { data: atual, error: errAtual } = await db.from('barbearias').select(coluna).eq('id', sessao.barbearia_id).maybeSingle<Record<string, string | null>>()
   if (errAtual?.code === '42703') {
-    return NextResponse.json({ erro: 'A aparência ainda não foi liberada nesta conta. Fala com o suporte do RÉGUA.' }, { status: 409 })
+    return NextResponse.json({ erro: 'A aparência ainda não foi liberada nesta conta. Fala com o suporte do CUBO.' }, { status: 409 })
   }
 
   // Nome novo a cada envio: o navegador não fica mostrando a imagem antiga

@@ -14,4 +14,4 @@ export async function extrasDosServicos(db: SupabaseClient, barbearia_id: string
 
 /** 42703 = a coluna ainda não existe no banco */
 export const semColuna = (e: { code?: string } | null | undefined) => e?.code === '42703'
-export const AVISO_ATUALIZACAO = 'Esse recurso ainda não foi liberado nesta conta. Fala com o suporte do RÉGUA.'
+export const AVISO_ATUALIZACAO = 'Esse recurso ainda não foi liberado nesta conta. Fala com o suporte do CUBO.'

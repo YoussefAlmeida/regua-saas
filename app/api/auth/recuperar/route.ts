@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       if (dono?.ativo) {
         const token = await gerarTokenNovaSenha(dono.id, VALIDADE_H)
         if (token) {
-          await enviarEmail(chave, 'RÉGUA — criar senha nova',
+          await enviarEmail(chave, 'CUBO — criar senha nova',
             `${textoLinkNovaSenha(dono.nome, `${site}/nova-senha/${token}`, VALIDADE_H)}\n\nSe não foi você que pediu, pode ignorar este e-mail.`)
         }
       }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Caminho manual: telefone da barbearia (cliente na página dela) ou suporte RÉGUA
+  // Caminho manual: telefone da barbearia (cliente na página dela) ou suporte CUBO
   let contatoBarbearia: { nome: string; telefone: string } | null = null
   if (d.tipo === 'whatsapp' && d.slug) {
     const { data: b } = await db.from('barbearias').select('nome, telefone').eq('slug', d.slug).maybeSingle()

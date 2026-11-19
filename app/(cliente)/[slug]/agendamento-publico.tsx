@@ -205,8 +205,8 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
   // Arquivo de calendário (.ics) do horário marcado
   const ics = marcado && servico ? (() => {
     const f = (iso: string) => iso.replace(/[-:]/g, '').replace(/\.\d{3}/, '')
-    const linhas = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//REGUA//Agendamento//PT', 'BEGIN:VEVENT',
-      `UID:${marcado.inicio}-${barbearia.slug}@regua`, `DTSTAMP:${f(new Date().toISOString())}`,
+    const linhas = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//CUBO//Agendamento//PT', 'BEGIN:VEVENT',
+      `UID:${marcado.inicio}-${barbearia.slug}@cubo`, `DTSTAMP:${f(new Date().toISOString())}`,
       `DTSTART:${f(new Date(marcado.inicio).toISOString())}`, `DTEND:${f(new Date(marcado.fim).toISOString())}`,
       `SUMMARY:${servico.nome} na ${barbearia.nome}`, ...(barbearia.endereco ? [`LOCATION:${barbearia.endereco.replace(/,/g, '\\,')}`] : []),
       `DESCRIPTION:Com ${marcado.profissional}`, 'END:VEVENT', 'END:VCALENDAR']
@@ -560,7 +560,7 @@ export default function AgendamentoPublico({ barbearia, profissionais, servicos,
         {etapa === 'inicio' && (
           <footer className="px-4 mt-12 text-center">
             <Link href={`/?ref=${barbearia.slug}`} className="inline-block font-body text-xs text-fg-muted hover:text-fg py-2">
-              Agendamento por <span className="font-display font-semibold tracking-[0.12em] text-fg">RÉGUA</span> · Tem barbearia? <span className="underline">Teste grátis</span>
+              Agendamento por <span className="font-display font-semibold tracking-[0.12em] text-fg">CUBO</span> · Tem barbearia? <span className="underline">Teste grátis</span>
             </Link>
           </footer>
         )}

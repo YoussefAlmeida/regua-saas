@@ -99,7 +99,7 @@ export default function DadosCliente({ slug, inicial }: { slug: string; inicial:
 
         <section className="space-y-2">
           <h2 className="ds-eyebrow">Privacidade</h2>
-          <a href="/api/cliente/meus-dados" download="meus-dados-regua.json" className="ds-btn-secondary w-full !justify-start"><Download size={15} aria-hidden /> Baixar tudo que está guardado sobre mim</a>
+          <a href="/api/cliente/meus-dados" download="meus-dados-cubo.json" className="ds-btn-secondary w-full !justify-start"><Download size={15} aria-hidden /> Baixar tudo que está guardado sobre mim</a>
           {!apagar ? (
             <button type="button" onClick={() => setApagar(true)} className="ds-btn-ghost w-full !justify-start !text-saida"><Trash2 size={15} aria-hidden /> Apagar minha conta</button>
           ) : (

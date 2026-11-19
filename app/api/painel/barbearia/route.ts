@@ -67,7 +67,7 @@ export async function PATCH(req: NextRequest) {
     .single()
 
   if (error?.code === '42703') {
-    return NextResponse.json({ erro: 'A aparência ainda não foi liberada nesta conta. Fala com o suporte do RÉGUA.' }, { status: 409 })
+    return NextResponse.json({ erro: 'A aparência ainda não foi liberada nesta conta. Fala com o suporte do CUBO.' }, { status: 409 })
   }
   if (error) return falhaInterna('painel/barbearia', error, 'Erro ao salvar')
 

@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     .select('id, papel, barbearia_id')
     .eq('whatsapp', waNorm)
   if (contas?.some(c => c.papel === 'barbeiro')) {
-    return NextResponse.json({ erro: 'Esse WhatsApp já é de um barbeiro cadastrado no RÉGUA' }, { status: 409 })
+    return NextResponse.json({ erro: 'Esse WhatsApp já é de um barbeiro cadastrado no CUBO' }, { status: 409 })
   }
   if (contas?.some(c => c.barbearia_id === barbearia_id)) {
     return NextResponse.json({ erro: 'Esse WhatsApp já está cadastrado como cliente nessa barbearia. Use outro número.' }, { status: 409 })

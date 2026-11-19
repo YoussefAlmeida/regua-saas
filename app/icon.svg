@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#1B1916"/>
-  <text x="32" y="40" text-anchor="middle" font-family="Georgia, serif" font-size="30" font-weight="700" fill="#F6F3EE">R</text>
-  <g fill="#C2703A">
-    <rect x="14" y="48" width="1.6" height="6"/><rect x="20" y="50" width="1.6" height="4"/><rect x="26" y="50" width="1.6" height="4"/>
-    <rect x="32" y="48" width="1.6" height="6"/><rect x="38" y="50" width="1.6" height="4"/><rect x="44" y="50" width="1.6" height="4"/>
-    <rect x="50" y="48" width="1.6" height="6"/>
+  <rect width="64" height="64" rx="14" fill="#0B0D10"/>
+  <g transform="translate(8 8) scale(0.75)" fill="none" stroke="#A3FF3E" stroke-width="3.6" stroke-linejoin="round">
+    <path d="M32 4 56 18v28L32 60 8 46V18z"/>
+    <path d="M8 18 32 32 56 18M32 32v28"/>
+    <path stroke-width="3" d="M32 11 44 18 32 25 20 18z"/>
+    <path stroke-width="3" d="M14 28.5 26 35.5v14L14 42.5z"/>
+    <path stroke-width="3" d="M38 35.5 50 28.5v14L38 49.5z"/>
   </g>
 </svg>
