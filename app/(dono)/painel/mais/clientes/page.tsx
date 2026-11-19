@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { criarClienteAutenticado } from '@/lib/supabase/usuario'
 import ClientesClient from './clientes-client'
 import { todasAsLinhas } from '@/lib/paginar'
+import { urlDoSiteAtual } from '@/lib/site-url'
 
 export default async function ClientesPage() {
   const h = await headers()
@@ -12,6 +13,7 @@ export default async function ClientesPage() {
   const barbearia_id = h.get('x-barbearia-id')!
   const db = await criarClienteAutenticado()
 
+  const { data: barbearia } = await db.from('barbearias').select('nome, slug').eq('id', barbearia_id).single()
   const { data: clientes } = await todasAsLinhas((de, ate) => db
     .from('usuarios')
     .select(`
@@ -25,5 +27,11 @@ export default async function ClientesPage() {
     .order('id')
     .range(de, ate))
 
-  return <ClientesClient clientesIniciais={clientes ?? []} />
+  const site = await urlDoSiteAtual()
+  return (
+    <ClientesClient
+      clientesIniciais={clientes ?? []}
+      barbearia={{ nome: barbearia?.nome ?? 'barbearia', link: barbearia?.slug ? `${site}/${barbearia.slug}` : site }}
+    />
+  )
 }
