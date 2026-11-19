@@ -113,7 +113,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
       {!liberada ? (
         <p className="flex gap-2 font-body text-sm text-fg ds-card p-4">
           <AlertTriangle size={16} className="text-amber shrink-0 mt-0.5" aria-hidden />
-          A personalização ainda não foi liberada nesta conta. Fala com o suporte do RÉGUA.
+          A personalização ainda não foi liberada nesta conta. Fala com o suporte do CUBO.
         </p>
       ) : (
         <>
@@ -195,7 +195,7 @@ export default function AparenciaBarbearia({ marca, liberada }: { marca: Marca; 
           )}
           {!padrao && (
             <button type="button" onClick={() => setPrimaria(PRIMARIA_PADRAO)} className="font-body text-xs text-fg-muted underline underline-offset-2 hover:text-fg">
-              Voltar pro amarelo padrão do RÉGUA
+              Voltar pro verde padrão do CUBO
             </button>
           )}
 

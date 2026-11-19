@@ -1,5 +1,5 @@
 /* ================================================================
-   Planos do RÉGUA — fonte única (landing, painel, admin e regras)
+   Planos do CUBO — fonte única (landing, painel, admin e regras)
 
    Teste grátis (14 dias): tudo liberado. Com o FOCO_SOLO ligado, o teste
    vale pra 1 profissional (o próprio dono), igual ao plano Cadeira.

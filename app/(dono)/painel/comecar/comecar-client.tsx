@@ -22,7 +22,7 @@ const PASSOS: { id: Passo; t: string }[] = [
 interface Servico { id: string; nome: string; preco: number; duracao_min: number }
 
 const SUGESTOES = [
-  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#F5D900' },
+  { nome: 'Corte', preco: '30', duracao_min: 30, cor: '#A3FF3E' },
   { nome: 'Barba', preco: '20', duracao_min: 20, cor: '#4DA3FF' },
   { nome: 'Corte + barba', preco: '45', duracao_min: 50, cor: '#3DDC84' },
   { nome: 'Pezinho', preco: '10', duracao_min: 10, cor: '#9B9B9B' },
@@ -147,7 +147,7 @@ export default function ComecarClient({
             </div>
             {conviteLink ? (
               <a
-                href={`https://wa.me/?text=${encodeURIComponent(`Fala! Te adicionei na equipe da ${barbearia.nome} no RÉGUA. Cria sua conta por aqui (vale 7 dias): ${conviteLink}`)}`}
+                href={`https://wa.me/?text=${encodeURIComponent(`Fala! Te adicionei na equipe da ${barbearia.nome} no CUBO. Cria sua conta por aqui (vale 7 dias): ${conviteLink}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-semibold w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button"
@@ -213,7 +213,7 @@ export default function ComecarClient({
                   <Plus size={12} /> {s.nome}
                 </button>
               ))}
-              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#F5D900' })} className="font-semibold px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs text-fg-muted hover:text-amber">
+              <button onClick={() => setRascunho({ nome: '', preco: '', duracao_min: 30, cor: '#A3FF3E' })} className="font-semibold px-3 py-2 rounded-full border border-dashed border-line font-ui text-xs text-fg-muted hover:text-amber">
                 Outro…
               </button>
             </div>

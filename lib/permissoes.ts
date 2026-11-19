@@ -1,5 +1,5 @@
 /* ================================================================
-   RÉGUA — Função central de checagem de permissão
+   CUBO — Função central de checagem de permissão
    Seção 6.1.1 do documento de produto
 
    ATENÇÃO: toda ação que modifica dados DEVE passar por aqui.

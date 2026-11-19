@@ -10,7 +10,7 @@ export default function NaoEncontrado() {
         Se você recebeu o link de uma barbearia, confere se ele foi digitado certinho ou pede o link de novo pra ela.
       </p>
       <div className="flex flex-col sm:flex-row gap-3">
-        <Link href="/" className="font-semibold bg-amber text-accent-fg font-ui text-sm px-5 py-3 rounded-button">Conhecer o RÉGUA</Link>
+        <Link href="/" className="font-semibold bg-amber text-accent-fg font-ui text-sm px-5 py-3 rounded-button">Conhecer o CUBO</Link>
         <Link href="/entrar" className="font-semibold border border-line text-fg font-ui text-sm px-5 py-3 rounded-button">Entrar</Link>
       </div>
     </div>

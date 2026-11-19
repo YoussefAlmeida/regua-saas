@@ -261,7 +261,7 @@ export default function FinanceiroClient({
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `regua-extrato-${mes}.csv`
+    a.download = `cubo-extrato-${mes}.csv`
     a.click()
     URL.revokeObjectURL(url)
     avisar('Arquivo baixado.', 'sucesso')

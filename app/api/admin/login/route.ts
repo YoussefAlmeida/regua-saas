@@ -3,7 +3,7 @@ import { COOKIE_ADMIN, criarTokenAdmin, opcoesCookieAdmin, senhaAdminConfere, re
 import { ipDa, segundosBloqueado, registrarFalha, limparFalhas, textoEspera } from '@/lib/limite-login'
 
 // O bloqueio é por conexão: errar a senha trava quem errou, não o login do admin
-// inteiro (antes, 8 erros de qualquer pessoa trancavam o dono do RÉGUA por 1 hora)
+// inteiro (antes, 8 erros de qualquer pessoa trancavam o dono do CUBO por 1 hora)
 export async function POST(req: NextRequest) {
   const ip = ipDa(req)
   const espera = await segundosBloqueado([`id:admin:${ip}`, `ip:${ip}`])

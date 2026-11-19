@@ -6,7 +6,7 @@ import { linkSuporte } from '@/lib/empresa'
 
 export const metadata: Metadata = {
   title: 'Termos de Uso',
-  description: 'Regras de uso do RÉGUA: teste grátis, planos, pagamento, cancelamento e responsabilidades.',
+  description: 'Regras de uso do CUBO: teste grátis, planos, pagamento, cancelamento e responsabilidades.',
   alternates: { canonical: '/termos' },
 }
 
@@ -16,14 +16,14 @@ export default function TermosPage() {
   return (
     <PaginaLegal titulo="Termos de Uso" atualizado="15/10/2026">
       <p>
-        Estes termos valem para quem usa o RÉGUA: donos de barbearia, barbeiros e clientes que marcam horário pelo link.
+        Estes termos valem para quem usa o CUBO: donos de barbearia, barbeiros e clientes que marcam horário pelo link.
         Ao criar uma conta ou marcar um horário, você concorda com eles e com a <Link href="/privacidade" className="text-amber hover:underline">Política de Privacidade</Link>.
       </p>
 
       <section>
         <h2>O serviço</h2>
         <p>
-          O RÉGUA oferece agenda online, página de agendamento sem app, lembretes por WhatsApp, financeiro e relatórios para
+          O CUBO oferece agenda online, página de agendamento sem app, lembretes por WhatsApp, financeiro e relatórios para
           barbearias. O serviço é oferecido &ldquo;como está&rdquo; e pode evoluir com o tempo; mudanças importantes serão avisadas.
         </p>
       </section>

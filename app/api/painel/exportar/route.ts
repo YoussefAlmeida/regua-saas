@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   return new NextResponse('﻿' + linhas.join('\r\n'), {
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="regua-extrato-${parse.data.mes}.csv"`,
+      'Content-Disposition': `attachment; filename="cubo-extrato-${parse.data.mes}.csv"`,
       'Cache-Control': 'no-store',
     },
   })

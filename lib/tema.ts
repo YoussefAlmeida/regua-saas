@@ -1,18 +1,18 @@
 /* ================================================================
    Identidade visual de cada barbearia (white label controlado)
    O dono escolhe as cores; o sistema garante que continuam legíveis
-   sobre o fundo escuro do RÉGUA: cor escura demais é clareada até
+   sobre o fundo escuro do CUBO: cor escura demais é clareada até
    atingir o contraste mínimo, e o texto sobre a cor (claro ou escuro)
    é escolhido pelo maior contraste. Tipografia, espaçamentos e
    estrutura não mudam.
    Sem imports: roda no servidor, no navegador e no teste.
    ================================================================ */
 
-export const FUNDO = '#101010'
-export const CLARO = '#FFFFFF'
-export const PRIMARIA_PADRAO = '#F5D900'
-/** Não é mais escolhida pela barbearia (uma cor de destaque só); fica o verde de sucesso */
-export const SECUNDARIA_PADRAO = '#3DDC84'
+export const FUNDO = '#0B0D10'
+export const CLARO = '#F4F5F6'
+export const PRIMARIA_PADRAO = '#A3FF3E'
+/** Não é mais escolhida pela barbearia (uma cor de destaque só); fica o verde neon (dinheiro entrando) */
+export const SECUNDARIA_PADRAO = '#A3FF3E'
 export const HEX = /^#[0-9a-fA-F]{6}$/
 
 type RGB = [number, number, number]

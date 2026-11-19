@@ -93,7 +93,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
           <div className="ds-card p-5 space-y-4">
             <p className="font-body text-sm text-fg">
               {tipo === 'email'
-                ? 'Fala com o suporte do RÉGUA que a gente te manda um link pra criar a senha nova.'
+                ? 'Fala com o suporte do CUBO que a gente te manda um link pra criar a senha nova.'
                 : resposta.contatoBarbearia
                   ? `Fala com a ${resposta.contatoBarbearia.nome}: eles mandam um link pra você criar a senha nova.`
                   : 'Pede pro dono da barbearia: no painel dele tem o botão "Link de nova senha", que manda o link pro seu WhatsApp.'}
@@ -101,7 +101,7 @@ export default function RecuperarSenha({ slug, tipoInicial }: { slug: string | n
             {(tipo === 'email' || resposta.contatoBarbearia) && (
               <a
                 href={tipo === 'email'
-                  ? wa(resposta.suporte, `Oi! Esqueci a senha do RÉGUA. Meu e-mail de cadastro é ${valor}.`)
+                  ? wa(resposta.suporte, `Oi! Esqueci a senha do CUBO. Meu e-mail de cadastro é ${valor}.`)
                   : wa(resposta.contatoBarbearia!.telefone, 'Oi! Esqueci minha senha de agendamento. Pode me mandar o link de senha nova?')}
                 target="_blank" rel="noopener noreferrer"
                 className="font-semibold w-full flex items-center justify-center gap-2 bg-entrada/10 border border-entrada/30 text-entrada font-ui text-sm py-3 rounded-button"

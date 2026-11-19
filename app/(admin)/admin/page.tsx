@@ -63,7 +63,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
       <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-display text-3xl text-amber">Régua Admin</h1>
+            <h1 className="font-display text-3xl text-amber">CUBO Admin</h1>
             <p className="font-body text-xs text-fg-muted">{lista.length} barbearia{lista.length !== 1 ? 's' : ''} · {novas7} nova{novas7 !== 1 ? 's' : ''} nos últimos 7 dias</p>
           </div>
           <SairAdmin />

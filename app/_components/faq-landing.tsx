@@ -6,7 +6,7 @@ import { ChevronDown } from 'lucide-react'
 const PERGUNTAS = [
   {
     q: 'Preciso instalar alguma coisa?',
-    r: 'Não. RÉGUA roda no navegador do celular ou computador. Sem app para baixar, sem instalação.',
+    r: 'Não. CUBO roda no navegador do celular ou computador. Sem app para baixar, sem instalação.',
   },
   {
     q: 'E se meu cliente não souber usar a internet?',

@@ -71,5 +71,5 @@ export async function validarTokenNovaSenha(token: string): Promise<{ usuario: U
 }
 
 export function textoLinkNovaSenha(nome: string, link: string, horas: number): string {
-  return `Oi, ${nome.split(' ')[0]}! Pra criar uma senha nova no RÉGUA, toca aqui (vale ${horas}h):\n${link}`
+  return `Oi, ${nome.split(' ')[0]}! Pra criar uma senha nova no CUBO, toca aqui (vale ${horas}h):\n${link}`
 }

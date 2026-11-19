@@ -19,7 +19,7 @@ export const MENU_DONO: { grupo: string; itens: ItemMenu[] }[] = [
   { grupo: 'Gestão', itens: [
     { href: '/painel/financeiro', label: 'Financeiro', desc: 'Caixa, despesas e relatório do mês', icon: Wallet },
     { href: '/painel/mais/configuracoes', label: 'Configurações', desc: 'Dados e aparência da barbearia', icon: Settings },
-    { href: '/painel/mais/plano', label: 'Plano', desc: 'Sua assinatura do RÉGUA', icon: CreditCard },
+    { href: '/painel/mais/plano', label: 'Plano', desc: 'Sua assinatura do CUBO', icon: CreditCard },
   ] },
 ]
 

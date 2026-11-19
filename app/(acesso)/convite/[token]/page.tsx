@@ -85,7 +85,7 @@ export default function ConvitePage() {
   return (
     <div className="min-h-screen bg-bg flex flex-col items-center justify-center px-4 py-12">
       <div className="mb-8 text-center">
-        <h1 aria-label="RÉGUA"><Marca className="text-fg scale-150 origin-center" /></h1>
+        <h1 aria-label="CUBO"><Marca className="text-fg scale-150 origin-center" /></h1>
         <p className="font-ui text-fg-muted text-xs uppercase tracking-[0.2em] mt-1">convite de barbeiro</p>
       </div>
 

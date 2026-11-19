@@ -6,7 +6,7 @@ import { criarClienteServico } from '@/lib/supabase/server'
 import { chaveDerivada } from '@/lib/sessao-chave'
 
 /* ================================================================
-   Painel admin do RÉGUA (só o dono do SaaS)
+   Painel admin do CUBO (só o dono do SaaS)
    - Senha = variável ADMIN_TOKEN
    - Cookie guarda um token assinado (não a senha), vale 8h
    ================================================================ */

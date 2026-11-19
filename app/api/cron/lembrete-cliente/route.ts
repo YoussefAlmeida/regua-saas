@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 
     const texto = textoLembreteCliente({
       clienteNome:   cliente.nome,
-      barbeariaNome: barbearia?.nome ?? 'RÉGUA',
+      barbeariaNome: barbearia?.nome ?? 'CUBO',
       servicoNome:   servico?.nome ?? 'Serviço',
       barbeiiroNome: profissional?.nome ?? 'Barbeiro',
       hora,

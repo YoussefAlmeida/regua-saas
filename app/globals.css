@@ -3,17 +3,18 @@
 @tailwind utilities;
 
 /* ================================================================
-   RÉGUA — Design Tokens
-   Identidade "Tech Futurista — Black & Electric Yellow".
-     Preto     #101010  fundo
-     Carvão    #181818  cartões
-     Grafite   #252525  superfície elevada, campos, hover
-     Borda     #333333
-     Branco    #FFFFFF  texto
-     Cinza     #9B9B9B  texto secundário (o #777777 da paleta reprova no
-                        contraste pra texto; fica pra ícone inativo e borda)
-     Amarelo   #F5D900  ação principal e destaque — nunca fundo de área grande
-   Semânticas: sucesso #3DDC84 · erro #FF5C5C · informação #4DA3FF · alerta #FF9F1C
+   CUBO — Design Tokens
+   Identidade "Neon CUBO": preto grafite + verde neon.
+     Preto     #0B0D10  fundo
+     Carvão    #15181C  cartões
+     Grafite   #1F2328  superfície elevada, campos, hover
+     Borda     #2A2F36
+     Gelo      #F4F5F6  texto
+     Cinza     #9BA1A8  texto secundário
+     Neon      #A3FF3E  marca, ação principal e dinheiro entrando
+   Regra do caixa: verde = dinheiro entrando, vermelho = dinheiro saindo.
+   Semânticas: erro/saída #FF5C5C · informação #4DA3FF · alerta #FF9F1C
+   Fonte: Montserrat (títulos 700, interface 600, texto 400/500)
    (os nomes amber/entrada/saida ficaram por compatibilidade com as telas)
    ================================================================ */
 @layer base {
@@ -21,57 +22,62 @@
     color-scheme: dark;
 
     /* ── shadcn/ui — sistema HSL ──────────────────────────────── */
-    --background:          0 0% 6%;
-    --foreground:          0 0% 100%;
-    --card:                0 0% 9%;
-    --card-foreground:     0 0% 100%;
-    --popover:             0 0% 9%;
-    --popover-foreground:  0 0% 100%;
-    --primary:             53 100% 48%;
-    --primary-foreground:  0 0% 6%;
-    --secondary:           0 0% 15%;
-    --secondary-foreground: 0 0% 100%;
-    --muted:               0 0% 15%;
-    --muted-foreground:    0 0% 61%;
-    --accent:              53 100% 48%;
-    --accent-foreground:   0 0% 6%;
+    --background:          216 19% 5%;
+    --foreground:          210 8% 96%;
+    --card:                214 14% 10%;
+    --card-foreground:     210 8% 96%;
+    --popover:             214 14% 10%;
+    --popover-foreground:  210 8% 96%;
+    --primary:             88 100% 62%;
+    --primary-foreground:  216 19% 5%;
+    --secondary:           213 13% 14%;
+    --secondary-foreground: 210 8% 96%;
+    --muted:               213 13% 14%;
+    --muted-foreground:    212 7% 63%;
+    --accent:              88 100% 62%;
+    --accent-foreground:   216 19% 5%;
     --destructive:         0 100% 68%;
-    --destructive-foreground: 0 0% 6%;
-    --border:              0 0% 20%;
+    --destructive-foreground: 216 19% 5%;
+    --border:              214 13% 19%;
     --input:               0 0% 47%;
-    --ring:                53 100% 48%;
+    --ring:                88 100% 62%;
     --radius:              0.75rem;
 
-    /* ── RÉGUA custom tokens ──────────────────────────────────── */
-    --bg:            #101010;
-    --surface:       #181818;
-    --surface-2:     #252525;
-    --line:          #333333;
-    --line-forte:    #777777;   /* borda de campo (contraste 3:1) */
-    --fg:            #FFFFFF;
-    --fg-muted:      #9B9B9B;
-    --regua-accent:  #F5D900;
-    --accent-press:  #D9C000;
-    --accent-fg:     #101010;   /* texto sobre o amarelo */
+    /* ── CUBO custom tokens ───────────────────────────────────── */
+    --bg:            #0B0D10;
+    --surface:       #15181C;
+    --surface-2:     #1F2328;
+    --line:          #2A2F36;
+    --line-forte:    #6E7681;   /* borda de campo (contraste 3:1) */
+    --fg:            #F4F5F6;
+    --fg-muted:      #9BA1A8;
+    --regua-accent:  #A3FF3E;
+    --accent-press:  #8FE82F;
+    --accent-fg:     #0B0D10;   /* texto sobre o neon */
 
-    --entrada:  #3DDC84;        /* sucesso / entrada */
+    --entrada:  #A3FF3E;        /* dinheiro entrando = a cor da marca */
     --saida:    #FF5C5C;        /* erro / saída */
     --info:     #4DA3FF;
     --alerta:   #FF9F1C;
 
+    /* Brilho neon (glow): cartões, botões e marca */
+    --glow-sm: 0 0 0 1px rgb(163 255 62 / 0.10), 0 0 18px -6px rgb(163 255 62 / 0.35);
+    --glow-md: 0 0 0 1px rgb(163 255 62 / 0.22), 0 0 32px -8px rgb(163 255 62 / 0.45);
+    --glow-lg: 0 0 0 1px rgb(163 255 62 / 0.30), 0 0 60px -10px rgb(163 255 62 / 0.55);
+
     /* Mesmas cores em canais RGB — o Tailwind usa pra transparência */
-    --bg-rgb:           16 16 16;
-    --surface-rgb:      24 24 24;
-    --surface-2-rgb:    37 37 37;
-    --line-rgb:         51 51 51;
-    --fg-rgb:           255 255 255;
-    --fg-muted-rgb:     155 155 155;
-    --accent-rgb:       245 217 0;
-    --accent-press-rgb: 217 192 0;
-    --accent-fg-rgb:    16 16 16;
-    --verde-rgb:        61 220 132;
-    --verde-fg-rgb:     16 16 16;
-    --entrada-rgb:      61 220 132;
+    --bg-rgb:           11 13 16;
+    --surface-rgb:      21 24 28;
+    --surface-2-rgb:    31 35 40;
+    --line-rgb:         42 47 54;
+    --fg-rgb:           244 245 246;
+    --fg-muted-rgb:     155 161 168;
+    --accent-rgb:       163 255 62;
+    --accent-press-rgb: 143 232 47;
+    --accent-fg-rgb:    11 13 16;
+    --verde-rgb:        163 255 62;
+    --verde-fg-rgb:     11 13 16;
+    --entrada-rgb:      163 255 62;
     --saida-rgb:        255 92 92;
     --info-rgb:         77 163 255;
     --alerta-rgb:       255 159 28;
@@ -133,7 +139,7 @@
 
   ::selection {
     background: rgb(var(--accent-rgb) / 0.35);
-    color: #fff;
+    color: var(--fg);
   }
 
   :focus-visible {
@@ -185,6 +191,36 @@
 
 /* Fundo técnico discreto (áreas vazias e página de vendas) */
 .ds-grade { background-image: radial-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px); background-size: 22px 22px; }
+
+/* ================================================================
+   Brilho neon (identidade CUBO) — em todo o sistema, mas contido:
+   cartões têm um halo fraco; ação principal brilha mais; o símbolo
+   do cubo tem a luz do letreiro. Quem pede menos movimento/efeito
+   (prefers-reduced-transparency não existe em todo navegador) segue
+   com a mesma leitura, porque o brilho nunca carrega informação.
+   ================================================================ */
+.cubo-brilho { filter: drop-shadow(0 0 6px rgb(var(--accent-rgb) / 0.55)); }
+
+.ds-card,
+.rounded-card.border-line {
+  box-shadow: 0 0 0 1px rgb(var(--accent-rgb) / 0.04), 0 0 28px -14px rgb(var(--accent-rgb) / 0.22);
+}
+
+.ds-btn-primary,
+button.bg-amber,
+a.bg-amber {
+  box-shadow: var(--glow-md);
+  transition-property: background-color, box-shadow, transform;
+}
+.ds-btn-primary:hover,
+button.bg-amber:hover,
+a.bg-amber:hover { box-shadow: var(--glow-lg); }
+button.bg-amber:disabled { box-shadow: none; }
+
+/* Destaque com borda neon (plano em destaque, cartão selecionado) */
+.border-amber { box-shadow: var(--glow-sm); }
+
+:focus-visible { box-shadow: var(--glow-sm); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

@@ -31,7 +31,7 @@ export function PainelVitrine() {
     <div className="rounded-2xl border border-line bg-surface shadow-[0_40px_120px_-30px_rgb(0_0_0/0.9)] overflow-hidden" aria-hidden>
       <div className="flex items-center gap-1.5 px-4 h-9 border-b border-line bg-surface-alt/60">
         <span className="w-2.5 h-2.5 rounded-full bg-line" /><span className="w-2.5 h-2.5 rounded-full bg-line" /><span className="w-2.5 h-2.5 rounded-full bg-line" />
-        <span className="ml-3 text-[11px] text-fg-muted">regua.app/painel</span>
+        <span className="ml-3 text-[11px] text-fg-muted">cubo.app/painel</span>
       </div>
       <div className="flex">
         <div className="hidden sm:block w-36 shrink-0 border-r border-line p-3 space-y-1">

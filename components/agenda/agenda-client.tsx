@@ -295,7 +295,7 @@ export default function AgendaClient({
           ini, fim: ini + Math.max(15, Math.round((new Date(a.fim).getTime() - new Date(a.inicio).getTime()) / 60_000)),
           titulo: a.cliente?.nome ?? '—',
           detalhe: a.servico?.nome ?? '',
-          cor: a.servico?.cor ?? '#F5D900',
+          cor: a.servico?.cor ?? '#A3FF3E',
           estado: a.status === 'concluido' ? 'concluido' : a.status === 'faltou' ? 'faltou' : 'aberto',
         }
       })
@@ -508,7 +508,7 @@ export default function AgendaClient({
                 <div className="flex items-start gap-3">
                   <div
                     className="w-3 h-3 rounded-full shrink-0 mt-1"
-                    style={{ backgroundColor: ag.servico?.cor ?? '#F5D900' }}
+                    style={{ backgroundColor: ag.servico?.cor ?? '#A3FF3E' }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">

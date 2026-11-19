@@ -12,10 +12,10 @@ import { LISTA_PLANOS, PLANOS as TABELA, FOCO_SOLO } from '@/lib/planos'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: { absolute: 'RÉGUA — Agenda online e caixa da barbearia, sem app pra baixar' },
+  title: { absolute: 'CUBO — Agenda online e caixa da barbearia, sem app pra baixar' },
   description: 'Seu cliente marca sozinho pelo link em menos de 1 minuto. Você vê sua agenda e o dinheiro do dia no celular. A partir de R$ 39,99 por mês. 14 dias grátis, sem cartão.',
   alternates: { canonical: '/' },
-  openGraph: { title: 'RÉGUA — Sua barbearia na régua', url: '/' },
+  openGraph: { title: 'CUBO — Gestão para barbearias', url: '/' },
 }
 
 // Planos vêm de lib/planos.ts (mesma tabela do painel e do admin).
@@ -26,7 +26,7 @@ const PLANOS_VISIVEIS = FOCO_SOLO ? [TABELA.cadeira] : LISTA_PLANOS
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'SoftwareApplication',
-  name: 'RÉGUA',
+  name: 'CUBO',
   applicationCategory: 'BusinessApplication',
   operatingSystem: 'Web',
   description: 'Agendamento online e fluxo de caixa para barbeiros e barbearias.',
@@ -63,16 +63,16 @@ const PASSOS = [
 ] as const
 
 const PLANOS = PLANOS_VISIVEIS.map(p => ({
-  id: p.id, label: p.nome, desc: p.resumo, preco: p.preco, destaque: !!p.destaque, funcionalidades: p.itens,
+  id: p.id, label: p.nome, desc: p.resumo, preco: p.preco, destaque: PLANOS_VISIVEIS.length === 1 || !!p.destaque, funcionalidades: p.itens,
 }))
 
-const btnOuro = 'inline-flex items-center justify-center gap-2 rounded-xl bg-amber text-accent-fg font-semibold shadow-[0_12px_40px_-14px_rgb(245_217_0/0.6)] hover:bg-accent-press transition-colors'
+const btnOuro = 'inline-flex items-center justify-center gap-2 rounded-xl bg-amber text-accent-fg font-semibold shadow-[0_12px_40px_-14px_rgb(163_255_62/0.6)] hover:bg-accent-press transition-colors'
 const btnLinha = 'inline-flex items-center justify-center gap-2 rounded-xl border border-fg/20 text-fg font-semibold hover:border-fg/50 transition-colors'
 const olho = 'text-sm font-semibold uppercase tracking-[0.14em] text-amber'
 const titulo = 'font-display text-[32px] sm:text-[44px] leading-[1.08] font-semibold text-fg'
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ ref?: string }> }) {
-  // Veio pelo "Agendamento por RÉGUA" de uma barbearia: a indicação vai junto pro cadastro
+  // Veio pelo "Agendamento por CUBO" de uma barbearia: a indicação vai junto pro cadastro
   const { ref } = await searchParams
   const cadastro = ref && /^[a-z0-9-]{1,60}$/.test(ref) ? `/cadastro-barbearia?ref=${ref}` : '/cadastro-barbearia'
 
@@ -83,7 +83,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       {/* ── Topo ─────────────────────────────────────────────── */}
       <header className="sticky top-0 z-40 bg-bg/80 backdrop-blur-md border-b border-line/60">
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
-          <Link href="/" aria-label="RÉGUA, início"><Marca className="text-fg" /></Link>
+          <Link href="/" aria-label="CUBO, início"><Marca className="text-fg" sub /></Link>
           <nav className="hidden md:flex items-center gap-8 text-sm text-fg-muted" aria-label="Seções">
             <a href="#resolve" className="hover:text-fg">O que resolve</a>
             <a href="#como-funciona" className="hover:text-fg">Como funciona</a>
@@ -98,7 +98,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       {/* ── Abertura ─────────────────────────────────────────── */}
       <section className="relative">
-        <div className="pointer-events-none absolute inset-x-0 -top-24 h-[620px] bg-[radial-gradient(60%_60%_at_50%_0%,rgb(245_217_0/0.09),transparent_70%)]" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 -top-24 h-[620px] bg-[radial-gradient(60%_60%_at_50%_0%,rgb(163_255_62/0.09),transparent_70%)]" aria-hidden />
         <div className="relative max-w-6xl mx-auto px-5 pt-16 md:pt-24 text-center">
           <p className={olho}>Agendamento e gestão para barbearias</p>
           <h1 className="font-display mt-5 text-[40px] leading-[1.05] sm:text-6xl lg:text-[72px] font-semibold text-fg max-w-4xl mx-auto">
@@ -147,7 +147,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <section id="resolve" className="border-y border-line bg-surface/50 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-5 py-20 md:py-28">
           <div className="max-w-2xl">
-            <p className={olho}>O que o RÉGUA resolve</p>
+            <p className={olho}>O que o CUBO resolve</p>
             <h2 className={`${titulo} mt-3`}>Você cuida do corte. A agenda e o caixa se organizam sozinhos.</h2>
           </div>
           <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -164,7 +164,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className="mt-14 rounded-2xl border border-line bg-bg overflow-hidden">
             <div className="grid grid-cols-2 border-b border-line text-sm font-semibold">
               <p className="px-5 py-4 text-fg-muted">Hoje, sem sistema</p>
-              <p className="px-5 py-4 text-amber border-l border-line">Com o RÉGUA</p>
+              <p className="px-5 py-4 text-amber border-l border-line">Com o CUBO</p>
             </div>
             {ANTES_DEPOIS.map(([antes, depois]) => (
               <div key={antes} className="grid grid-cols-2 border-b border-line last:border-b-0 text-sm sm:text-base">
@@ -207,9 +207,9 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           <div className={`mt-14 grid gap-5 items-stretch ${PLANOS.length === 1 ? 'max-w-md mx-auto' : 'md:grid-cols-3'}`}>
             {PLANOS.map(p => (
               <article key={p.id} className={`relative flex flex-col rounded-2xl p-7 ${
-                p.destaque ? 'bg-bg border-2 border-amber shadow-[0_30px_80px_-30px_rgb(245_217_0/0.35)]' : 'bg-bg border border-line'}`}>
+                p.destaque ? 'bg-bg border-2 border-amber shadow-[0_30px_80px_-30px_rgb(163_255_62/0.35)]' : 'bg-bg border border-line'}`}>
                 {p.destaque && (
-                  <span className="absolute -top-3 left-7 px-3 py-1 rounded-full bg-amber text-accent-fg text-xs font-semibold">Mais escolhido por equipes</span>
+                  <span className="absolute -top-3 left-7 px-3 py-1 rounded-full bg-amber text-accent-fg text-xs font-semibold">{FOCO_SOLO ? 'Teste grátis por 14 dias' : 'Mais escolhido por equipes'}</span>
                 )}
                 <h3 className="font-display text-[26px] font-semibold">{p.label}</h3>
                 <p className="mt-1 text-sm text-fg-muted">{p.desc}</p>
@@ -233,7 +233,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
           {FOCO_SOLO ? (
             <p className="mt-8 text-center text-sm text-fg-muted">
               A gente instala com você, na sua barbearia, e volta em 30 dias pra ver se está tudo rodando.{' '}
-              <a href={linkSuporte('Oi! Minha barbearia tem mais de um barbeiro. Como funciona o RÉGUA pra equipe?')} target="_blank" rel="noreferrer" className="underline hover:text-fg">Tem equipe? Fala com a gente.</a>
+              <a href={linkSuporte('Oi! Minha barbearia tem mais de um barbeiro. Como funciona o CUBO pra equipe?')} target="_blank" rel="noreferrer" className="underline hover:text-fg">Tem equipe? Fala com a gente.</a>
             </p>
           ) : (
             <p className="mt-8 text-center text-sm text-fg-muted">
@@ -266,7 +266,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       {/* ── Fechamento ──────────────────────────────────────── */}
       <section className="px-5 pb-24">
         <div className="relative max-w-6xl mx-auto rounded-3xl border border-amber/30 bg-surface px-6 py-16 sm:px-14 sm:py-20 text-center overflow-hidden">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgb(245_217_0/0.10),transparent_70%)]" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_50%_0%,rgb(163_255_62/0.10),transparent_70%)]" aria-hidden />
           <div className="relative">
             <h2 className="font-display text-[32px] sm:text-[48px] leading-[1.08] font-semibold max-w-2xl mx-auto">
               Cadastre hoje. Amanhã seu cliente já marca pelo link.
@@ -274,7 +274,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <p className="mt-5 text-fg-muted text-lg max-w-xl mx-auto">Você testa 14 dias com tudo liberado, sem cartão. Leva 10 minutos pra deixar pronto.</p>
             <div className="mt-9 flex flex-col sm:flex-row justify-center gap-3">
               <Link href={cadastro} className={`${btnOuro} px-7 py-4 text-base`}>Testar grátis por 14 dias <ArrowRight size={18} aria-hidden /></Link>
-              <a href={linkSuporte('Oi! Quero saber mais sobre o RÉGUA.')} target="_blank" rel="noreferrer" className={`${btnLinha} px-7 py-4 text-base`}>
+              <a href={linkSuporte('Oi! Quero saber mais sobre o CUBO.')} target="_blank" rel="noreferrer" className={`${btnLinha} px-7 py-4 text-base`}>
                 Falar com a gente
               </a>
             </div>
@@ -296,7 +296,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
             <Link href="/termos" className="hover:text-fg">Termos</Link>
             <Link href="/privacidade" className="hover:text-fg">Privacidade</Link>
           </nav>
-          <p className="text-sm text-fg-muted">© 2026 RÉGUA</p>
+          <p className="text-sm text-fg-muted">© 2026 CUBO</p>
         </div>
       </footer>
     </div>

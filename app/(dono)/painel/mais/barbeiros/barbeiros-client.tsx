@@ -49,7 +49,7 @@ export default function BarbeirosClient({ barbeirosIniciais, dono, max, permisso
     setLinkConvite(json.link)
   }
 
-  const textoConvite = `Fala! Te adicionei na equipe da barbearia no RÉGUA. Cria sua conta por esse link (vale 7 dias): ${linkConvite}`
+  const textoConvite = `Fala! Te adicionei na equipe da barbearia no CUBO. Cria sua conta por esse link (vale 7 dias): ${linkConvite}`
 
   async function copiar() {
     await navigator.clipboard.writeText(linkConvite)

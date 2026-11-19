@@ -40,7 +40,7 @@ export async function anonimizarCliente(usuario_id: string, barbearia_id: string
   return { ok: true as const, cancelados: cancelados?.length ?? 0 }
 }
 
-/** Tudo que o RÉGUA guarda sobre o cliente nessa barbearia (art. 18, II e V) */
+/** Tudo que o CUBO guarda sobre o cliente nessa barbearia (art. 18, II e V) */
 export async function dadosDoCliente(usuario_id: string, barbearia_id: string) {
   const db = criarClienteServico()
   const [{ data: u }, { data: b }, { data: ags }] = await Promise.all([
@@ -53,7 +53,7 @@ export async function dadosDoCliente(usuario_id: string, barbearia_id: string) {
   return {
     gerado_em: new Date().toISOString(),
     controladora: b ? { barbearia: b.nome, telefone: b.telefone, endereco: b.endereco } : null,
-    operador: 'RÉGUA (sistema de agendamento usado pela barbearia)',
+    operador: 'CUBO (sistema de agendamento usado pela barbearia)',
     voce: u,
     agendamentos: ags ?? [],
     politica: '/privacidade',

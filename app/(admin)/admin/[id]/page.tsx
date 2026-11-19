@@ -237,7 +237,7 @@ export default async function AdminBarbeariaPage({ params, searchParams }: { par
           </div>
           <div className="flex flex-wrap gap-2">
             {b.telefone && (
-              <a href={wa(b.telefone, `Oi, ${dono?.nome?.split(' ')[0] ?? ''}! Aqui é do RÉGUA. Tudo certo com o sistema?`)} target="_blank" rel="noopener noreferrer"
+              <a href={wa(b.telefone, `Oi, ${dono?.nome?.split(' ')[0] ?? ''}! Aqui é do CUBO. Tudo certo com o sistema?`)} target="_blank" rel="noopener noreferrer"
                 className="font-semibold inline-flex items-center gap-1.5 px-3 py-2 rounded-button border border-entrada/40 text-entrada font-ui text-xs hover:bg-entrada/10">
                 <MessageCircle size={13} /> WhatsApp
               </a>

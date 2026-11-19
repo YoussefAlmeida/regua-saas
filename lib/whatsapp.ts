@@ -95,7 +95,7 @@ export function textoNotificacaoBarbeiro(opts: {
 
 export function textoFimTrial(opts: { barbeariaNome: string; dias: number }): string {
   return (
-    `Seu teste do RÉGUA na ${opts.barbeariaNome} acaba em ${opts.dias} dias.\n` +
+    `Seu teste do CUBO na ${opts.barbeariaNome} acaba em ${opts.dias} dias.\n` +
     `Escolha um plano em Mais → Meu plano pra não perder o acesso. ` +
     `Seus dados ficam guardados de qualquer jeito.`
   )

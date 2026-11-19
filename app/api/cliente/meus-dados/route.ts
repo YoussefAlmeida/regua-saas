@@ -13,7 +13,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(dados, null, 2), {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="meus-dados-regua.json"',
+      'Content-Disposition': 'attachment; filename="meus-dados-cubo.json"',
       'Cache-Control': 'no-store',
     },
   })
